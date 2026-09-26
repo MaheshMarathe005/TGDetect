@@ -1,0 +1,87 @@
+{
+  "raw_source": {
+    "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-47/detailed-bidirectional-flow-labels/capture20110816.binetflow",
+    "final_url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-47/detailed-bidirectional-flow-labels/capture20110816.binetflow",
+    "retrieved_utc": "2026-09-23T07:57:24.024904+00:00",
+    "bytes": 76780048,
+    "sha256": "801800eeda9a5a44868b1e3e492f93dc6d52b5d14566c1d8431c9e85d0d2adaa",
+    "headers": {
+      "Content-Length": "76780048",
+      "Last-Modified": "Fri, 30 Jan 2015 16:22:18 GMT",
+      "ETag": "\"4939210-50de1021fe280\""
+    },
+    "authentication": "HTTPS authoritative source; local checksum, no published reference hash"
+  },
+  "raw_rows": 558919,
+  "selected_rows": 8192,
+  "selection": "linspace positions in completion-time order; no label sampling",
+  "split_id": "completion_chronological_60_20_20_v1",
+  "partitions": {
+    "train": {
+      "start": 0,
+      "end": 4915,
+      "count": 4915,
+      "positives": 41,
+      "start_time": 1313488906.977298,
+      "end_time": 1313493623.198102
+    },
+    "validation": {
+      "start": 4915,
+      "end": 6553,
+      "count": 1638,
+      "positives": 14,
+      "start_time": 1313493624.627882,
+      "end_time": 1313495245.1826441
+    },
+    "test": {
+      "start": 6553,
+      "end": 8192,
+      "count": 1639,
+      "positives": 9,
+      "start_time": 1313495245.81674,
+      "end_time": 1313496656.8446572
+    }
+  },
+  "features": [
+    "log_dur",
+    "log_pkts",
+    "log_bytes",
+    "log_src_bytes",
+    "src_byte_ratio",
+    "tcp",
+    "udp",
+    "icmp",
+    "dport_fraction",
+    "dport_missing"
+  ],
+  "scaler_mean": [
+    1.074925422668457,
+    1.6555218696594238,
+    6.337076187133789,
+    5.2284464836120605,
+    0.4070624113082886,
+    0.2571719288825989,
+    0.7312309145927429,
+    0.009969481267035007,
+    0.08038542419672012,
+    0.01220752764493227
+  ],
+  "scaler_std": [
+    2.1990959644317627,
+    1.0180761814117432,
+    1.638572335243225,
+    1.4516019821166992,
+    0.22846925258636475,
+    0.43708616495132446,
+    0.44333508610725403,
+    0.09934739023447037,
+    0.18296265602111816,
+    0.10981032252311707
+  ],
+  "observation_time": "StartTime+Dur; exporter arrival unavailable",
+  "label_mapping": "Botnet=1; Normal and Background=0 (Background uncertain)",
+  "selected_row_ids_sha256": "4c165feedb1d043c0c645a1cdd7394c48892aca07b3244482de6e4bafb323376",
+  "neighbors": 4,
+  "sampled_nodes": 3289,
+  "processed_sha256": "4f507f3f9f981de2a9420b28137d5bf061d8a9d0a77538164906ed58993de3b1"
+}

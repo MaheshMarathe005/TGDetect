@@ -1,0 +1,156 @@
+{
+  "scope": "synthetic learning/correctness only; no CTU or APT claim",
+  "threshold": 0.5,
+  "results": [
+    {
+      "model": "B",
+      "seed": 0,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 0.484375,
+        "f1": 0.6526315789473685
+      },
+      "reset_memory": {
+        "accuracy": 0.484375,
+        "f1": 0.6526315789473685
+      }
+    },
+    {
+      "model": "B_MR",
+      "seed": 0,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "reset_memory": {
+        "accuracy": 0.484375,
+        "f1": 0.6526315789473685
+      }
+    },
+    {
+      "model": "B",
+      "seed": 1,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 0.5703125,
+        "f1": 0.0
+      },
+      "reset_memory": {
+        "accuracy": 0.5703125,
+        "f1": 0.0
+      }
+    },
+    {
+      "model": "B_MR",
+      "seed": 1,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "reset_memory": {
+        "accuracy": 0.5703125,
+        "f1": 0.0
+      }
+    },
+    {
+      "model": "B",
+      "seed": 2,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 0.421875,
+        "f1": 0.5934065934065934
+      },
+      "reset_memory": {
+        "accuracy": 0.421875,
+        "f1": 0.5934065934065934
+      }
+    },
+    {
+      "model": "B_MR",
+      "seed": 2,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "reset_memory": {
+        "accuracy": 0.421875,
+        "f1": 0.5934065934065934
+      }
+    },
+    {
+      "model": "B",
+      "seed": 3,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 0.484375,
+        "f1": 0.0
+      },
+      "reset_memory": {
+        "accuracy": 0.484375,
+        "f1": 0.0
+      }
+    },
+    {
+      "model": "B_MR",
+      "seed": 3,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "reset_memory": {
+        "accuracy": 0.484375,
+        "f1": 0.0
+      }
+    },
+    {
+      "model": "B",
+      "seed": 4,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 0.53125,
+        "f1": 0.6938775510204082
+      },
+      "reset_memory": {
+        "accuracy": 0.53125,
+        "f1": 0.6938775510204082
+      }
+    },
+    {
+      "model": "B_MR",
+      "seed": 4,
+      "epochs": 60,
+      "pairs_train": 64,
+      "pairs_test": 128,
+      "normal": {
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "reset_memory": {
+        "accuracy": 0.46875,
+        "f1": 0.0
+      }
+    }
+  ]
+}

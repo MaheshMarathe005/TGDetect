@@ -1,0 +1,97 @@
+{
+  "status": "PASS",
+  "verified_utc": "2026-09-24T17:27:22.924446+00:00",
+  "runs": 60,
+  "complete_registered_grid": "PASS",
+  "all_checkpoints_load_strictly": "PASS",
+  "all_weights_finite": "PASS",
+  "saved_predictions_metrics_thresholds": "PASS",
+  "aggregate_and_paired_summary": "PASS",
+  "source_and_data_hashes": "PASS",
+  "anchor_reproduction": [
+    {
+      "run_id": "GNN_H_seed0",
+      "frozen_run_id": "B_H_seed0",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "GNN_H_seed1",
+      "frozen_run_id": "B_H_seed1",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "GNN_H_seed2",
+      "frozen_run_id": "B_H_seed2",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "GNN_H_seed3",
+      "frozen_run_id": "B_H_seed3",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "GNN_H_seed4",
+      "frozen_run_id": "B_H_seed4",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "TGNN_seed0",
+      "frozen_run_id": "B_T_H_seed0",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "TGNN_seed1",
+      "frozen_run_id": "B_T_H_seed1",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "TGNN_seed2",
+      "frozen_run_id": "B_T_H_seed2",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "TGNN_seed3",
+      "frozen_run_id": "B_T_H_seed3",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    },
+    {
+      "run_id": "TGNN_seed4",
+      "frozen_run_id": "B_T_H_seed4",
+      "predictions_bit_identical": true,
+      "maximum_probability_difference": 0.0,
+      "weights_bit_identical": true
+    }
+  ],
+  "validation_f1_maximizers": [
+    "TGNN",
+    "TGNN_A",
+    "TGNN_M",
+    "TGNN_M_A",
+    "TGNN_Q",
+    "TGNN_Q_A",
+    "TGNN_Q_M",
+    "TGNN_Q_M_A",
+    "TGNN_N"
+  ],
+  "best_observed_tgnn_test_f1": "TGNN_Q_A",
+  "summary_sha256": "1be3420aae31cd555189f82d92456563e1bf8a04bed7e63202462381badc70db",
+  "manifest_sha256": "015e9327ff04305df122c092e46319e86225b75d96cdc8cf8038398bfd7c48e5"
+}

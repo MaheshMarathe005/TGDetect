@@ -1,0 +1,196 @@
+{
+  "selected_workers": 16,
+  "measurements": [
+    {
+      "workers": 1,
+      "status": "PASS",
+      "aggregate_steps_per_second": 25.078264979163666,
+      "worker_measurements": [
+        {
+          "seconds": 5.104021355,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        }
+      ]
+    },
+    {
+      "workers": 2,
+      "status": "PASS",
+      "aggregate_steps_per_second": 50.46094387902375,
+      "worker_measurements": [
+        {
+          "seconds": 5.022304138999999,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 5.073230508999998,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        }
+      ]
+    },
+    {
+      "workers": 4,
+      "status": "PASS",
+      "aggregate_steps_per_second": 96.38005819416615,
+      "worker_measurements": [
+        {
+          "seconds": 5.012118400999995,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 5.312302250000002,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 5.084095558999991,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 5.0610529439999965,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        }
+      ]
+    },
+    {
+      "workers": 8,
+      "status": "PASS",
+      "aggregate_steps_per_second": 202.18498385902663,
+      "worker_measurements": [
+        {
+          "seconds": 5.0646689010000046,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 5.020272431999999,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 5.01243101899999,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 4.940281831999997,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 4.905196934999992,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 4.994626080000003,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 4.915650400000004,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 4.995070777999999,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        }
+      ]
+    },
+    {
+      "workers": 16,
+      "status": "PASS",
+      "aggregate_steps_per_second": 299.91080596982914,
+      "worker_measurements": [
+        {
+          "seconds": 6.775613294999999,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.77844382699999,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.7835394249999865,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.752263481,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.814696917999996,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.828696930000007,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.800645701000008,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.7727202939999955,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.751973805999995,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.807148261999998,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.797324502000009,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.776339190000002,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.808544952000005,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.815166087999998,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.754839699999991,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        },
+        {
+          "seconds": 6.780745539999998,
+          "steps": 128,
+          "peak_allocated_bytes": 102857728
+        }
+      ]
+    }
+  ],
+  "criterion": "Best aggregate step throughput, within 5% choose fewer processes"
+}

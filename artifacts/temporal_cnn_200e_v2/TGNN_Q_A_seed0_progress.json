@@ -1,0 +1,8 @@
+{
+  "run_id": "TGNN_Q_A_seed0",
+  "epoch": 200,
+  "epochs": 200,
+  "loss": 0.0004101964586880058,
+  "updated_utc": "2026-09-26T06:54:18.920146+00:00",
+  "elapsed_seconds": 306.657615718
+}

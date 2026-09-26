@@ -1,0 +1,13 @@
+{
+  "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/detailed-bidirectional-flow-labels/capture20110818-2.binetflow",
+  "final_url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/detailed-bidirectional-flow-labels/capture20110818-2.binetflow",
+  "retrieved_utc": "2026-09-23T07:52:50.621816+00:00",
+  "bytes": 14596615,
+  "sha256": "cee542d4b5efe4fa1cd59b87ece5aaea9a13d8f0abe56cd07cee31590736428c",
+  "headers": {
+    "Content-Length": "14596615",
+    "Last-Modified": "Mon, 02 Feb 2015 08:54:31 GMT",
+    "ETag": "\"deba07-50e171a401fc0\""
+  },
+  "authentication": "HTTPS authoritative source; local checksum, no published reference hash"
+}
