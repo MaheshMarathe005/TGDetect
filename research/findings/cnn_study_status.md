@@ -1,6 +1,6 @@
 # Temporal CNN experiment — registered and launched
 
-Date: 26 September 2026. [Protocol](../../TEMPORAL_CNN_PROTOCOL.md).
+Date: 26 September 2026. [Protocol](../TEMPORAL_CNN_PROTOCOL.md).
 [Completed Modal app](https://modal.com/apps/prathampansare25/main/ap-7y95Pbrwfia3sP44n9PnMW)
 on profile `prathampansare25`, one L4.
 
@@ -31,7 +31,7 @@ recorded every second. Concurrent timings include contention.
 
 Live artifacts: Modal Volume `tg-detect-temporal-cnn-v1`, directory
 `temporal_cnn_200e_v2`. Local download location:
-`../../artifacts/temporal_cnn_200e_v2/`.
+`../artifacts/temporal_cnn_200e_v2/`.
 
 ```bash
 ~/main_env/bin/python sync_temporal_cnn.py
@@ -39,10 +39,10 @@ Live artifacts: Modal Volume `tg-detect-temporal-cnn-v1`, directory
 ```
 
 The study is now complete: **40/40 runs finished and independently audited**.
-See [final findings](../../TEMPORAL_CNN_FINDINGS.md).
+See [final findings](../TEMPORAL_CNN_FINDINGS.md).
 The summary, per-seed JSON, checkpoints, predictions, epoch losses, concurrency
 benchmark, GPU telemetry and verification are saved under
-`../../artifacts/temporal_cnn_200e_v2/`.
+`../artifacts/temporal_cnn_200e_v2/`.
 
 The final telemetry contains 661 one-second samples: mean GPU utilization
 **95.99%** (maximum 100%), mean device memory **4903.9 MiB** (maximum 6319 MiB),

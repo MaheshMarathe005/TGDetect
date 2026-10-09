@@ -1,0 +1,508 @@
+{
+  "moves": [
+    {
+      "old_path": "test_node_memory_v3.py",
+      "new_path": "research/test_node_memory_v3.py",
+      "sha256": "647f460e8292179b1f099bf27574727232037ea3b17a7975d08fe09aa7abb781"
+    },
+    {
+      "old_path": "RESEARCH_UPDATE.md",
+      "new_path": "research/RESEARCH_UPDATE.md",
+      "sha256": "5edca6bf26133a6cf260cac53e05cc56aedb39d9e1f0bdbbfd8f5157a355c64f"
+    },
+    {
+      "old_path": "BASELINE_PAPER_SPEC.md",
+      "new_path": "research/BASELINE_PAPER_SPEC.md",
+      "sha256": "b4c39bacf46b27e723cb18c1fc2054cfb577862d0e3fa75591a8ee70a7322fae"
+    },
+    {
+      "old_path": "TGNN_COMPONENT_PROTOCOL.md",
+      "new_path": "research/TGNN_COMPONENT_PROTOCOL.md",
+      "sha256": "29acdb2673e9518b693eff2f3b8f5ab514637120d53a164f5f09bf8e48c22248"
+    },
+    {
+      "old_path": "MATCHED_TIME_REHEARSAL_REPORT.md",
+      "new_path": "research/MATCHED_TIME_REHEARSAL_REPORT.md",
+      "sha256": "6de3ef8b8b03ad89d6f0ccb864e965196fef6b97ce5641ceeaa8f9d87c37a6fa"
+    },
+    {
+      "old_path": "EXISTING_MODEL_AUDIT.json",
+      "new_path": "research/EXISTING_MODEL_AUDIT.json",
+      "sha256": "cecaa2d3fed1e92f5eb5f240532af2215c7a0e9a3c28338be9aa1911d0a233b9"
+    },
+    {
+      "old_path": "ENVIRONMENT_AUDIT.json",
+      "new_path": "research/ENVIRONMENT_AUDIT.json",
+      "sha256": "4cb98bf62cd148b62dc5221af38651d092a120f4f574452b8111929dad0f424c"
+    },
+    {
+      "old_path": "test_windows_apt.py",
+      "new_path": "research/test_windows_apt.py",
+      "sha256": "2ad2092012742950c0ca058f0dae3458f3020db45b01ce762dee247bc16a342d"
+    },
+    {
+      "old_path": "ABLATION_MATRIX.json",
+      "new_path": "research/ABLATION_MATRIX.json",
+      "sha256": "5dc5d8f28a74ffcc54dfc7312266fb2a52b9ba0714d4fd617e8bd5a1d5779085"
+    },
+    {
+      "old_path": "modal_train_v16.py",
+      "new_path": "research/modal_train_v16.py",
+      "sha256": "ecb2518049563751502fdef64cb9f2692001705f8bb908867c49dc795d63ac49"
+    },
+    {
+      "old_path": "test_tgnn_components.py",
+      "new_path": "research/test_tgnn_components.py",
+      "sha256": "53c42306219147cad3a9bbbc4b56e06a3ff553732d749f21f73fcd253b8f4f3b"
+    },
+    {
+      "old_path": "darpa_pilot_data.py",
+      "new_path": "research/darpa_pilot_data.py",
+      "sha256": "a32dd83466d064520032be1f11dc5d874a572f0e246555f6389cf457a73f2e4c"
+    },
+    {
+      "old_path": "audit_matched_memory_results.py",
+      "new_path": "research/audit_matched_memory_results.py",
+      "sha256": "2934da878ad75d66e84a1170636f595b10fef46e3c60994db267e8d5f40abfd2"
+    },
+    {
+      "old_path": "sync_temporal_cnn.py",
+      "new_path": "research/sync_temporal_cnn.py",
+      "sha256": "6291f1ba06d27ef5e8481f21cd772c9f71c2aa43795a37b4a6ecc6e9387b7e8b"
+    },
+    {
+      "old_path": "ASTRA_RESEARCH_LEDGER.md",
+      "new_path": "research/ASTRA_RESEARCH_LEDGER.md",
+      "sha256": "e163a265789be0a8a6e04dae3e066eb0d8b5cda1c083023efa3138f8dc8eec70"
+    },
+    {
+      "old_path": "audit_temporal_cnn_results.py",
+      "new_path": "research/audit_temporal_cnn_results.py",
+      "sha256": "113f47a1efd210ee4ee08c11d0ed2284f5e8ea034c21bfe206724d01228c6257"
+    },
+    {
+      "old_path": "modal_tgnn_components.py",
+      "new_path": "research/modal_tgnn_components.py",
+      "sha256": "f5a19de69e5a25df9cfdfe2870e5ecf07cb29dfe295eadf2a7b489e0bca86af6"
+    },
+    {
+      "old_path": "modal_dedale_final.py",
+      "new_path": "research/modal_dedale_final.py",
+      "sha256": "d72e49f6fb40ff9bdd36e4257f68050bd5b0eff74b9dbc516073b54e1cb44308"
+    },
+    {
+      "old_path": "ARCHITECTURE_AUDIT.md",
+      "new_path": "research/ARCHITECTURE_AUDIT.md",
+      "sha256": "accf2d332625d2a3b52b9d27a1df732fc448fac7678dd4ad40994b0845576c3f"
+    },
+    {
+      "old_path": "ADAPTED_PROTOCOL.md",
+      "new_path": "research/ADAPTED_PROTOCOL.md",
+      "sha256": "0e6175e5d246210311f2e8f3c87c0d015a6df06557137a577128a3786c101c87"
+    },
+    {
+      "old_path": "node_memory_v3.py",
+      "new_path": "research/node_memory_v3.py",
+      "sha256": "82d96c3695e7e0cb3597ad7b2e78b7c531edad4cd05f00cbcb2b6271c3a3ee52"
+    },
+    {
+      "old_path": "TEMPORAL_CNN_PROTOCOL.md",
+      "new_path": "research/TEMPORAL_CNN_PROTOCOL.md",
+      "sha256": "7af551ff7a48d73b00eccc4fca960434f5c0ef037ec1d8e7cd76a376a96cc7cb"
+    },
+    {
+      "old_path": "run_tgnn_components.py",
+      "new_path": "research/run_tgnn_components.py",
+      "sha256": "168796e95bb57531c662fd446f1a8afa3416822660829dd9f727a69da88d3d87"
+    },
+    {
+      "old_path": "pomsathit_baseline.py",
+      "new_path": "research/pomsathit_baseline.py",
+      "sha256": "d565dd0a1f2f20273b761ae8e5f8e279f1a26c8c337593f3cc798450a4baa029"
+    },
+    {
+      "old_path": "report_causal_pilot.py",
+      "new_path": "research/report_causal_pilot.py",
+      "sha256": "9b083e28cea633ed44dbbc9c4ce55f395c21b8015ede7af4eb6117cc743c5f9a"
+    },
+    {
+      "old_path": "check_windows_apt_transfer.py",
+      "new_path": "research/check_windows_apt_transfer.py",
+      "sha256": "0cf6983610d0784382c53dba78fb81cd2cc6c3dbd210d325cf9a35857759a907"
+    },
+    {
+      "old_path": "TEMPORAL_CNN_FINDINGS.md",
+      "new_path": "research/TEMPORAL_CNN_FINDINGS.md",
+      "sha256": "00351905240bdfc17d9dbb8fb31b500d0fee5e5c83bba4ab08e1a0b1be06183b"
+    },
+    {
+      "old_path": "audit_windows_apt_results.py",
+      "new_path": "research/audit_windows_apt_results.py",
+      "sha256": "d4156c07d74bee903fa1ab990f04b1063a827998d5d062dbac4a27d2809e6917"
+    },
+    {
+      "old_path": "fetch_pilot_data.py",
+      "new_path": "research/fetch_pilot_data.py",
+      "sha256": "44c7a22b1716ebd3295b7d814cf23575ce5ced6618641a77531103fc689ba01a"
+    },
+    {
+      "old_path": "BASELINE_ARCHITECTURE.json",
+      "new_path": "research/BASELINE_ARCHITECTURE.json",
+      "sha256": "f344924cf80bf5d8c3ddd1257d3cd79ef86a1ff394e7e1969561a1ae8322065e"
+    },
+    {
+      "old_path": "audit_models.py",
+      "new_path": "research/audit_models.py",
+      "sha256": "e104e96e67af71bed010aa474fe30e9e4f27039e19c73d88b43d5315e17e5011"
+    },
+    {
+      "old_path": "threshold_calibration.py",
+      "new_path": "research/threshold_calibration.py",
+      "sha256": "10b6acef273abb7f06e0fe90de3f02e137826d785f404ad649ad337cde23be67"
+    },
+    {
+      "old_path": "modal_matched_memory.py",
+      "new_path": "research/modal_matched_memory.py",
+      "sha256": "7461e419ff61af4ab64ed6c85868dc1ecf587ae50dbeaa724d342609c3469e59"
+    },
+    {
+      "old_path": "causal_data.py",
+      "new_path": "research/causal_data.py",
+      "sha256": "c0216df20aabcd7153e99e19551b38b35472f22d38498b6d3e896882dfa4ef6f"
+    },
+    {
+      "old_path": "modal_darpa_pilot.py",
+      "new_path": "research/modal_darpa_pilot.py",
+      "sha256": "ad7a0a6f8f48956c88aa9cba9db751fa983d29d0a7b0e12df40191214684b199"
+    },
+    {
+      "old_path": "watch_and_train.sh",
+      "new_path": "research/watch_and_train.sh",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "old_path": "modal_common.py",
+      "new_path": "research/modal_common.py",
+      "sha256": "4178a3267e3cc1289cf02f321454409ed24858550a8f5be8cadb779dbbebdcd3"
+    },
+    {
+      "old_path": "ASTRA_FROM_SCRATCH_PROMPT.md",
+      "new_path": "research/ASTRA_FROM_SCRATCH_PROMPT.md",
+      "sha256": "6a300bca989bd943edd760743ac23b6b2926933ea3bac823650ea14828472eb9"
+    },
+    {
+      "old_path": "modal_lab.py",
+      "new_path": "research/modal_lab.py",
+      "sha256": "a22c58d3c1a52950442edaf0eaffedd44b3fee15898c15075b3a5630b7236328"
+    },
+    {
+      "old_path": "test_temporal_cnn.py",
+      "new_path": "research/test_temporal_cnn.py",
+      "sha256": "2a7ef39c8c8d7532b11cb66ec30a0c557709fce6dd84b2038d8daba6b166cacc"
+    },
+    {
+      "old_path": "run_windows_apt.py",
+      "new_path": "research/run_windows_apt.py",
+      "sha256": "4641d99be64c195fe267ccbd66acb39c635cd8c98c9efc8a684b0be124fc3e20"
+    },
+    {
+      "old_path": "REFERENCE_RESULTS.json",
+      "new_path": "research/REFERENCE_RESULTS.json",
+      "sha256": "126333dd4c287030744a8dff571dcbef4f61d94ab4b5ce00f83d61315b452ecb"
+    },
+    {
+      "old_path": "ADAPTED_BASELINE_ARCHITECTURE.json",
+      "new_path": "research/ADAPTED_BASELINE_ARCHITECTURE.json",
+      "sha256": "7bd8da6476d9c3b9911e62938988b5aa7c3f3761bd39ead4b6999ec2806070ab"
+    },
+    {
+      "old_path": "report_tgnn_components.py",
+      "new_path": "research/report_tgnn_components.py",
+      "sha256": "575ac96740b05bd28b2609fd6df94d51e2e8b6ee401a27490e742a9ba518db30"
+    },
+    {
+      "old_path": "dedale_data.py",
+      "new_path": "research/dedale_data.py",
+      "sha256": "10c8078614f60efb7d5fe6b66ac0b5ed58ed75bcceddc05388abe418af46a2f2"
+    },
+    {
+      "old_path": "trigger.py",
+      "new_path": "research/trigger.py",
+      "sha256": "04eb09694a5f2cdcbfa032c14644cbfbff3b380bc9924dac9c3570b4c83a4a5d"
+    },
+    {
+      "old_path": "modal_temporal_cnn.py",
+      "new_path": "research/modal_temporal_cnn.py",
+      "sha256": "52998940223d421491008202468e8c3a4bdca1ec1d33ad1913a2c6dbd280cd7f"
+    },
+    {
+      "old_path": "modal_dedale_train.py",
+      "new_path": "research/modal_dedale_train.py",
+      "sha256": "191b9d6bf726536268f3381af952665124eef673f6545581c40db03b727d2d99"
+    },
+    {
+      "old_path": "causal_tgn.py",
+      "new_path": "research/causal_tgn.py",
+      "sha256": "9ff3cf657abcc9aee53332cc6bd242aa8756e5515eefc78c53040aca376bce81"
+    },
+    {
+      "old_path": "windows_apt_data.py",
+      "new_path": "research/windows_apt_data.py",
+      "sha256": "19c96fd17d59375911af51cbcbf05345765d1f123125eaec7b09c3a7285a5b0f"
+    },
+    {
+      "old_path": "EXPERIMENT_MATRIX_README.md",
+      "new_path": "research/EXPERIMENT_MATRIX_README.md",
+      "sha256": "8219f287fb2c491eea8e42a31ca99268050a2a0313901c1d2658248e0c34e7c7"
+    },
+    {
+      "old_path": "download_dedale_real.py",
+      "new_path": "research/download_dedale_real.py",
+      "sha256": "187ae6c18ac0a9c147775d7b5d2f2ba55dcc20e259a130a4455a5d1d78a8ebee"
+    },
+    {
+      "old_path": "temporal_cnn.py",
+      "new_path": "research/temporal_cnn.py",
+      "sha256": "5439f3ea7de7bb8c555633f402ee01ecbdcb44d6d1302e4c25b1f6a87f90086d"
+    },
+    {
+      "old_path": "estimate_l4_budget.py",
+      "new_path": "research/estimate_l4_budget.py",
+      "sha256": "c0b90f0447445e1e7944d58a43c5fb45b2ce108d36288abd90c0296fac6c55c6"
+    },
+    {
+      "old_path": "data_gen_v6.py",
+      "new_path": "research/data_gen_v6.py",
+      "sha256": "6fb197829b6cd17fd39f3af29752000df7e5123e68371690c22722edeff26070"
+    },
+    {
+      "old_path": "windows_apt_controls.py",
+      "new_path": "research/windows_apt_controls.py",
+      "sha256": "7961deee54626218e76775ac235dd95e8edc98b035700ea8a9cb29afec10799f"
+    },
+    {
+      "old_path": "sync_darpa_pilot.py",
+      "new_path": "research/sync_darpa_pilot.py",
+      "sha256": "978bfbeb0822cb12a9b68d1d4600f818e57a183b6654e69066a8551042595c1f"
+    },
+    {
+      "old_path": "modal_matched_time_rehearsal.py",
+      "new_path": "research/modal_matched_time_rehearsal.py",
+      "sha256": "d7fc50d9144a75122aebca7b0d9010cda7966861f7db11692f8393e12f624cb6"
+    },
+    {
+      "old_path": "audit_node_memory_v3_results.py",
+      "new_path": "research/audit_node_memory_v3_results.py",
+      "sha256": "e945f4e18083062ca5b7a5e1ea8770bfcd12e4245fc8faa4c3f8dbed7a70f4c9"
+    },
+    {
+      "old_path": "node_memory_models.py",
+      "new_path": "research/node_memory_models.py",
+      "sha256": "ce81b9c0a975c9cfccd7717ed2a05bf38a223f91eef9e3063ba546cea36c5ce3"
+    },
+    {
+      "old_path": "audit_environment.py",
+      "new_path": "research/audit_environment.py",
+      "sha256": "a96f0acfa4d959a138b889aeafa3dd5cf52895b5a1aa4a34df2e8988b8da2fe0"
+    },
+    {
+      "old_path": "sync_tgnn_components.py",
+      "new_path": "research/sync_tgnn_components.py",
+      "sha256": "915529faf3c45b302dd1bf1932b8230e660e8284330692c3b7044e4f7f3e8984"
+    },
+    {
+      "old_path": "run_causal_pilot.py",
+      "new_path": "research/run_causal_pilot.py",
+      "sha256": "4ef3ae43ab160c7dccb486ff10b48533d599a16fa8b4163f29bdb0a94ffacaf8"
+    },
+    {
+      "old_path": "Adaptive_Detection_of_Advanced_Persistent_Threats_APT_With_Graph_Neural_Networks_and_Rehearsal-Based_Continual_Learning_on_Wazuh_EDR_Telemetry (1).pdf",
+      "new_path": "research/Adaptive_Detection_of_Advanced_Persistent_Threats_APT_With_Graph_Neural_Networks_and_Rehearsal-Based_Continual_Learning_on_Wazuh_EDR_Telemetry (1).pdf",
+      "sha256": "6a0c42ae15c209c704493138c6ea3fd2f346669c9854a0b897d661da3e413980"
+    },
+    {
+      "old_path": "modal_dedale_mem_v3.py",
+      "new_path": "research/modal_dedale_mem_v3.py",
+      "sha256": "e7c8fe35f4a12e13f0594227834b559b95491c562d72e61fd568949745b94f81"
+    },
+    {
+      "old_path": "matched_memory_training.py",
+      "new_path": "research/matched_memory_training.py",
+      "sha256": "71327acaf4fc2cfbec3893cd1cfdbb16d7ed1df462984f30101c276da1bf4b92"
+    },
+    {
+      "old_path": "sync_windows_apt.py",
+      "new_path": "research/sync_windows_apt.py",
+      "sha256": "f18bbd41263c6e361e32141e67b7824ebeef59412fe9e26f515767930ee9807e"
+    },
+    {
+      "old_path": "TGNN_COMPONENT_FINDINGS.md",
+      "new_path": "research/TGNN_COMPONENT_FINDINGS.md",
+      "sha256": "1630680d709ea621e632c9ab591c0fe0d0199b6c9503b3ae6b04c8fe42c1bbea"
+    },
+    {
+      "old_path": "test_causal_pilot.py",
+      "new_path": "research/test_causal_pilot.py",
+      "sha256": "31eb047d15b4f1dfe68e80eb5ee3f29d7d263e9653fdc4d8c381e725f074c38c"
+    },
+    {
+      "old_path": "run_matched_time_rehearsal.py",
+      "new_path": "research/run_matched_time_rehearsal.py",
+      "sha256": "5793c760f1cad6f9d7aba26d2c9e98f5a20dde0691526c205dd65620573058f2"
+    },
+    {
+      "old_path": "temporal_toy.py",
+      "new_path": "research/temporal_toy.py",
+      "sha256": "4599b7106e3f0666cb46b7e4aa3b64b66bab5efd29e68b0a887f3a2b0464aae1"
+    },
+    {
+      "old_path": "package_windows_apt.py",
+      "new_path": "research/package_windows_apt.py",
+      "sha256": "074e374752f4c984e04996beb58bee2921a02047b7673baf1065a3ffe6933088"
+    },
+    {
+      "old_path": "audit_component_results.py",
+      "new_path": "research/audit_component_results.py",
+      "sha256": "c8a9bf9b9fab52a9a0bfdb8582c4327f59411a492eba5a6acfb62e5a8339cb3f"
+    },
+    {
+      "old_path": "modal_data_real.py",
+      "new_path": "research/modal_data_real.py",
+      "sha256": "d0a57a5586813057b54cf2df8f87b241deee4b1f29833ca6c7b9ec12ab6ad494"
+    },
+    {
+      "old_path": "modal_export_preprocessing.py",
+      "new_path": "research/modal_export_preprocessing.py",
+      "sha256": "17c57d7a17c1ef03c40f93582d382c20613c07955d6f638debe154e6bbafc90c"
+    },
+    {
+      "old_path": "modal_bench_real.py",
+      "new_path": "research/modal_bench_real.py",
+      "sha256": "f538e8b55d42496a6d331c3c47cacdc810c1ebb46580404de4a51ba03ab0ad24"
+    },
+    {
+      "old_path": "TGNN_PILOT_REPORT.md",
+      "new_path": "research/TGNN_PILOT_REPORT.md",
+      "sha256": "dd06451bb3f7620e1da224e1730ce75b551f49bc28dd0105be883d5dbb329e06"
+    },
+    {
+      "old_path": "modal_windows_apt.py",
+      "new_path": "research/modal_windows_apt.py",
+      "sha256": "bb72df9509ae32fec57576ce96595624bce58203f85dd3a7f4ca2f755f7a8497"
+    },
+    {
+      "old_path": "test_darpa_pilot.py",
+      "new_path": "research/test_darpa_pilot.py",
+      "sha256": "0f6254b092d57a9b7c3866bb055ed631566bb80741ee035eefe282639d14efec"
+    },
+    {
+      "old_path": "test_dashboard.py",
+      "new_path": "research/test_dashboard.py",
+      "sha256": "a74c218a9bc4ca3418c0e1c6ad961f58c987cbb01a0e4fe5dfe311f073d700cb"
+    },
+    {
+      "old_path": "run_temporal_cnn.py",
+      "new_path": "research/run_temporal_cnn.py",
+      "sha256": "0e77dc44fa61ca6677a8245b4732c167013c6bbe9f39bc46418ceea9b66daeb7"
+    },
+    {
+      "old_path": "modal_dedale_mem.py",
+      "new_path": "research/modal_dedale_mem.py",
+      "sha256": "e932a986d95521d03586138cb6a844999cba4ff45cfe449c49f7fbec1d4199fd"
+    },
+    {
+      "old_path": "run_darpa_pilot.py",
+      "new_path": "research/run_darpa_pilot.py",
+      "sha256": "14a31c930feb243a588a0b4e835edb54b6d909c7aa64bd06241634f9f3a7e8bb"
+    },
+    {
+      "old_path": "BASE_PAPER_RESET_COPY.pdf",
+      "new_path": "research/BASE_PAPER_RESET_COPY.pdf",
+      "sha256": "f29657f45f73c7e23a3924558405e7f9e63e1f6f014c905240745c23f02e06b8"
+    },
+    {
+      "old_path": "modal_dedale.py",
+      "new_path": "research/modal_dedale.py",
+      "sha256": "4c0f7e4d4070ae3c521b057e3a4feb318c83e9cbc00ddde051feb47bc858443a"
+    },
+    {
+      "old_path": "test_research_foundation.py",
+      "new_path": "research/test_research_foundation.py",
+      "sha256": "75338dabc0ea3f5a2496d9e966d687acd635d986effc38d02999f8cf8c329e13"
+    },
+    {
+      "old_path": "RESET_INVENTORY.json",
+      "new_path": "research/RESET_INVENTORY.json",
+      "sha256": "943c8a95c23b3097220ba590e933c0b30e147f962fcf316f44fe160fce3a9578"
+    },
+    {
+      "old_path": "test_teammate_dashboard.py",
+      "new_path": "research/test_teammate_dashboard.py",
+      "sha256": "95239235b011dc2bea819f1b29801e0cbf2e9513f92c00cec60b5976c7f90a45"
+    },
+    {
+      "old_path": "MATCHED_TIME_REHEARSAL_PROTOCOL.md",
+      "new_path": "research/MATCHED_TIME_REHEARSAL_PROTOCOL.md",
+      "sha256": "5f29188e7c25a8ce7066742f657d6f7ed2b1353e2df1325e0efded72502042a2"
+    },
+    {
+      "old_path": "windows_apt_models.py",
+      "new_path": "research/windows_apt_models.py",
+      "sha256": "01bd76e5117e30ac6b61ddadfd37ada2dd1d1a9c20961a772d3d2f00809f91e2"
+    },
+    {
+      "old_path": "tgnn_components.py",
+      "new_path": "research/tgnn_components.py",
+      "sha256": "1aaae2c0bcb65200465d75c3f932c6dfdd62e378ec883f1ec71d3e09cc053043"
+    },
+    {
+      "old_path": "modal_diag.py",
+      "new_path": "research/modal_diag.py",
+      "sha256": "e8fcb6d3654a51e749d1e392720fb59aef11f7e9a0ed45f567d5f285d94d933c"
+    },
+    {
+      "old_path": "audit_memory_horizon.py",
+      "new_path": "research/audit_memory_horizon.py",
+      "sha256": "6866fde4f454ac2415824eedbe995c784e97a1a96d819bea8b88c9e69dcceb8e"
+    },
+    {
+      "old_path": "artifacts",
+      "new_path": "research/artifacts"
+    },
+    {
+      "old_path": "data",
+      "new_path": "research/data"
+    },
+    {
+      "old_path": ".labtest",
+      "new_path": "research/.labtest"
+    },
+    {
+      "old_path": "claude",
+      "new_path": "research/claude"
+    },
+    {
+      "old_path": "__pycache__",
+      "new_path": "research/__pycache__"
+    },
+    {
+      "old_path": "dashboard/browser_check.py",
+      "new_path": "research/browser_check.py",
+      "sha256": "8fc61b50af61152faaf4273674eaa0a0a14bcc277bc14ca7c388c031f9f7cd63"
+    },
+    {
+      "old_path": "dashboard/frontend_legacy",
+      "new_path": "research/frontend_legacy"
+    }
+  ],
+  "runtime_modules": [
+    "node_memory_models",
+    "node_memory_v3",
+    "windows_apt_models",
+    "tgnn_components",
+    "temporal_cnn",
+    "causal_tgn",
+    "pomsathit_baseline"
+  ],
+  "notes": "Research sources unchanged except browser_check.py output root; original README preserved with findings links adjusted."
+}

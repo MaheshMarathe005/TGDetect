@@ -41,9 +41,9 @@ reference reruns reproduce original weights and probabilities bit for bit.
 
 - [Full per-seed CSV](component_runs.csv)
 - [Aggregate metrics and paired differences](component_summary.json)
-- [Detailed original report](../../artifacts/components_200e_v1/TGNN_COMPONENT_REPORT.md)
-- [Independent verification](../../artifacts/components_200e_v1/local_verification.json)
-- [Resource measurements and interpretation](../../TGNN_COMPONENT_FINDINGS.md)
-- [Frozen reference](../../REFERENCE_RESULTS.json)
+- [Detailed original report](../artifacts/components_200e_v1/TGNN_COMPONENT_REPORT.md)
+- [Independent verification](../artifacts/components_200e_v1/local_verification.json)
+- [Resource measurements and interpretation](../TGNN_COMPONENT_FINDINGS.md)
+- [Frozen reference](../REFERENCE_RESULTS.json)
 
 Summary SHA256: `1be3420aae31cd555189f82d92456563e1bf8a04bed7e63202462381badc70db`.

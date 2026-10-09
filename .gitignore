@@ -4,3 +4,24 @@ __pycache__/
 .venv/
 results/
 *.log
+dashboard/frontend/node_modules/
+dashboard/frontend/dist/
+dashboard/data/
+research/artifacts/dedale_host_mem_matched/results/*.pt
+research/artifacts/dedale_host_mem_matched/results/*.npz
+
+# Replaced frontend rollback and Next build cache
+research/frontend_legacy/
+dashboard/frontend/.next/
+dashboard/frontend/*.tsbuildinfo
+
+# Local datasets and generated experiment output
+/artifacts/
+/data/**
+!/data/**/
+!/data/**/*.md
+!/data/**/*.py
+/.labtest/data/
+node_modules/
+/frontend_legacy/dist/
+*.part

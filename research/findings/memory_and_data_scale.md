@@ -40,8 +40,8 @@ longer than the gradient-training horizon. At evaluation, state is reset once,
 then warmed chronologically through train, validation and test with fixed weights
 and without feeding labels into the state. There is no state reset at test start.
 
-Evidence: [model](../../tgnn_components.py), [runner](../../run_tgnn_components.py),
-[state handling](../../causal_tgn.py), [protocol](../../TGNN_COMPONENT_PROTOCOL.md).
+Evidence: [model](../tgnn_components.py), [runner](../run_tgnn_components.py),
+[state handling](../causal_tgn.py), [protocol](../TGNN_COMPONENT_PROTOCOL.md).
 
 ## Measured data limitations
 
