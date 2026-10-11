@@ -270,24 +270,25 @@ export function AttackGraph({
           role="img"
           aria-label="Directed entity graph. Drag cards to arrange; select a connection to inspect evidence."
           onPointerMove={(e) => {
-            if (!drag.current) return;
+            const currentDrag = drag.current;
+            if (!currentDrag) return;
             const p = point(e);
             if (p)
               setMoved((old) => ({
                 ...old,
-                [drag.current!.node]: {
+                [currentDrag.node]: {
                   x: Math.max(
                     15,
                     Math.min(
                       width - 220,
-                      drag.current!.x + p.x - drag.current!.px,
+                      currentDrag.x + p.x - currentDrag.px,
                     ),
                   ),
                   y: Math.max(
                     60,
                     Math.min(
                       height - 45,
-                      drag.current!.y + p.y - drag.current!.py,
+                      currentDrag.y + p.y - currentDrag.py,
                     ),
                   ),
                 },

@@ -700,3 +700,336 @@
     transition: none !important;
   }
 }
+
+/* === TGDETECT CYBERPUNK INVESTIGATION THEME START === */
+.graphShell {
+  color: #d8f4fb;
+  background: #020914;
+  border-color: rgba(0, 229, 255, 0.24);
+  border-radius: 3px;
+  box-shadow:
+    0 16px 55px rgba(0, 0, 0, 0.34),
+    0 0 38px rgba(0, 229, 255, 0.035);
+}
+
+.graphToolbar {
+  color: #80a4b8;
+  background:
+    linear-gradient(90deg, rgba(0, 229, 255, 0.04), rgba(168, 85, 247, 0.04)),
+    #050f1e;
+  border-color: rgba(0, 229, 255, 0.16);
+}
+
+.graphToolbar b {
+  color: #00d9ff;
+  background: rgba(0, 229, 255, 0.07);
+  border: 1px solid rgba(0, 229, 255, 0.12);
+  border-radius: 2px;
+}
+
+.graphToolbar button,
+.playback button {
+  color: #8feafb;
+  background: #061524;
+  border-color: rgba(0, 229, 255, 0.17);
+  border-radius: 2px;
+}
+
+.graphToolbar button:hover,
+.playback button:hover {
+  color: white;
+  background: rgba(0, 229, 255, 0.09);
+  border-color: rgba(0, 229, 255, 0.38);
+}
+
+.graphViewport {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(0, 229, 255, 0.04), transparent 22rem),
+    #020914;
+  scrollbar-color: #0a7896 #020914;
+}
+
+.laneLabel {
+  fill: #3f718e;
+}
+
+.edge {
+  stroke: #176482;
+}
+
+.selectedEdge {
+  stroke: #ff4df8;
+  filter: drop-shadow(0 0 4px rgba(255, 61, 245, 0.75));
+}
+
+.edgeLabel rect {
+  fill: #061827;
+  stroke: #13637d;
+}
+
+.edgeLabel text {
+  fill: #68eaff;
+}
+
+.entityCard > rect:first-child {
+  fill: #071522;
+  stroke: #15506a;
+  filter:
+    drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35))
+    drop-shadow(0 0 7px rgba(0, 229, 255, 0.035));
+}
+
+.entityCard:hover > rect:first-child,
+.focusCard > rect:first-child {
+  fill: #0a1d2d;
+  stroke: #00d9ff;
+  filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.16));
+}
+
+.seedCard > rect:first-child {
+  fill: #1b0c2b;
+  stroke: #ff4df8;
+  filter:
+    drop-shadow(0 0 12px rgba(255, 61, 245, 0.17))
+    drop-shadow(0 8px 12px rgba(0, 0, 0, 0.3));
+}
+
+.entityCard svg {
+  stroke: #00d9ff;
+}
+
+.seedCard svg {
+  stroke: #ff7af8;
+}
+
+.iconTile {
+  fill: #08283a;
+}
+
+.seedCard .iconTile {
+  fill: #32133f;
+}
+
+.entityTitle {
+  fill: #e6fbff;
+}
+
+.entityMeta {
+  fill: #65879c;
+}
+
+.graphHint {
+  color: #587b92;
+  background: #040d1a;
+  border-color: rgba(0, 229, 255, 0.13);
+}
+
+.graphHint i {
+  background: #ff4df8;
+  box-shadow: 0 0 8px #ff4df8;
+}
+
+.connectionSummary {
+  color: #d28aff;
+  background: rgba(35, 9, 45, 0.72);
+  border-color: rgba(255, 61, 245, 0.23);
+}
+
+.builder {
+  color: #cde8f2;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(0, 229, 255, 0.06), transparent 18rem),
+    linear-gradient(130deg, #06101f, #090b1c);
+  border-color: rgba(0, 229, 255, 0.18);
+  border-radius: 3px;
+  box-shadow: 0 16px 55px rgba(0, 0, 0, 0.24);
+}
+
+.builderIcon {
+  color: #00e5ff;
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(255, 61, 245, 0.09));
+  border-color: rgba(0, 229, 255, 0.26);
+  border-radius: 2px;
+}
+
+.builderHeading p {
+  color: #00d9ff;
+}
+
+.builderHeading h2 {
+  color: #eafaff;
+}
+
+.hypothesis {
+  color: #ff8cf8;
+  background: rgba(255, 61, 245, 0.065);
+  border-color: rgba(255, 61, 245, 0.23);
+  border-radius: 2px;
+}
+
+.builderIntro {
+  color: #6e8ca1;
+}
+
+.builderControls {
+  background: #040d19;
+  border-color: rgba(0, 229, 255, 0.13);
+  border-radius: 3px;
+}
+
+.builderControls label,
+.playback > span,
+.playback label {
+  color: #608297;
+}
+
+.builderControls select,
+.playback select {
+  color: #a9d7e2;
+  background: #061422;
+  border-color: rgba(0, 229, 255, 0.17);
+  border-radius: 2px;
+}
+
+.builderControls > button {
+  color: #020912;
+  background: linear-gradient(100deg, #00d9ff, #b95cff);
+  border-color: rgba(255, 255, 255, 0.22);
+  border-radius: 2px;
+  box-shadow: 0 0 17px rgba(0, 229, 255, 0.1);
+}
+
+.builderControls > button:hover {
+  background: linear-gradient(100deg, #57edff, #ff62f7);
+}
+
+.pathTabs button {
+  color: #6e8da3;
+  background: #06111f;
+  border-color: rgba(0, 229, 255, 0.12);
+  border-radius: 2px;
+}
+
+.pathTabs button[aria-pressed="true"] {
+  color: #d6f7ff;
+  background: linear-gradient(90deg, rgba(0, 229, 255, 0.1), rgba(168, 85, 247, 0.08));
+  border-color: rgba(0, 229, 255, 0.36);
+}
+
+.pathTabs button[aria-pressed="true"] span {
+  color: #ff80f7;
+}
+
+.playback b {
+  color: #00e5ff;
+}
+
+.pathCanvas {
+  background:
+    linear-gradient(rgba(0, 217, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 217, 255, 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 40% 50%, rgba(168, 85, 247, 0.07), transparent 28rem),
+    #020913;
+  background-size: 30px 30px, 30px 30px, auto, auto;
+  border-color: rgba(0, 229, 255, 0.18);
+  border-radius: 3px;
+}
+
+.pathStep > button {
+  color: #89a7b9;
+  background: #061320;
+  border-color: rgba(0, 229, 255, 0.14);
+  border-radius: 3px;
+}
+
+.pathStep > button:hover {
+  border-color: rgba(0, 229, 255, 0.42);
+}
+
+.activeStep > button {
+  background:
+    linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(255, 61, 245, 0.08)),
+    #071321;
+  border-color: #00d9ff;
+  box-shadow:
+    0 0 0 2px rgba(0, 229, 255, 0.06),
+    0 0 22px rgba(0, 229, 255, 0.08);
+}
+
+.completeStep > button {
+  border-color: rgba(0, 245, 160, 0.32);
+  background: rgba(0, 245, 160, 0.035);
+}
+
+.stepNumber {
+  color: #00d9ff;
+  background: #082034;
+  border-color: rgba(0, 229, 255, 0.22);
+  border-radius: 2px;
+}
+
+.activeStep .stepNumber {
+  color: #020914;
+  background: #00e5ff;
+  border-color: white;
+}
+
+.pathEntity svg {
+  color: #00d9ff;
+}
+
+.pathEntity b {
+  color: #cceaf3;
+}
+
+.pathEntity small,
+.pathStep time {
+  color: #55768b;
+}
+
+.pathRelation {
+  color: #ff6bf7;
+}
+
+.pathRelation > i,
+.join:before,
+.join:after {
+  background: #3c2352;
+}
+
+.pathRelation em {
+  color: #ff8cf8;
+  border-color: rgba(255, 61, 245, 0.25);
+  border-radius: 2px;
+}
+
+.join {
+  color: #8b5cf6;
+}
+
+.join > span {
+  color: #5b7d91;
+}
+
+.scrubber {
+  accent-color: #00e5ff;
+}
+
+.story {
+  color: #89a9ba;
+  background: rgba(8, 16, 32, 0.9);
+  border-color: rgba(0, 229, 255, 0.14);
+  border-radius: 3px;
+}
+
+.storyIndex {
+  color: #ff83fa;
+  background: rgba(255, 61, 245, 0.07);
+  border-color: rgba(255, 61, 245, 0.2);
+  border-radius: 2px;
+}
+
+.state {
+  color: #ff7cf6;
+}
+/* === TGDETECT CYBERPUNK INVESTIGATION THEME END === */

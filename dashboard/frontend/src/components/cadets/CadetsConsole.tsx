@@ -250,12 +250,12 @@ export function CadetsConsole() {
             <Shield size={24} />
           </span>
           <span>
-            TGDetect<small>SECURITY INTELLIGENCE</small>
+            TGDetect<small>CYBER THREAT INTELLIGENCE</small>
           </span>
         </a>
         <div className={styles.workspace}>
           <span className={styles.dot} />
-          CADETS / Research workspace<small>V3 • verified checkpoint</small>
+          CADETS // CYBER OPS<small>V3 // GRAPH DEFENSE NODE</small>
         </div>
         <p className={styles.navLabel}>WORKSPACE</p>
         <nav aria-label="Workspace navigation">
@@ -281,9 +281,6 @@ export function CadetsConsole() {
             <br />
             Real model. Traceable scores.
           </p>
-          <a href="/legacy">
-            Open Sysmon workspace <ArrowRight size={14} />
-          </a>
         </div>
       </aside>
       <main className={styles.main}>
@@ -363,10 +360,10 @@ export function CadetsConsole() {
                       <svg viewBox="0 0 350 220">
                         <defs>
                           <radialGradient id="halo">
-                            <stop stopColor="#a784eb" stopOpacity=".28" />
+                            <stop stopColor="#00e5ff" stopOpacity=".28" />
                             <stop
                               offset="1"
-                              stopColor="#a784eb"
+                              stopColor="#00e5ff"
                               stopOpacity="0"
                             />
                           </radialGradient>
@@ -386,15 +383,15 @@ export function CadetsConsole() {
                               y1="110"
                               x2={x}
                               y2={y}
-                              stroke="#736194"
+                              stroke="#214d72"
                               strokeDasharray="4 5"
                             />
                             <circle
                               cx={x}
                               cy={y}
                               r="13"
-                              fill="#352c50"
-                              stroke="#ad95d1"
+                              fill="#10182d"
+                              stroke="#a855f7"
                             />
                           </g>
                         ))}
@@ -402,14 +399,14 @@ export function CadetsConsole() {
                           cx="175"
                           cy="110"
                           r="36"
-                          fill="#34264e"
-                          stroke="#d1b0ff"
+                          fill="#18102d"
+                          stroke="#ff4df8"
                           strokeWidth="2"
                         />
                         <path
                           d="M160 110l10 10 20-22"
                           fill="none"
-                          stroke="#d1b0ff"
+                          stroke="#ff4df8"
                           strokeWidth="3"
                         />
                       </svg>
@@ -1285,7 +1282,7 @@ function EventDetail({ event, close }: { event: Event; close: () => void }) {
               <div key={role}>
                 <h3>{role === "src" ? "Source" : "Destination"} attributes</h3>
                 <dl>
-                  {Object.entries(detail.data![`${role}_attributes`]).map(
+                  {Object.entries(detail.data?.[`${role}_attributes`] ?? {}).map(
                     ([key, value]) => (
                       <div key={key}>
                         <dt>{key}</dt>
