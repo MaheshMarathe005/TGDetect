@@ -331,3 +331,75 @@
   background-image: radial-gradient(circle, hsl(var(--primary) / 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
 }
+
+/* === TGDETECT CYBERPUNK GLOBAL THEME START === */
+:root {
+  color-scheme: dark;
+  --background: 224 60% 3%;
+  --foreground: 190 100% 94%;
+  --card: 222 50% 6%;
+  --card-foreground: 190 100% 94%;
+  --popover: 222 50% 6%;
+  --popover-foreground: 190 100% 94%;
+  --primary: 188 100% 50%;
+  --primary-foreground: 224 60% 3%;
+  --secondary: 222 40% 10%;
+  --secondary-foreground: 190 100% 94%;
+  --muted: 222 35% 10%;
+  --muted-foreground: 205 24% 62%;
+  --accent: 300 100% 64%;
+  --accent-foreground: 224 60% 3%;
+  --destructive: 345 100% 59%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 197 63% 18%;
+  --input: 197 63% 18%;
+  --ring: 188 100% 50%;
+  --success: 158 100% 48%;
+  --warning: 43 100% 58%;
+  --danger: 345 100% 59%;
+  --info: 188 100% 50%;
+  --purple: 278 100% 68%;
+  --teal: 174 100% 48%;
+}
+
+html {
+  background: #02050b;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(0, 229, 255, 0.07), transparent 28rem),
+    radial-gradient(circle at 86% 5%, rgba(255, 61, 245, 0.07), transparent 30rem),
+    #02050b;
+  color: #dffbff;
+  font-family:
+    "Segoe UI",
+    "SFMono-Regular",
+    "Roboto Mono",
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+::selection {
+  color: #001018;
+  background: #00e5ff;
+}
+
+::-webkit-scrollbar-track {
+  background: #030812;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#00d9ff, #8b5cf6);
+  border-radius: 99px;
+}
+
+button,
+a,
+select,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+/* === TGDETECT CYBERPUNK GLOBAL THEME END === */
