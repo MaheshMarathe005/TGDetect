@@ -3,13 +3,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/lib/theme-context";
-import { ModelProvider } from "@/lib/model-context";
-import { DatasetProvider } from "@/lib/dataset-context";
 
 export const metadata: Metadata = {
   title: "TGDetect — Temporal Graph Neural Network for Threat Detection",
   description:
-    "Backend-contract-ready frontend for the TGDetect backend: TGEvent investigation, temporal heterogeneous graph, attack-chain reconstruction, parquet artifacts, and GAT and causal node-memory model model views.",
+    "CADETS temporal graph investigation with the trained V3 detector, traceable alert evidence and candidate attack-chain reconstruction.",
   keywords: [
     "TGDetect",
     "Temporal Graph",
@@ -35,7 +33,7 @@ export default function RootLayout({
       <body
         className={`antialiased bg-background text-foreground`}
       >
-        <ThemeProvider><ModelProvider><DatasetProvider>{children}</DatasetProvider></ModelProvider></ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
         <Toaster />
       </body>
     </html>

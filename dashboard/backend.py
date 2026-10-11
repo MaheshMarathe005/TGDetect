@@ -529,3 +529,9 @@ def index(request: Request):
 
 from dashboard.teammate_api import register as register_teammate_api
 register_teammate_api(app)
+
+from dashboard.cadets import router as cadets_router
+app.include_router(cadets_router)
+
+from dashboard.graph_datasets import router as graph_datasets_router
+app.include_router(graph_datasets_router)

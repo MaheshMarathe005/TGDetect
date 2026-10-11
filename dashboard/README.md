@@ -1,5 +1,11 @@
 # TG-Detect dashboard
 
+The default page is now the CADETS V3 investigation workspace, with the verified
+trained checkpoint, complete prepared corpus, evidence explanations and temporal
+chain reconstruction. See [CADETS setup and verification](CADETS.md).
+The previous Sysmon interface is retained at `/legacy`; its independent model
+artifacts are required for its inference workflows.
+
 The active frontend is the teammate Next.js interface copied from
 `/home/mahesh/Desktop/tgdetect_frountend_temp_pratham/TGDetect-Temporal-Graph/frontend`.
 Its MIT license is retained in `frontend/LICENSE`. The previous Vite frontend is
