@@ -1,9 +1,0 @@
-{
-  "archive_sha256": "103380984d162ccdb90137fa7473ccae7784ef722956d7c0bb632ffdf59c0741",
-  "runs_verified": 60,
-  "raw_metrics_match": true,
-  "checkpoint_hashes_match": true,
-  "source_hashes_match": true,
-  "gpu": "Tesla T4",
-  "gpu_training_launched_during_review": false
-}

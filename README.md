@@ -13,7 +13,7 @@
   <a href="#what-you-can-do">Features</a> ·
   <a href="#how-it-works">Architecture</a> ·
   <a href="#run-locally">Run locally</a> ·
-  <a href="#research-and-verification">Research</a> ·
+  <a href="#verification">Verification</a> ·
   <a href="#license">License</a>
 </p>
 
@@ -24,9 +24,11 @@ workspace. The CADETS V3 pipeline scores endpoint events and entities; the web
 application lets analysts explore connected observations, inspect evidence and
 trace chronological candidate paths.
 
-**This repository publishes source code.** Datasets, reference papers, trained
-weights, experiment artifacts and archived project copies stay local. Supply the
-prepared data and checkpoint before using inference or data-backed API features.
+**This repository publishes the web application source.** The `research/` folder
+is temporarily excluded from GitHub and preserved locally, along with datasets,
+reference papers, trained weights and experiment artifacts. CADETS replay and
+upload inference require the local research implementation as well as prepared
+data and a checkpoint.
 
 ## What you can do
 
@@ -37,7 +39,6 @@ prepared data and checkpoint before using inference or data-backed API features.
 | Event explorer | Browse dataset splits and inspect endpoint attributes and relations. |
 | Model validation | Replay the CADETS checkpoint against recorded scores. |
 | Dataset uploads | Import supported JSON, JSONL or CSV events and explore an isolated scored graph. |
-| Research | Compare model versions, investigate encoders and graph attention, and reproduce documented experiments. |
 
 Predictions require analyst review. Connected paths describe investigative
 hypotheses; anomaly evidence is not a probability of compromise. Recorded
@@ -65,7 +66,8 @@ flowchart LR
 
 The backend reads the prepared corpus, checkpoint and investigation index from
 `datasets/application/cadets_v3/`. Model definitions live in `web_app/model/`;
-experiment implementations live in `research/`. The browser uses the frontend's
+experiment implementations remain in the local, ignored `research/` folder.
+The browser uses the frontend's
 `/api` proxy to communicate with FastAPI.
 
 ```mermaid
@@ -97,10 +99,7 @@ TG-Detect/
 │   ├── frontend/          Next.js application and shared UI
 │   ├── backend/           FastAPI APIs and preparation commands
 │   └── model/             Inference definitions and preprocessing
-├── research/              Experiments, audits, comparisons and regression tests
-│   ├── support/           Regression fixture helper
-│   ├── artifacts/         Local experiment outputs                  [ignored]
-│   └── archives/          Preserved historical project versions     [ignored]
+├── research/              Local experiments and regression tests    [ignored]
 ├── datasets/              Raw/prepared data, weights and uploads    [ignored]
 ├── research paper/        PDFs, manuscript and presentation assets  [ignored]
 ├── docs/assets/           README illustrations
@@ -110,9 +109,9 @@ TG-Detect/
 ```
 
 Trained model formats such as `.pt`, `.pth`, `.ckpt`, `.safetensors` and `.onnx`
-are ignored throughout the repository. The GAT notebook with an embedded corpus
-and encoder weights stays local; its Python source and notebook builder remain
-available. Ignore rules do not remove assets from earlier Git history.
+are ignored throughout the repository. Research scripts, notebooks and regression
+tests stay in the local `research/` folder for now. Ignore rules do not remove
+assets from earlier Git history.
 
 ## Run locally
 
@@ -137,7 +136,9 @@ require additional packages and a configured Modal account.
 Place the prepared CADETS corpus, token bank, trained checkpoint, saved result
 and investigation index under `datasets/application/cadets_v3/`. Consult the
 [CADETS guide](web_app/backend/CADETS.md) for preparation commands and schema.
-These files are intentionally excluded from this source push.
+The local `research/` folder must also supply the V3 implementation and its
+supporting packages for checkpoint replay, preparation and upload scoring.
+These assets and research files are intentionally excluded from GitHub for now.
 
 ### 2. Start the backend
 
@@ -163,33 +164,19 @@ Open **http://localhost:3000**. FastAPI's interactive API documentation is at
 to the backend command. Set `TGDETECT_API_ORIGIN` when the backend uses a different
 address; rebuild/restart the frontend after changing it.
 
-## Research and verification
+## Verification
 
-[Codebase notes](research/CODEBASE_NOTES.md) explain the script families and
-application dependencies. The [script inventory](research/SCRIPT_INVENTORY.md)
-and [relocation manifest](research/RESTRUCTURE_MANIFEST.json) document the source
-scan, path changes and removal of 14 temporary checks. Regression tests remain.
+Research scripts, codebase notes, inventories and regression tests remain in the
+local `research/` folder, which is temporarily excluded from GitHub. A fresh clone
+does not contain the research test suite or the V3 research packages required for
+CADETS replay and upload inference. The results below describe checks performed
+on the complete local checkout before excluding that folder.
 
-Run model tests without application assets:
-
-```bash
-python -m pip install pytest
-python -m pytest -q research/test_sliding_v3.py research/test_node_memory_v3.py
-```
-
-For CADETS API/inference checks after supplying local assets:
+The published frontend can be checked independently:
 
 ```bash
-python -m pip install pytest httpx
-python -m pytest -q research/test_cadets_dashboard.py research/test_graph_uploads.py
-```
-
-Run experiment commands from `research/`. For scripts using the older `data/`
-default, create a local link after providing raw datasets:
-
-```bash
-cd research
-ln -s ../datasets/raw data
+cd web_app/frontend
+npm run build
 ```
 
 | Latest local verification | Result |
@@ -202,9 +189,8 @@ ln -s ../datasets/raw data
 | Optional legacy Sysmon tests | 10 failures because separate DEDALE result artifacts are absent |
 
 The optional `/legacy` UI uses independent Sysmon/DEDALE artifacts. Its missing
-results do not affect the prepared CADETS pipeline; its regression tests remain
-available. Archived project copies and generated source snapshots are excluded
-from active test collection.
+results are separate from the CADETS pipeline. Its regression tests remain local,
+along with the other research tests and archived project copies.
 
 ## License
 

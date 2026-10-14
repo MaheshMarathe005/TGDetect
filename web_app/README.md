@@ -3,7 +3,8 @@
 `frontend/` contains the Next.js UI. `backend/` contains the FastAPI APIs,
 checkpoint loading, dataset upload and preparation commands. `model/` contains
 inference model definitions and preprocessing; experiment implementations remain
-in `../research/`.
+in the local, ignored `../research/` folder. CADETS replay and upload inference
+require those research packages; they are temporarily excluded from GitHub.
 
 Run from the repository root:
 

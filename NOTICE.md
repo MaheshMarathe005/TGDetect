@@ -7,13 +7,10 @@ respective components.
 
 - The frontend retains its original MIT notice, copyright 2025 TGDetect
   Contributors, in [web_app/frontend/LICENSE](web_app/frontend/LICENSE).
-- The bundled ORTHRUS reference implementation under `research/orthrus_official/`
-  comes from [UBC Provenance / ORTHRUS](https://github.com/ubc-provenance/orthrus).
-  Its original authors' rights and applicable upstream terms remain in effect;
-  the root license does not relicense that reference snapshot.
-- KAIROS reference code under `research/publication/sources/kairos_upstream/`
-  retains its upstream provenance. The root license does not grant new rights
-  to third-party source or published research papers.
+- ORTHRUS and KAIROS reference code remains in the local, ignored research
+  directory and is not included in this published checkout. Its original
+  authors' rights and applicable upstream terms remain in effect; the root
+  license does not relicense third-party reference code or research papers.
 - Installed dependencies retain their own licenses. They are excluded from Git.
 - Datasets, trained weights, reference PDFs and local archived project versions
   are excluded from this source publication. The MIT source-code license does

@@ -1,3 +1,7 @@
+> Research scripts and regression tests referenced in this guide remain local.
+> The `research/` folder is temporarily excluded from GitHub. Supply its V3
+> implementation and supporting packages for replay, preparation and upload inference.
+
 # CADETS V3 investigation workspace
 
 The default Next.js page now runs a separate CADETS workspace. The older Sysmon
