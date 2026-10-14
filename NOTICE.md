@@ -1,7 +1,7 @@
 # Attribution and license scope
 
 The root [MIT license](LICENSE) applies to original TGDetect code and repository
-documentation contributed by Mahesh Marathe and TGDetect Contributors. Existing
+documentation contributed by Mahesh Marathe. Existing
 third-party copyright notices and license terms continue to apply to their
 respective components.
 
