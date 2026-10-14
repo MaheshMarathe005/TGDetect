@@ -76,7 +76,7 @@ def latency():
 def main():
     import json
     result=latency.remote()
-    out=Path(__file__).resolve().parents[1]/'artifacts/v3_vs_orthrus'
+    out=Path(__file__).resolve().parent/'artifacts/v3_vs_orthrus'
     out.mkdir(parents=True,exist_ok=True)
     (out/'latency.json').write_text(json.dumps(result,indent=2))
     print('Saved',out/'latency.json')

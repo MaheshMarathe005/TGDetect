@@ -1,0 +1,630 @@
+Received 2 November 2025, accepted 26 November 2025, date of publication 2 December 2025,
+date of current version 22 December 2025.
+Digital Object Identifier 10.1109/ACCESS.2025.3639270
+
+
+
+
+Adaptive Detection of Advanced Persistent
+Threats (APT) With Graph Neural Networks
+and Rehearsal-Based Continual Learning
+on Wazuh EDR Telemetry
+AUTTAPON POMSATHIT
+Department of IoT and Information Engineering, School of Engineering, King Mongkut’s Institute of Technology Ladkrabang, Bangkok, Thailand
+e-mail: auttapon.po@kmitl.ac.th
+
+
+
+
+  ABSTRACT In the rapidly evolving cybersecurity landscape, Advanced Persistent Threats (APTs) pose
+  major challenges due to their stealthy and adaptive behavior. Traditional detection methods based on
+  signatures or heuristics are limited in identifying novel and evolving attacks, while static deep learning
+  models suffer from concept drift and catastrophic forgetting, leading to degraded performance over time. This
+  paper proposes an adaptive APT detection framework that integrates Graph Neural Networks (GNNs) with
+  rehearsal-based continual learning using telemetry data from Wazuh, an open-source Security Information
+  and Event Management (SIEM) and Endpoint Detection and Response (EDR) platform. Endpoint telemetry
+  is represented as graphs where nodes denote system components and edges describe behavioral interactions
+  among them. Experimental evaluations on real-world Wazuh telemetry augmented with sandbox-executed
+  APT scenarios demonstrate that the proposed approach consistently achieves F1-scores above 0.98,
+  outperforming static and fine-tuned baselines in both adaptability and knowledge retention. These results
+  confirm that combining graph-based representations with continual learning offers a scalable, interpretable,
+  and resilient solution for modern SOC and EDR environments facing advanced and evolving cyber threats.
+
+
+  INDEX TERMS Advanced persistent threat (APT), graph neural networks (GNN), Wazuh, open-source
+  EDR, rehearsal, continual learning, concept drift.
+
+
+I. INTRODUCTION                                                                                    Traditional detection techniques, such as signature-based
+In today’s interconnected digital landscape, the rapid expan-                                   and heuristic systems, struggle to detect unseen or obfuscated
+sion of information systems and endpoints has significantly                                     threats because they rely on predefined rules and known indi-
+increased the attack surface across critical sectors such                                       cators. These methods also generate high false-positive rates,
+as finance, healthcare, and government. This growth has                                         reducing their practicality in large-scale environments [3],
+enabled adversaries to launch increasingly sophisticated                                        [4]. To overcome these limitations, recent studies have
+Advanced Persistent Threats (APTs)—stealthy, multi-stage                                        adopted machine learning (ML) and deep learning (DL)
+attacks designed to infiltrate networks, escalate privileges,                                   approaches that automatically extract discriminative features
+and remain undetected for extended periods. High-profile                                        from telemetry and system logs [5]. However, despite their
+incidents, including supply chain and healthcare breaches,                                      success, static ML/DL models still face two major challenges:
+demonstrate the severe financial and reputational conse-                                        concept drift, where attack behaviors evolve over time, and
+quences of such persistent attacks [1], [2].                                                    catastrophic forgetting, where updates overwrite previously
+                                                                                                learned knowledge, causing performance degradation [6].
+   The associate editor coordinating the review of this manuscript and                             To mitigate these challenges, researchers have explored
+approving it for publication was Jonathan Rodriguez              .                              continual learning (CL) techniques that allow models to
+
+                                                  2025 The Authors. This work is licensed under a Creative Commons Attribution 4.0 License.
+VOLUME 13, 2025                                          For more information, see https://creativecommons.org/licenses/by/4.0/                        212973
+                                                                   A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+adapt to new data streams while preserving prior knowledge.               To address these challenges, continual learning strate-
+Among various strategies, rehearsal-based learning—which               gies have been investigated. Fine-tuning approaches adapt
+stores and replays a small subset of past samples during               models incrementally but often result in severe forgetting.
+training—has shown strong potential in maintaining model               Regularization-based methods attempt to preserve model
+stability under evolving conditions. In parallel, Graph                weights, yet remain fragile in rapidly changing threat
+Neural Networks (GNNs) have emerged as powerful tools                  landscapes. Rehearsal-based continual learning, by retaining
+for cybersecurity because they can model relationships                 a subset of past data, has proven effective for network intru-
+between system entities and capture multi-hop dependen-                sion detection [10], offering a balanced trade-off between
+cies across attack stages such as lateral movement and                 adaptability and stability.
+persistence [7], [8].                                                     Parallel to these developments, graph-based approaches
+   This study introduces an adaptive APT detection frame-              have emerged in cybersecurity. By representing system
+work that combines GNNs with rehearsal-based continual                 entities (processes, files, IP addresses) as nodes and their
+learning using telemetry from Wazuh, an open-source                    interactions as edges, Graph Neural Networks (GNNs) can
+Security Information and Event Management (SIEM) and                   capture multi-hop dependencies and contextual relationships
+Endpoint Detection and Response (EDR) platform. Wazuh                  overlooked by sequential models. Recent surveys highlight
+provides detailed endpoint telemetry, including process                the growing role of GNNs in anomaly detection, malware
+creation, file modifications, registry access, and network             analysis, and cyber threat detection. Despite these advances,
+connections. By representing this telemetry as graphs where            limited research has integrated GNNs with continual learning
+nodes denote system components and edges represent their               strategies specifically for APT detection.
+interactions—the proposed framework effectively captures                  Another limitation in prior studies is their reliance on
+the relational structures of complex APT behaviors [9]. The            simulated logs such as Windows Sysmon, which, while
+continual learning component further ensures adaptability to           valuable, do not fully capture real-world SOC environments.
+emerging threats while mitigating catastrophic forgetting.             In contrast, Wazuh, an open-source SIEM/EDR platform,
+   The main contributions of this paper are summarized as              provides comprehensive endpoint telemetry in a reproducible
+follows:                                                               manner. Moreover, sandbox environments such as Cuckoo
+   1. Graph-based APT detection: A novel representation of             have been widely used to generate controlled malware and
+       Wazuh EDR telemetry as graphs to model complex and              APT scenarios for evaluation.
+       evolving APT behaviors.                                            To the best of our understanding, this research represents
+   2. Integration of GNNs with continual learning: A                   one of the initial investigations that amalgamate Wazuh
+       rehearsal-based GNN architecture that mitigates con-            telemetry, graph neural networks, and rehearsal-based con-
+       cept drift and catastrophic forgetting.                         tinual learning methodologies for the purpose of adaptive
+   3. Experimental validation: Comprehensive evaluation                Advanced Persistent Threat (APT) detection, consequently
+       using Wazuh telemetry and sandbox-generated APT                 facilitating the convergence of scholarly inquiry and practical
+       scenarios demonstrates consistent F1-scores above               implementations within Security Operations Centers (SOC)
+       0.98, surpassing both static and fine-tuned baselines.          and Endpoint Detection and Response (EDR) systems.
+   This work highlights the synergy between graph-based
+modeling and continual learning for building adaptive, scal-           III. METHODOLOGY AND EXPERIMENTAL SETUP
+able, and interpretable intrusion detection systems suitable           This section presents the proposed framework for adaptive
+for modern Security Operations Centers (SOCs) and EDR                  detection of Advanced Persistent Threats (APTs) using Graph
+deployments.                                                           Neural Networks (GNNs) with Rehearsal-based Continual
+   The remainder of this paper is organized as follows:                Learning (CL). The pipeline consists of four stages: data
+Section II reviews related work; Section III presents the              collection, graph construction, GNN-based detection, and
+proposed methodology and experimental setup; Section IV                continual learning with rehearsal.
+discusses results and interpretability; and Section V con-
+cludes the study and outlines future work.                             A. DATA COLLECTION WITH WAZUH EDR TELEMETRY
+                                                                       We utilize Wazuh, an open-source SIEM/EDR platform,
+II. RELATED WORK                                                       as the primary source of endpoint telemetry. Wazuh agents
+Research on APT detection spans traditional, ML-based,                 monitor:
+and graph-based approaches. Signature-based and heuristic                 • Process creation/termination (e.g., malicious script exe-
+detection methods provided early solutions, but their reliance              cution),
+on static patterns limited adaptability to evolving APT tactics.          • File operations (creation, modification, deletion),
+As attackers adopted polymorphism and advanced evasion,                   • Registry access (for persistence),
+researchers turned to machine learning and deep learning                  • Network connections (for lateral movement and C2).
+techniques to analyze behavioral telemetry. These models               To simulate realistic APT behaviors, we enrich Wazuh
+improved detection performance but faced scalability issues            telemetry with sandbox-executed malware traces following
+due to concept drift and catastrophic forgetting.                      the MITRE ATT&CK framework [11].
+
+212974                                                                                                                            VOLUME 13, 2025
+A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+B. GRAPH CONSTRUCTION                                                             [13] have shown that GNN-based classification significantly
+We represent telemetry as a graph:                                                improves performance in tasks such as intrusion and anomaly
+                                                                                  detection, owing to its ability to capture structural dependen-
+                            G = (V , E, X )                            (1)        cies in complex network data.
+  Explanation:
+    V: Set of nodes (e.g., processes, files, IPs)                                 D. REHEARSAL-BASED CONTINUAL LEARNING
+    E: Set of edges (interactions between nodes)                                  To address concept drift and catastrophic forgetting, we incor-
+    X: Node feature matrix (e.g., command lines, hashes)                          porate a rehearsal-based continual learning strategy. The
+and                                                                               training objective at each step includes both the loss on the
+                                                                                  current data batch Dt, and a rehearsal loss over previously
+                              X ∈ R|V |×d                              (2)
+                                                                                  seen samples stored in a buffer Dbuf, as defined in (5)
+   (2) is the node feature matrix containing attributes such as
+command lines, hashes, and IP addresses.                                                      L =Ln ew (Dt ) +λ∗Lr ehearsal (Db uf)          (5)
+   Such graph-based modeling of security logs has been
+                                                                                    •  L is the total loss at each update step.
+shown to effectively capture attack dependencies across
+                                                                                    •  Ln ew (Dt ) denotes the loss computed on the current task
+entities [12], [13]. This enables detection of multi-hop
+                                                                                       or batch of data.
+behaviors typical of APTs, such as privilege escalation
+                                                                                     • Lr ehearsal (Db uf) is the loss computed on a small buffer
+followed by lateral movement [7], [8].
+                                                                                       of past data to retain previous knowledge.
+                                                                                     • λ is a balancing hyperparameter that controls the trade-
+C. GRAPH NEURAL NETWORK MODEL
+                                                                                       off between adaptation to new information and retention
+We employ a multi-layer GNN to propagate information                                   of prior knowledge.
+across graph neighborhoods. The hidden representation of a                        This approach aligns with the principles of continual learning,
+node vvv at layer l+1l+1l+1 is computed as:                                       where the model must adapt to evolving input distributions
+                                                                                  without forgetting previously acquired knowledge. Rehearsal
+                                                         
+ h(l+1)
+  v     = σ   W (l)
+                    ∗ AGGREGATE    h (l)
+                                     v   ∪h (l)
+                                            u   : u ∈ N (v)
+                                                                                  ensures stability by replaying a small, representative set of
+                                                            (3)                   past samples, helping the model maintain performance across
+(3) defines how a node’s representation is updated in a Graph                     time.
+Neural Network (GNN). The model aggregates the features of
+a node and its neighbors, then applies a transformation and a                     E. EVALUATION PROTOCOL
+nonlinear activation function.                                                    The framework is evaluated using datasets combining benign
+      (l)
+   • hv is the hidden representation of node v at layer l.                        Wazuh telemetry and sandbox-executed APT traces [11].
+   • N (v) denotes the set of neighboring nodes of node v.                        We compare three training strategies:
+      (l)
+   • hu refers to the hidden state of a neighboring node uat                        1) Static learning: one-time training without updates.
+     the same layer.                                                                2) Fine-tuning: incremental learning without rehearsal.
+   • W(l) is a trainable weight matrix for the current layer.                       3) Continual learning with rehearsal: proposed method.
+   • AGGREGATE (. . .) is a function that combines feature                          Performance is measured using Precision, Recall, F1-
+     vectors from node v and its neighbors (e.g., via mean or                     score, and AUC, which are standard metrics in intrusion
+     attention).                                                                  detection and classification [15]. The proposed approach
+   • σ (. . .) is a nonlinear activation function such as ReLU.                   consistently achieves F1-scores above 0.98, demonstrating
+At the output layer, the classification is performed using a                      robustness against evolving APT campaigns.
+softmax function as shown in (4):
+                                                                                  F. DATASET AND EXPERIMENTAL SETUP
+                                                
+                 yv = soft max Wo ∗ h(L) v + bo              (4)
+                                                                                  To rigorously evaluate the proposed framework, we con-
+   • yv is the predicted output (i.e., class probability distribu-                structed a hybrid dataset that integrates benign enterprise
+     tion) for node v.                                                            telemetry with sandbox-executed APT scenarios. Benign
+       (L)
+   • hv represents the final hidden state of node v from the                      traces were collected from Wazuh agents deployed in an
+     last GNN layer L.                                                            enterprise-like environment, capturing everyday activities
+   • Wo and bo are the trainable output weight matrix and                         such as office application usage, web browsing, and system
+     bias vector, respectively.                                                   utilities. Malicious traces were generated by executing APT
+  • The softmax function ensures that the output values                           samples in a controlled sandbox, following the MITRE
+     are normalized into a probability distribution across the                    ATT&CK framework, thereby ensuring realistic coverage of
+     target classes.                                                              multiple adversarial tactics including persistence, privilege
+  This output mechanism enables node-wise classification in                       escalation, and command-and-control. This combination
+the graph, allowing the model to assign class probabilities                       allows for evaluation under realistic, evolving threat condi-
+based on the learned node representations. Prior studies [12],                    tions while maintaining reproducibility.
+
+VOLUME 13, 2025                                                                                                                           212975
+                                                                 A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+TABLE 1. Dataset summary.                                                   attention pooling, and trained with the same optimizer
+                                                                            and learning schedule as the GNN models.
+                                                                        b) Static GNN – identical architecture as the proposed
+                                                                            model but trained only once without updates.
+                                                                        c) Fine-tuned GNN – incrementally updated on new data,
+                                                                            without rehearsal.
+                                                                        d) Generative Replay IDS – implemented following,
+                                                                            with replayed samples generated from a lightweight
+                                                                            variational autoencoder.
+                                                                     This unified experimental configuration ensures a fair com-
+                                                                     parison across baselines while enabling detailed analysis of
+   The dataset is summarized in Table 1. The benign portion          model accuracy, adaptability, and efficiency. By fixing hyper-
+contains approximately 12,500 graphs, representing 1.2 mil-          parameters across repeated runs and reporting aggregated
+lion nodes and 3.5 million edges, derived from continuous            results, we guarantee statistical robustness and reproducibil-
+enterprise telemetry. The malicious portion comprises 8,300          ity in accordance with IEEE evaluation standards.
+graphs with 0.9 million nodes and 2.7 million edges,
+generated from sandbox-executed APT campaigns. The dis-              H. BASELINE MODELS
+tribution ensures that both common enterprise behaviors and          To demonstrate the effectiveness of the proposed framework,
+sophisticated multi-stage attacks are adequately represented,        we compared it against a set of representative baselines that
+enabling balanced evaluation across detection and adaptabil-         span traditional sequence-based detection, graph-based meth-
+ity. This dataset design provides a balanced yet challenging         ods without continual learning, and state-of-the-art continual
+benchmark, where benign activities introduce variability             learning approaches. This selection ensures a comprehensive
+while APT traces contribute complex, stealthy behaviors.             evaluation across different modeling paradigms.
+By leveraging both real-world telemetry and reproducible
+sandbox execution, the evaluation framework ensures valid-           TABLE 2. Baseline models for comparison.
+ity, scalability, and relevance to SOC deployments.
+
+G. IMPLEMENTATION DETAILS
+To ensure reproducibility and fairness in evaluation, all mod-
+els were implemented using PyTorch Geometric and trained
+on a high-performance computing environment equipped
+with an NVIDIA Tesla V100 GPU (32 GB memory). The
+same hardware and software stack was employed for all base-
+lines to eliminate variability due to computational resources.
+
+1) TRAINING CONFIGURATION
+The proposed GNN with rehearsal-based continual learning
+was configured with the following parameters:
+   a) Architecture: 3 GNN layers with hidden
+      dimension = 128
+   b) Activation: ReLU with dropout = 0.2
+   c) Optimizer: Adam with learning rate = 1e-3, weight              1) BASELINE DESCRIPTIONS
+      decay = 1e-5                                                      a) CNN-BiLSTM with Attention [5]: A sequence-based
+   d) Batch size: 256, trained for 200 epochs per scenario                 intrusion detection model widely used in prior research.
+   e) Rehearsal buffer: 10% of past samples, updated via                   It first extracts local dependencies via convolutional
+      reservoir sampling                                                   layers, then models long-term temporal behaviors
+   f) Aggregation function: Attention-based neighborhood                   with a bidirectional LSTM, followed by an attention
+      aggregation                                                          mechanism to focus on salient features.
+To evaluate robustness, each experiment was repeated five               b) Static GNN [12]: A graph-based model trained once
+times with different random seeds, and the mean ± standard                 and evaluated without updates. While effective at cap-
+deviation was reported for all metrics.                                    turing relational dependencies, this model is vulnerable
+                                                                           to concept drift as it cannot adapt to evolving attack
+2) BASELINE CONFIGURATIONS                                                 patterns.
+The baseline models were configured as follows:                         c) Fine-tuned GNN [13]: An incremental learning
+  a) CNN-BiLSTM with Attention – implemented with                          approach where the GNN is updated on new data
+     2 convolutional layers, BiLSTM (128 hidden units),                    without rehearsal. This allows short-term adaptability
+
+212976                                                                                                                          VOLUME 13, 2025
+A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+       but typically suffers from catastrophic forgetting,                        adversarial conditions. By jointly considering these two
+       leading to degraded long-term performance.                                 classes of metrics, our evaluation framework ensures that the
+   d) Generative Replay IDS: A continual learning approach                        proposed system is not only accurate under evolving threat
+       that employs generative replay. A lightweight gen-                         landscapes, but also efficient, interpretable, and robust for
+       erative model synthesizes pseudo-samples from past                         deployment in SOC/EDR infrastructures.
+       distributions to stabilize learning. This method rep-
+       resents the state-of-the-art in continual learning for                     1) METRIC DESCRIPTIONS
+       intrusion detection, serving as a strong benchmark                          a) Precision (Positive Predictive Value): Measures the
+       against our proposed approach.                                                  proportion of alerts classified as malicious that are
+   As summarized in Table 2, each baseline highlights differ-                          indeed malicious. High precision reduces false positives
+ent strengths and limitations. Sequence-based methods such                             and analyst fatigue.
+as CNN-BiLSTM excel in capturing temporal dependencies                             b) Recall (True Positive Rate): Quantifies the proportion of
+but fail to model the multi-hop relationships inherent in APT                          actual malicious events correctly detected. High recall
+campaigns. Static GNNs leverage graph structure effectively                            minimizes the likelihood of APTs remaining undetected.
+but remain static and unable to adapt under concept drift.                         c) F1-score: Harmonic mean of precision and recall, bal-
+Fine-tuned GNNs offer short-term adaptability yet suffer                               ancing the trade-off between minimizing false positives
+from catastrophic forgetting over time. In contrast, generative                        and maximizing threat detection.
+replay provides continual adaptation but introduces higher                         d) AUC (Area Under the ROC Curve): Captures the trade-
+computational overhead. These comparisons establish a                                  off between true positive and false positive rates across
+balanced benchmark, ensuring that the proposed GNN with                                thresholds, providing a robust, threshold-independent
+rehearsal-based continual learning is evaluated against both                           metric.
+traditional approaches and state-of-the-art methods, thereby                       e) Detection Latency (ms): Measures the average time
+validating its robustness and adaptability.                                            to analyze telemetry and issue alerts, indicating the
+                                                                                       feasibility of near real-time threat mitigation.
+I. PERFORMANCE METRICS                                                              f) Memory Overhead (%): Quantifies additional stor-
+To provide a rigorous and comprehensive evaluation,                                    age required for rehearsal buffers or replay mecha-
+we employ both accuracy-oriented and efficiency-oriented                               nisms, reflecting the trade-off between adaptability and
+metrics. In cybersecurity, conventional accuracy alone can                             scalability.
+be misleading due to the imbalanced distribution of benign                           As summarized in Table 3, the chosen metrics span both
+and malicious events, where benign traces vastly outnumber                        detection effectiveness and operational efficiency, offering a
+malicious ones. This imbalance often inflates accuracy values                     balanced evaluation framework. Accuracy-oriented metrics
+while obscuring the model’s ability to detect stealthy APT                        validate the framework’s ability to detect evolving APT
+activities. Therefore, metrics such as precision, recall, F1-                     behaviors, while efficiency-oriented metrics ensure that the
+score, and AUC have become the de facto standard in                               solution remains scalable and deployable in enterprise SOCs.
+intrusion detection research [5], [15]. Precision and recall                      Together, these measures provide a holistic assessment,
+quantify the trade-off between reducing false alarms and                          ensuring that the proposed system is not only accurate
+maximizing true detection rates, while the F1-score provides                      but also efficient, interpretable, and resilient in real-world
+a balanced measure under skewed class distributions. AUC                          cybersecurity contexts.
+further enables threshold-independent evaluation, which is
+crucial for SOC environments that require adaptive decision                       IV. EXPERIMENTAL RESULTS
+thresholds.                                                                       A. MAIN RESULTS
+   In addition to detection accuracy, operational feasibility is                  The results of our experimental evaluation provide a com-
+critical for real-world deployment. We thus incorporate detec-                    prehensive comparison between the proposed GNN with
+tion latency (time required to process telemetry and produce                      rehearsal-based continual learning and the selected baselines.
+alerts) and memory overhead (additional storage required for                      Unlike static or sequential models that either fail to adapt
+continual learning mechanisms). These efficiency-oriented                         or suffer from catastrophic forgetting, the proposed method
+measures provide insight into scalability, real-time appli-                       demonstrates consistent improvements in both detection
+cability, and resource consumption—key considerations for                         accuracy and adaptability across evolving APT scenarios.
+enterprise SOCs handling massive volumes of telemetry.                            To ensure robustness, each experiment was repeated five
+   Moreover, with the growing adoption of attention mecha-                        times with different random seeds, and the mean ± standard
+nisms [16] and explainable AI frameworks [17], evaluation                         deviation is reported.
+must extend beyond raw performance to consider inter-                                Accuracy-oriented metrics (Precision, Recall, F1-score,
+pretability and trustworthiness for human analysts. Similarly,                    and AUC) highlight the framework’s ability to detect multi-
+the rise of adversarial attacks against intrusion detection                       stage APT behaviors with high fidelity, while efficiency-
+models [18] highlights the importance of robust evaluation                        oriented measures (Latency and Memory Overhead) validate
+using recall and AUC, which reflect resilience under adaptive                     its feasibility for SOC/EDR environments. These dual
+
+VOLUME 13, 2025                                                                                                                          212977
+                                                                  A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+TABLE 3. Performance metrics for evaluation.                          TABLE 4. Model performance comparison (mean ± STD over 5 runs).
+
+
+
+
+                                                                      baseline. This trade-off highlights the practical scalability of
+                                                                      the method for enterprise SOC environments.
+                                                                         The results confirm that the proposed GNN with rehearsal-
+                                                                      based continual learning provides a balanced combination
+                                                                      of accuracy, adaptability, and efficiency. By outperforming
+                                                                      both conventional and state-of-the-art baselines in F1-score,
+                                                                      AUC, and recall, while maintaining operational feasibil-
+perspectives are essential, as high detection accuracy alone          ity, the framework demonstrates its suitability for real-
+is insufficient if the model cannot be deployed in real-              world SOC/EDR deployment. Furthermore, its alignment
+world systems at scale. Furthermore, the improvements                 with attention-based advances, explainability objectives and
+align with recent advances in attention mechanisms [19],              adversarial robustness requirements underscores its potential
+which strengthen relational learning, as well as ongoing              to serve as a next-generation approach for adaptive APT
+efforts in explainable AI [20] to provide interpretability of         detection [24], [25].
+detected attack paths. Additionally, the robustness analysis
+against concept drift and adversarial behaviors directly              B. ABLATION STUDY
+addresses concerns raised in adversarial machine learning             To further validate the contributions of each component
+studies [21], [22], [23], confirming the framework’s resilience       in the proposed framework, we conducted an ablation
+in adversarial settings.                                              study. This analysis isolates the impact of the graph-based
+   As summarized in Table 4, the proposed framework con-              representation and the rehearsal-based continual learning
+sistently outperforms all baselines across accuracy-oriented          mechanism. By systematically disabling or modifying indi-
+metrics. Notably, the F1-score improves by +2.1% compared             vidual components, we measure their influence on detection
+to fine-tuning and +5.0% compared to CNN-BiLSTM,                      accuracy and adaptability under evolving APT scenarios.
+demonstrating enhanced adaptability to evolving threats. The          Such studies are essential in intrusion detection research,
+Recall improvement of nearly 5 percentage points confirms             as they clarify whether improvements arise from specific
+the system’s effectiveness at capturing stealthy APT activities       design choices or from the combined effect of multiple
+that other models fail to detect.                                     modules [26], [27].
+   From an efficiency standpoint, the proposed framework                 As shown in Table 5, both the graph representation
+achieves these gains with minimal overhead: average detec-            and rehearsal-based continual learning are indispensable
+tion latency increased only by ∼2 ms compared to static               to the proposed framework. Their integration achieves the
+GNNs, while the rehearsal buffer required 10% additional              best trade-off between detection accuracy and adaptability,
+storage, which is lower than the generative replay IDS                confirming that the framework’s superior performance stems
+
+212978                                                                                                                           VOLUME 13, 2025
+A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+TABLE 5. Ablation study on model components.                                      TABLE 6. Detection performance by mitre ATT&CK tactic.
+
+
+
+
+not from a single component but from the synergistic effect of
+combining graph-based modeling with continual adaptation.                         finding is consistent with previous observations in APT
+   The ablation study highlights several key insights. First,                     research, where C2 communication is among the most
+graph-based modeling alone (GNN only) achieves rela-                              evasive behaviors.
+tively high detection accuracy, confirming that multi-hop                            This threat-specific evaluation confirms that while the
+dependencies across processes, files, and network entities                        proposed framework delivers strong overall performance,
+are crucial for identifying APT behaviors. Second, the                            its ability to detect stealthy C2 behaviors remains an open
+rehearsal mechanism applied to sequential models improves                         challenge for future research.
+retention of past knowledge but underperforms in recall and
+F1-score, indicating that sequential representations fail to                      D. VISUALIZATION AND INTERPRETABILITY
+capture the full relational context of attacks. Third, fine-tuned                 Beyond raw detection performance, interpretability is critical
+GNNs achieve modest improvements but remain vulnerable                            for SOC analysts, who must understand why an alert was
+to catastrophic forgetting, consistent with prior findings                        triggered. Recent efforts in explainable AI (XAI) [20]
+in continual learning research. Finally, the full integration                     emphasize that black-box models, while accurate, may
+of GNN and rehearsal-based continual learning yields the                          hinder trust and operational adoption if their outputs are
+highest F1-score (0.981), demonstrating that both modules                         not explainable. To address this, we present visualizations
+contribute complementary strengths: relational modeling and                       of detected malicious subgraphs and interpret the relational
+adaptive knowledge retention [28], [29], [30], [31].                              patterns captured by the GNN.
+                                                                                     Fig. 1. Precision–Recall curve of the proposed GNN with
+C. THREAT-SPECIFIC PERFORMANCE                                                    rehearsal-based continual learning compared with baseline
+While overall performance metrics provide a useful bench-                         models. The curve demonstrates that the proposed framework
+mark, practical SOC/EDR deployments require fine-grained                          maintains high precision and recall under class-imbalance
+evaluation of detection capabilities across different adver-                      conditions, confirming superior detection reliability and
+sarial tactics. APT are typically multi-stage campaigns, and                      robustness.
+certain tactics (e.g., persistence or privilege escalation) may                      Fig. 2. Visualization of a malicious subgraph detected
+be more easily detectable than stealthy behaviors such as                         by the proposed framework. Nodes represent processes,
+command-and-control (C2). Following the MITRE ATT&CK                              files, registry keys, and network entities, while edges denote
+framework, we evaluate the proposed system’s performance                          behavioral interactions among them. The highlighted multi-
+on three representative tactic categories: persistence, privi-                    hop relationships illustrate how the GNN captures persistence
+lege escalation, and C2 communication [32], [33], [34].                           and lateral-movement patterns typical of APT campaigns,
+   As shown in Table 6, the proposed framework performs                           enhancing interpretability for SOC analysts.
+strongly on persistence and privilege escalation, achieving
+F1-scores above 0.98. This is due to the clear graph                              E. DISCUSSION
+signatures associated with file modifications and process                         The main findings from the experimental results can be
+injections, which are well captured by the GNN. In contrast,                      summarized as follows:
+performance on command-and-control detection is relatively                         a) Graph-based modeling improves accuracy. Represent-
+lower (F1 = 0.936), reflecting the difficulty of identifying                          ing endpoint telemetry as graphs enables the model to
+stealthy outbound connections and encrypted traffic. This                             capture multi-hop dependencies across processes, files,
+
+VOLUME 13, 2025                                                                                                                            212979
+                                                                           A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+                                                                                c) Efficiency trade-offs are acceptable. The additional
+                                                                                   memory required for the rehearsal buffer is modest, and
+                                                                                   the latency overhead is minimal, making the approach
+                                                                                   suitable for large-scale SOC/EDR environments.
+                                                                                d) Detection varies across tactics. While persistence and
+                                                                                   privilege escalation are detected with high reliability,
+                                                                                   command-and-control remains more challenging due to
+                                                                                   its stealthy nature.
+                                                                                e) Interpretability enhances trust. Visualization of mali-
+                                                                                   cious subgraphs and PR curves provides transparency,
+                                                                                   enabling analysts to trace how detections are made
+                                                                                   and increasing confidence in automated alerts [35],
+                                                                                   [36], [37].
+
+                                                                               F. COMPARATIVE DISCUSSION
+                                                                               To evaluate the significance of this study in the broader
+                                                                               research landscape, a comparative analysis was conducted
+                                                                               against representative works on APT and intrusion detection
+                                                                               using Graph Neural Networks (GNNs) and continual learning
+                                                                               techniques. Table 7 summarizes the key characteristics,
+                                                                               datasets, and performance metrics of these studies compared
+FIGURE 1. Precision–Recall curve showing that the proposed GNN with            to the proposed framework [38], [39], [40].
+rehearsal-based continual learning maintains high precision and recall
+under class imbalance, outperforming baseline models.
+                                                                               TABLE 7. Comparative analysis with existing studies.
+
+
+
+
+FIGURE 2. Visualization of a malicious subgraph captured by the
+proposed framework. Nodes represent processes, files, registry keys, and
+network entities; edges denote behavioral interactions indicating
+multi-hop APT activities.
+
+
+                                                                                  As summarized in Table 7, existing graph-based intrusion
+    registry keys, and network entities, leading to superior                   detection studies such as Ren et al. [1] and Su and Wang [13]
+    precision, recall, and F1-scores compared to sequence-                     achieve strong accuracy under static conditions but fail to
+    based methods.                                                             adapt when faced with evolving threat behaviors. Continual
+ b) Continual learning stabilizes adaptability. The rehearsal                  learning–oriented frameworks like Oikonomou et al. [23]
+    mechanism reduces catastrophic forgetting and allows                       and Wei et al. [11] improve adaptability but rely primarily
+    the model to retain past knowledge while adapting                          on synthetic datasets or require complex generative replay,
+    to new threats, ensuring consistent performance under                      which limits their deployment feasibility in real-world
+    concept drift.                                                             Security Operations Centers (SOCs).
+
+212980                                                                                                                                    VOLUME 13, 2025
+A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+   In contrast, the proposed framework integrates rehearsal-                      Neural Networks (GNNs) with rehearsal-based continual
+based continual learning directly with real endpoint telemetry                    learning using telemetry from the Wazuh EDR platform.
+from Wazuh, enabling continuous adaptation to evolving                            By representing endpoint interactions as graphs, the frame-
+APT tactics while preserving previously learned knowledge.                        work effectively captures multi-hop relationships among
+The experimental results confirm that this integration pro-                       system entities and adapts to evolving attack behaviors.
+vides a stable balance between accuracy (F1-score = 0.981),                          Experimental evaluations show that the proposed model
+latency, and memory overhead. Moreover, the use of real                           achieves consistent F1-scores above 0.98 while maintaining
+EDR data differentiates this study from prior approaches that                     low latency and minimal resource consumption. These results
+rely on simulated or benchmark datasets, offering a practical                     demonstrate that the combination of graph-based relational
+contribution to the deployment of adaptive detection systems                      modeling and continual learning provides an accurate,
+in enterprise environments.                                                       scalable, and resilient solution for real-world adaptive threat
+                                                                                  detection.
+G. KNOWLEDGE CONTRIBUTION
+Overall, this research advances the state of the art in adaptive                  PRACTICAL IMPLICATIONS
+threat detection in three major aspects:                                          The proposed approach can be directly integrated into modern
+   1) Bridging theory and practice: It demonstrates the                           Security Operations Centers (SOCs) and Endpoint Detection
+       feasibility of applying continual learning in real                         and Response (EDR) workflows. Its continual learning mech-
+       EDR environments, closing the gap between aca-                             anism enables incremental model updates without retraining
+       demic continual learning models and operational SOC                        from scratch, thereby reducing operational downtime. The
+       systems [39].                                                              graph-based interpretability further allows SOC analysts to
+   2) Enhanced adaptability and scalability: By combin-                           trace attack paths and understand behavioral correlations,
+       ing GNN-based relational modeling with rehearsal-                          enhancing situational awareness and accelerating incident
+       based continual learning, the framework maintains                          response. This practical applicability makes the framework
+       detection stability under dynamic APT behaviors while                      suitable for deployment in enterprise environments facing
+       remaining computationally efficien [40]t.                                  dynamic cyber threats [42], [43].
+   3) Interpretability for SOC analysts: Through graph-
+       based visualizations, the framework enhances the                           FUTURE WORK
+       transparency of detection results, enabling analysts to                    Future extensions will focus on federated continual learning
+       trace multi-stage attack paths and improve decision-                       to support decentralized SOCs, optimizing rehearsal buffer
+       making [41].                                                               strategies for long-term scalability, and improving robustness
+These contributions collectively provide a new foundation for                     against adversarial APT tactics. Integration with explainable
+designing scalable, interpretable, and continuously adaptive                      AI visual interfaces is also planned to enhance analyst
+intrusion detection systems, representing a significant step                      collaboration and human–AI interpretability in cybersecurity
+forward in both academic research and real-world cyberse-                         operations [44], [45].
+curity practice.
+                                                                                  REFERENCES
+H. LIMITATIONS                                                                    [1] W. Ren, X. Song, Y. Hong, Y. Lei, J. Yao, Y. Du, and W. Li, ‘‘APT attack
+Despite the strong performance of the proposed framework,                             detection based on graph convolutional neural networks,’’ Int. J. Comput.
+                                                                                      Intell. Syst., vol. 16, no. 1, Nov. 2023, doi: 10.1007/s44196-023-00369-5.
+several limitations remain. First, large-scale enterprise envi-                   [2] M. Zhong, M. Lin, C. Zhang, and Z. Xu, ‘‘A survey on graph
+ronments generate substantially higher telemetry volume,                              neural networks for intrusion detection systems: Methods, trends and
+which may increase memory overhead for the rehearsal buffer                           challenges,’’ Comput. Secur., vol. 141, Jun. 2024, Art. no. 103821, doi:
+                                                                                      10.1016/j.cose.2024.103821.
+and affect scalability under resource-constrained deploy-                         [3] W. Ju, S. Yi, Y. Wang, Z. Xiao, Z. Mao, H. Li, Y. Gu, Y. Qin, N. Yin,
+ments. Second, while the system achieves high accuracy                                S. Wang, X. Liu, P. S. Yu, and M. Zhang, ‘‘A survey of graph neural
+on persistence and privilege-escalation behaviors, detecting                          networks in real world: Imbalance, noise, privacy and OOD challenges,’’
+                                                                                      2024, arXiv:2403.04468.
+stealthy command-and-control (C2) communication remains                           [4] L. Akoglu, H. Tong, and D. Koutra, ‘‘Graph-based anomaly detection and
+challenging due to its low visibility and encrypted traffic                           description: A survey,’’ 2014, arXiv:1404.4679.
+patterns. Third, adversarial evasion techniques targeting                         [5] K. Faber, R. Corizzo, B. Sniezynski, and N. Japkowicz, ‘‘Lifelong learning
+                                                                                      for anomaly detection: New challenges, perspectives, and insights,’’ SSRN
+graph structures or GNN message passing may reduce
+                                                                                      J., Mar. 2023, doi: 10.2139/ssrn.4374293.
+robustness against adaptive attackers. These limitations                          [6] T. Lesort, ‘‘Continual learning for anomaly detection: An empiri-
+highlight important opportunities for improving scalability,                          cal study,’’ Neural Netw., vol. 153, pp. 275–289, Nov. 2022, doi:
+adversarial resilience, and detection of stealthy tactics in                          10.1016/j.neunet.2022.05.011.
+                                                                                  [7] M. Siganos, P. Radoglou-Grammatikis, I. Kotsiuba, E. Markakis,
+future work.                                                                          I. Moscholios, S. Goudos, and P. Sarigiannidis, ‘‘Explainable AI-based
+                                                                                      intrusion detection in the Internet of Things,’’ in Proc. 18th Int. Conf. Avail-
+V. CONCLUSION AND FUTURE WORK                                                         ability, Rel. Secur., Aug. 2023, pp. 1–10, doi: 10.1145/3600160.3605162.
+                                                                                  [8] A. Sebastian, ‘‘Explainable artificial intelligence models for intrusion
+This study presented an adaptive framework for Advanced                               detection systems to improve the efficiency and interpretability of black
+Persistent Threat (APT) detection that combines Graph                                 box models,’’ Int. J. Appl. Math., vol. 38, no. 5s, pp. 769–790, Oct. 2025.
+
+VOLUME 13, 2025                                                                                                                                              212981
+                                                                                        A. Pomsathit: Adaptive Detection of Advanced Persistent Threats (APT) With GNNs
+
+
+
+
+ [9] S. F. Rabooki, B. Li, F. G. Febrinanto, C. Peng, E. Naghizade, F. Han, and             [33] B. Al-Sada, A. Sadighian, and G. Oligeri, ‘‘MITRE ATT&CK: State of the
+     F. Xia, ‘‘GraphDART: Graph distillation for efficient advanced persistent                   art and way forward,’’ 2023, arXiv:2308.14016.
+     threat detection,’’ 2025, arXiv:2501.02796.                                            [34] X. Shen, Z. Li, G. Burleigh, L. Wang, and Y. Chen, ‘‘Decoding the
+[10] X. Zhang, R. Zhao, Z. Jiang, H. Chen, Y. Ding, E. C. H. Ngai, and                           MITRE engenuity ATT&amp;CK enterprise evaluation: An analysis of
+     S.-H. Yang, ‘‘Continual learning with strategic selection and forgetting for                EDR performance in real-world environments,’’ 2024, arXiv:2401.15878.
+     network intrusion detection,’’ 2024, arXiv:2412.16264.                                 [35] H. Mohammadian, G. Higgins, S. Ansong, R. Razavi-Far, and A. A.
+[11] X. Wei, L. Qi, H. Li, J. Zhou, and Y. Cao, ‘‘Graph anomaly detection                        Ghorbani, ‘‘Explainable malware detection through integrated graph
+     based on multi-aspect contrastive learning,’’ in Proc. 4th Int. Symp.                       reduction and learning techniques,’’ Big Data Res., vol. 41, Aug. 2025,
+     Comput. Technol. Inf. Sci. (ISCTIS), Jul. 2024, pp. 51–55, doi: 10.1109/isc-                Art. no. 100555, doi: 10.1016/j.bdr.2025.100555.
+     tis63324.2024.10698918.                                                                [36] M. Rahman, S. Ullah, S. Nahar, M. S. Hossain, M. Rahman, and M. Rah-
+[12] X. Yang, H. Yu, X. Gao, H. Wang, J. Zhang, and T. Li, ‘‘Federated                           man, ‘‘The role of explainable AI in cyber threat intelligence: Enhancing
+     continual learning via knowledge fusion: A survey,’’ IEEE Trans.                            transparency and trust in security systems,’’ World J. Adv. Res. Rev., vol. 23,
+     Knowl. Data Eng., vol. 36, no. 8, pp. 3832–3850, Aug. 2024, doi:                            no. 2, pp. 2897–2907, Aug. 2024, doi: 10.30574/wjarr.2024.23.2.2404.
+     10.1109/TKDE.2024.3363240.                                                             [37] A. Bizzarri, C.-E. Yu, B. Jalaian, F. Riguzzi, and N. D. Bastian, ‘‘A
+[13] Y. Su and X. A. Wang, ‘‘A graph neural network approach with self-                          synergistic approach in network intrusion detection by neurosymbolic AI,’’
+     supervised learning for malware detection,’’ in Proc. ITNEC, Sep. 2024,                     2024, arXiv:2406.00938.
+     pp. 775–778, doi: 10.1109/ITNEC60942.2024.10732985.                                    [38] M. A. Jahin et al., ‘‘CAGN-GAT fusion: A hybrid contrastive attentive
+[14] S. Khan, M. Naseer, M. Hayat, S. W. Zamir, F. S. Khan, and M. Shah,                         graph neural network for network intrusion detection,’’ in Proc. Int. Conf.
+     ‘‘Transformers in vision: A survey,’’ 2021, arXiv:2101.01169.                               Ind., Eng. Appl. Appl. Intell. Syst. Cham, Switzerland: Springer, 2025,
+[15] M. T. Ribeiro, S. Singh, and C. Guestrin, ‘‘Anchors: High-precision model-                  pp. 415–428, doi: 10.1007/978-981-96-8892-0_35.
+     agnostic explanations,’’ in Proc. AAAI, vol. 32, 2018, pp. 1527–1535.                  [39] J. Ying, T. Zhu, A. Zheng, T. Chen, M. Lv, and Y. Chen, ‘‘METANOIA: A
+[16] H. Sun, W. Yang, and Y. Xiao, ‘‘A review of adversarial attacks and                         lifelong intrusion detection and investigation system for mitigating concept
+     defenses on graphs,’’ in Proc. 4th Int. Conf. Artif. Intell. Comput. Eng.,                  drift,’’ 2024, arXiv:2501.00438.
+     Nov. 2023, pp. 416–421, doi: 10.1145/3652628.3652697.                                  [40] A. A. M. Bahar, K. S. Ferrahi, M.-L. Messai, H. Seba, and K. Amrouche,
+[17] G. Adamson, ‘‘Explaining technology we do not understand,’’ IEEE                            ‘‘CONTINUUM: Detecting APT attacks through spatial–temporal graph
+     Trans. Technol. Soc., vol. 4, no. 1, pp. 34–45, Mar. 2023, doi:                             neural networks,’’ 2025, arXiv:2501.02981.
+     10.1109/TTS.2023.3240107.                                                              [41] Z. Guo, X. Li, H. Shen, X. Zhang, W. Wang, and D. Xie, ‘‘Detecting
+[18] R. Upreti, P. G. Lind, A. Elmokashfi, and A. Yazidi, ‘‘Trustworthy machine                  advanced persistent threats via casual graph neural network,’’ Proc. SPIE,
+     learning in the context of security and privacy,’’ Int. J. Inf. Secur., vol. 23,            vol. 13516, pp. 273–279, Jan. 2025, doi: 10.1117/12.3052125.
+     no. 3, pp. 2287–2314, Apr. 2024.                                                       [42] S. Freitas and A. Gharib, ‘‘Web scale graph mining for cyber threat
+[19] H. Kim, B. S. Lee, W.-Y. Shin, and S. Lim, ‘‘Graph anomaly detection                        intelligence,’’ 2024, arXiv:2411.06239.
+     with graph neural networks: Current status and challenges,’’ IEEE Access,              [43] P. Kumar, D. Javeed, A. K. M. N. Islam, and X. Luo, ‘‘DeepSecure: A
+     vol. 10, pp. 111820–111829, 2022, doi: 10.1109/ACCESS.2022.3211306.                         computational design science approach for interpretable threat hunting in
+                                                                                                 cybersecurity decision making,’’ Decis. Support Syst., vol. 188, Jan. 2025,
+[20] J. Xu, J. Chen, S. You, Z. Xiao, Y. Yang, and J. Lu, ‘‘Robustness of
+                                                                                                 Art. no. 114351, doi: 10.1016/j.dss.2024.114351.
+     deep learning models on graphs: A survey,’’ AI Open, vol. 2, pp. 69–78,
+     Jan. 2021, doi: 10.1016/j.aiopen.2021.05.002.                                          [44] P. A. Gandhi, P. N. Wudali, Y. Amaru, Y. Elovici, and A. Shabtai,
+                                                                                                 ‘‘SHIELD: APT detection and intelligent explanation using LLM,’’ 2025,
+[21] Q. Yuan, S.-U. Guan, P. Ni, T. Luo, K. L. Man, P. Wong, and V. Chang,
+                                                                                                 arXiv:2502.02342.
+     ‘‘Continual graph learning: A survey,’’ 2023, arXiv:2301.12230.
+                                                                                            [45] H. Nazari, A. Yazdinejad, A. Dehghantanha, F. Zarrinkalam, and
+[22] W. Liu, P. Gao, H. Zhang, K. Li, W. Yang, X. Wei, and J. Shu, ‘‘Detecting
+                                                                                                 G. Srivastava, ‘‘P3GNN: A privacy-preserving provenance graph-based
+     complex multi-step attacks with explainable graph neural network,’’ 2024,
+                                                                                                 model for APT detection in software defined networking,’’ 2024,
+     arXiv:2405.11335.
+                                                                                                 arXiv:2406.12003.
+[23] C. Oikonomou, I. Iliopoulos, D. Ioannidis, and D. Tzovaras, ‘‘A multi-
+     class intrusion detection system based on continual learning,’’ in Proc.
+     IEEE Int. Conf. Cyber Secur. Resilience (CSR), Jul. 2023, pp. 86–91, doi:
+     10.1109/CSR57506.2023.10224974.
+[24] N. Xiao, B. Lang, T. Wang, and Y. Chen, ‘‘APT-MMF: An advanced per-
+     sistent threat actor attribution method based on multimodal and multilevel                                       AUTTAPON POMSATHIT received the B.Eng.
+     feature fusion,’’ Comput. Secur., vol. 144, Sep. 2024, Art. no. 103960, doi:                                     degree in electronics engineering, the M.Eng.
+     10.1016/j.cose.2024.103960.                                                                                      degree in information engineering, and the
+[25] Y. Amaru, P. Wudali, Y. Elovici, and A. Shabtai, ‘‘RAPID: Robust APT                                             Ph.D. degree in electrical engineering from
+     detection and investigation using context-aware deep learning,’’ 2024,                                           the King Mongkut’s Institute of Technology
+     arXiv:2406.05362.                                                                                                Ladkrabang (KMITL), Thailand, in 2001, 2005,
+[26] M. M. Hasan, M. U. Islam, and J. Uddin, ‘‘Advanced persistent threat                                             and 2013, respectively.
+     identification with boosting and explainable AI,’’ Social Netw. Comput.                                             He is currently an Assistant Professor with the
+     Sci., vol. 4, no. 3, Mar. 2023, doi: 10.1007/s42979-023-01744-x.                                                 Department of Computer Engineering, Faculty of
+[27] A. S. Al-Aamri, R. Abdulghafor, S. Turaev, I. Al-Shaikhli, A. Zeki, and                                          Engineering, KMITL. He has over 20 years of
+     S. Talib, ‘‘Machine learning for APT detection,’’ Sustainability, vol. 15,             teaching and research experience, having previously served as the Director of
+     no. 18, p. 13820, Sep. 2023, doi: 10.3390/su151813820.                                 the Office of Academic Resources and Information Technology, Phranakhon
+[28] Z. Qiao, J. Xiao, Q. Sun, M. Xiao, X. Luo, and H. Xiong, ‘‘Towards                     Rajabhat University, and Head of the Cybersecurity and Digital Technology
+     continuous reuse of graph models via holistic memory diversification,’’
+                                                                                            Management Program, Rangsit University. He is the co-author of several
+     2024, arXiv:2406.07413.
+                                                                                            books, including Computer and Information Security Theory and IT Security
+[29] S. Choi, W. Kim, S. Kim, Y. In, S. Kim, and C. Park, ‘‘DSLR: Diversity
+                                                                                            Concept, and has contributed to national and international research projects
+     enhancement and structure learning for rehearsal-based graph continual
+     learning,’’ in Proc. ACM Web Conf., May 2024, pp. 733–744, doi:                        on intrusion detection systems, industrial control system security, and
+     10.1145/3589334.3645561.                                                               digital community technology. His research interests include artificial
+[30] H. Liu, Y. Yang, and X. Wang, ‘‘Overcoming catastrophic forgetting                     intelligence, cybersecurity analysis, penetration testing, wireless security,
+     in graph neural networks,’’ in Proc. AAAI Conf. Artif. Intell., vol. 35,               and network infrastructure. He holds several professional certifications,
+     May 2021, pp. 8653–8661, doi: 10.1609/aaai.v35i10.17049.                               including Cisco Certified Network Associate (CCNA), Huawei Certified
+[31] T. D. Hoang, D. V. Tung, D.-H. Nguyen, B.-S. Nguyen, H. H. Nguyen, and                 ICT Associate (HCIA–Cloud Service), and Palo Alto Network Security
+     H. Le, ‘‘Universal graph continual learning,’’ 2023, arXiv:2308.13982.                 Administrator (PCNSA). He served as a consultant for government agencies
+[32] W. Li, ‘‘A comparative analysis of advanced persistent threat detection                and organizations on information security, strategic IT planning, and digital
+     methodologies: A systematic review,’’ Appl. Comput. Eng., vol. 165, no. 1,             transformation, and a reviewer for academic journals and conferences.
+     pp. 102–108, Jul. 11, 2025, doi: 10.54254/2755-2721/2025.ld24900.
+
+212982                                                                                                                                                        VOLUME 13, 2025
+

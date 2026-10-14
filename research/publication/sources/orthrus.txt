@@ -1,0 +1,1286 @@
+ O RTHRUS: Achieving High Quality of Attribution in Provenance-based Intrusion
+                            Detection Systems
+
+        Baoxiang Jiang1∗† , Tristan Bilot234∗† , Nour El Madhoun3 , Khaldoun Al Agha2 , Anis Zouaoui4
+                               Shahrear Iqbal5 , Xueyuan Han6 , Thomas Pasquier7
+                     1 Xi’an Jiaotong University, 2 Université Paris-Saclay, 3 LISITE – Isep,
+                  4 Iriguard, 5 National Research Council Canada, 6 Wake Forest University
+                                        7 University of British Columbia
+
+
+
+                               Abstract                            actions within complex systems, leveraging domain-specific
+Past success in applying machine learning to data provenance       semantics – typically based on aggregated topological infor-
+graphs – a structured representation of the history of operat-     mation of nodes and their surrounding neighborhoods – to
+ing system activities – to detect host system intrusions has       identify unusual nodes, edges, paths, subgraphs, or even entire
+fueled continued interest in the security community. Recent        graphs [11, 43].
+solutions, particularly anomaly-based approaches using graph          In computer systems, a popular approach to intrusion de-
+neural networks (GNNs) to detect previously unknown at-            tection and investigation – the practice of identifying the
+tacks, have reported near-perfect accuracy. Surprisingly, de-      presence of an attacker in a host system and reasoning about
+spite this high performance, the industry remains reluctant to     the cause and damage of the attack [35, 41, 76] – is to analyze
+adopt these intrusion detection systems (IDSs).                    a special type of graph called a provenance graph. In these
+   We identify Quality of Attribution (QoA) as the key factor      graphs, nodes represent low-level operating system objects,
+contributing to this disconnect. QoA refers to the amount of       such as processes, files, and sockets, and edges represent var-
+effort required from a human analyst to investigate an IDS’s       ious types of interactions between these objects as a result
+detection output, uncover the root causes of an attack, un-        of system calls [52, 53]. A provenance graph is directed, at-
+derstand its ramifications, and dismiss potential false alarms.    tributed, and dynamic. It is directed and attributed because
+Unfortunately, prior work often generates large volumes of         two nodes are causally connected by a typed edge to rep-
+low-QoA output, much of which is irrelevant to attack activi-      resent a system object (e.g., a process) acting upon another
+ties, leading to alert fatigue and analyst burnout. We introduce   object (e.g., a file) through a specific system call (e.g., open).
+O RTHRUS, the first IDS to achieve high-QoA detection on           Different node types also have distinct attributes describing
+data provenance graphs at the node level. O RTHRUS detects         the entities they represent. For example, a process node has
+malicious hosts using a GNN encoder designed to capture the        command line options, and a file node has a file name as
+fine-grained spatio-temporal dynamics of system events. It         attributes. A provenance graph is dynamic because it evolves
+then reconstructs the attack path through dependency analysis      over time as the underlying system runs, with its temporal
+to ensure high-QoA detection.                                      structure capturing the history of the system’s execution.
+   We compare O RTHRUS against five state-of-the-art IDSs.            Provenance graphs can be used to detect malicious behav-
+O RTHRUS reduces the number of nodes requiring manual in-          iors, such as Advanced Persistent Threats (APTs), a partic-
+spection for attack attribution by several orders of magnitude,    ularly stealthy type of attack [27, 40], during system execu-
+significantly easing the burden on security analysts while         tion. Systems designed for this purpose are often referred to
+achieving strong detection performance.                            as Provenance-based Intrusion Detection Systems (PIDSs).
+                                                                   They can be divided into two broad categories: (1) prior-
+                                                                   knowledge-based solutions; and (2) anomaly-based ones.
+1     Introduction                                                 Prior-knowledge-based solutions rely on known attack pat-
+                                                                   terns and are unable to detect unknown attacks. In contrast,
+In recent years, graph-based machine learning (ML) tech-           anomaly-based systems are unsupervised and learn benign
+niques have gained increasing traction for anomaly detection       behavior patterns from system execution, enabling them to de-
+across various fields, such as finance, social sciences, and bi-   tect previously unknown attacks. We focus on anomaly-based
+ology [10, 19, 21, 62, 67, 74]. Graphs are used to model inter-    systems.
+    * These authors contributed equally.                              Prior work [18, 27, 29, 32, 40, 44, 65, 66, 69, 72, 73] has
+    †Work done while at the University of British Columbia.        proposed various techniques for detecting anomalies in prove-
+nance graphs that indicate attack activity. These solutions         between system objects (e.g., processes, files, sockets, etc.).
+primarily focus on improving detection performance; how-            This information can be used to detect anomalies in system
+ever, they rarely consider the attribution quality of detection     behavior. PIDSs have evolved from detecting anomalies in
+signals [20]. Attribution is a crucial aspect of intrusion detec-   repeated executions of the same application [28, 44] to ana-
+tion, where security experts must carefully analyze the output      lyzing whole-system provenance [27], achieving increasing
+of the system to identify an intrusion’s root cause and mitigate    accuracy and precision [18, 36, 57]. Unfortunately, the attri-
+its impact. Low-quality signals provide either no contextual        bution quality of state-of-the-art systems remains a significant
+information or an overwhelming amount of irrelevant data,           barrier to their practical adoption [20], as they often generate
+contributing to alert fatigue [31] and frequent burnout [61].       an overwhelming number of alerts.
+We identify two main factors contributing to this problem:             Security analysts must examine the information reported
+(1) the evaluation strategies adopted by prior work (see §2),       by a detection system to identify attacks and distinguish be-
+and (2) the metrics used to evaluate detection performance          tween true and false positives. This task becomes particularly
+fail to account for the significant class imbalance in intrusion    challenging when the number of anomalous graph elements
+detection problems (see §5).                                        reported is disproportionately large compared to the actual
+   We discuss how past evaluation strategies, due to fundamen-      anomaly [20]. This shortcoming is a direct result of how
+tal flaws in their design, have led to systems that overwhelm       researchers have evaluated past work. We identify three eval-
+security analysts with irrelevant information. Building on this     uation strategies used in assessing state-of-the-art systems,
+insight, we propose a conservative evaluation approach that         highlight their flaws, and propose a new approach to address
+favors systems producing a minimal amount of data, better           these shortcomings.1
+aligning with security analysts’ needs and guiding the design          Table 1 compare the number nodes considered malicious
+of O RTHRUS. As a result, O RTHRUS generates data several           under each evaluation strategy. We describe these approaches
+orders of magnitude smaller than state-of-the-art methods, ef-      and explain their flaws below.
+fectively combating alert fatigue. This reduction would allow       Neighborhood Approach (e.g., ThreaTrace [66], Flash [57],
+analysts to spend less time on report analysis and more time        and MAGIC [36]). In this evaluation strategy, any node within
+actively handling threats [12]. To achieve this, O RTHRUS           2 hops (both ancestors and descendants) of a node mentioned
+combines a novel high-precision anomaly detection system            in the textual description of the ground truth is considered
+to identify key attack-related nodes with a dependency anal-        to be contributing to the attack. For instance, in a scenario
+ysis technique to extract relevant ancestors and descendants        where a malicious process and a benign one access a shared
+of those nodes. We evaluate O RTHRUS against five state-of-         library, both nodes are considered part of the attack, even if
+the-art baselines (Kairos [18], ThreaTrace [66], SIGL [29],         one process is completely unrelated. In general, a node is
+MAGIC [36], and Flash [57]). We show O RTHRUS’ superi-              labeled as malicious simply by sharing a dependency with
+ority in terms of detection performance, attribution quality,       an attack-related event. This strategy leads to a significant
+training time, and memory consumption.                              overestimation of the number of malicious nodes.
+                                                                    Batch Approach (e.g., Kairos [18] and EdgeTorrent [38]).
+Contributions                                                       In this strategy, the evaluated system processes a batch of
+                                                                    events (e.g., a fixed number in the case of EdgeTorrent or
+• O RTHRUS is the first PIDS capable of performing mean-            based on elapsed time in the case of Kairos) and computes
+  ingful node-level detection on whole-system provenance            an anomaly score for the entire batch. As with the previous
+  graphs. We carefully designed a detection pipeline that re-       strategy, this tends to overestimate the number of malicious
+  duces the amount of data security experts need to analyze         nodes, as events occurring simultaneously with an attack are
+  by several orders of magnitude.                                   considered malicious.
+• We generate and open-source a comprehensive and solid             Source Approach (e.g., R-CAID [25]). In this strategy, the
+  ground truth labeling for PIDSs’ standard benchmark               source nodes of an attack are identified, and all descendants
+  datasets (DARPA E3 [8] and E5 [9]).                               are considered malicious. This method is problematic because
+• We open-source our solution and evaluate it using publicly        it overestimates the scope of attack activities. For example, if
+  available datasets (see our compliance with the open science      an attacker hijacks a Firefox process to download a malicious
+  policy in §9).                                                    payload, all subsequent activities performed by the browser
+                                                                    are labeled as malicious. This can include hours of benign
+                                                                    browsing activities that are completely unrelated to the attack.
+                                                                    As previous strategies, this significantly overestimate attacks
+2   Issues with Current Evaluation Strategies
+                                                                    activities.
+Provenance-based Intrusion Detection Systems (PIDSs) rep-              As Arp et al. [15] warn us about how the choice of poor
+resent a computer system’s execution as a directed graph,              1We acknowledge that our own work UNICORN [27], SIGL [29], and
+
+known as a provenance graph, which depicts interactions             Kairos [18] have contributed to this trend and share these flaws.
+    Datasets             Training     Validation    Test            Total       Neigh.     Batch      Source      Ours    Prevalence
+    E3-CADETS            449,325      40,581        268,153         758,059     12,852     4,929      2,062       68      2.5 × 10−4
+    E3-THEIA             410,023      34,365        699,295         1,143,683   25,362     51,098     35,794      118     1.7 × 10−4
+    E3-CLEARSCOPE        132,121      797           111,394         244,312     32,451     8,727      2,750       41      3.7 × 10−4
+    E5-CADETS            3,275,875    1,245,539     3,111,378       7,632,792   20,524     717,783    401,065     123     4.0 × 10−5
+    E5-THEIA             745,773      234,896       747,452         1,728,121   162,714    61,368     9,374       69      9.2 × 10−5
+    E5-CLEARSCOPE        171,771      3,842         150,725         326,338     48,488     8,636      1,020       51      3.4 × 10−4
+
+Table 1: Comparison of evaluation strategies. Ground truth for the neighborhood (Neigh.) approach is calculated based on the
+methodology from Wang et al. [66], the batch approach from Cheng et al. [18], and the source approach from Goyal et al. [25].
+We contacted the authors to confirm our understanding of their methodology. In all cases, our ground truth is smaller by several
+orders of magnitude. We also report the prevalence of malicious nodes in the test set using our methodology. It is important to
+note the significant class imbalance, with the proportion of malicious nodes ranging from approximately 1:10,000 to 1:1,000,000
+across different datasets. A visual representation of the output of a “perfect” detection system for each strategy is provided in
+Appendix D.
+
+
+evaluation methodology can lead to the design of impractical            assume that the system is outside of attacker control when
+systems, while Pendlebury et al. [54] show how it leads to mis-         the training data is captured and when the training occurs
+leading performance reports in Malware classification task.             (i.e., we exclude data and model poisoning from our threat
+While systems developed under the above evaluation method-              model). O RTHRUS’ software, the provenance capture mech-
+ologies may appear capable of identifying perturbations po-             anism, and the underlying OS form our trusted computing
+tentially correlated with attacks, they fail to achieve precise         base. We assume the capture mechanism and OS are protected
+node-level attribution. Previous work [18, 57] acknowledges             from attackers using hardening techniques described in past
+this issue and recognizes the challenge posed by the large vol-         provenance capture work [16, 52]. Finally, we assume that the
+ume of data produced by state-of-the-art PIDSs for security             provenance record is protected against tampering; we lever-
+analysts. Kairos [18] employs community discovery and sum-              age tamper-evident logging techniques [50, 51] to ensure log
+marization techniques to group output data into meaningful              integrity and detect any attempts at tampering.
+subgraphs, while Flash [57] adopts a similar strategy by gen-
+erating so-called “Attack Evolution Graphs”. However, these
+approaches address only the symptom, not the root problem.              4   O RTHRUS Framework
+They merely organize and summarize the vast amounts of
+unnecessary data into more manageable chunks [17] without               O RTHRUS is an anomaly-based intrusion detection system
+resolving the fundamental inability of these systems to pin-            that leverages advanced temporal graph learning techniques
+point nodes directly relevant to malicious behaviors. Practical         and causality analysis to (1) perform node-level anomaly de-
+systems cannot emerge until an appropriate methodology for              tection without prior knowledge of attacks, and (2) reconstruct
+evaluating them is established.                                         attack scenarios. O RTHRUS generates concise attack summary
+Our approach. We manually and painstakingly analyzed                    graphs with high attribution quality, enabling labor-efficient
+the datasets, comparing the textual documentation with the              attack investigation. Fig. 1 illustrates the overall architecture
+data they contain, to identify individual nodes that are part           of O RTHRUS, which comprises five components:
+of the attacks. While previous approaches considered several            ⃝1 Graph Construction (§4.1). Provenance graphs are built
+thousand nodes as malicious, we identified between 41 and               from raw logs, and redundant edges are pruned while preserv-
+123 nodes. When we attempted to evaluate previous systems               ing the sequence of events.
+using our approach, we quickly uncovered their inadequacies             ⃝2 Edge Featurization (§4.2). O RTHRUS converts prove-
+(see §5). We design O RTHRUS to achieve high attribution                nance graphs into a sequence of vectorized edges used for
+quality.                                                                graph learning.
+                                                                        ⃝3 Temporal Graph Learning (§4.3). O RTHRUS employs
+                                                                        an encoder-decoder architecture to capture both the structural
+3    Threat Model                                                       and temporal aspects of provenance graphs. The model pro-
+                                                                        cesses the edge vector sequence as input, encoding it into edge
+We follow the same threat model as past work [18, 27, 47,               embeddings. These embeddings are then decoded to predict
+48, 65]. We assume that attackers seek to take control of and           the type of each edge. Reconstruction errors are determined
+maintain their presence in the target system. Activities not cap-       by calculating the loss between the predicted and actual edge
+tured by standard kernel-level systems are considered out of            types.
+scope (e.g., covert and hardware-level side channels). We also          ⃝4 Anomaly Detection (§4.4). First, we apply an automated
+  1                 Graph Construction                        2                        Edge Featurization
+
+                                                                                         Type + node attribute
+                                                                                             featurization
+      System Logs               Provenance Graph                  Attributes                                               Edge Features
+
+  3                                                Temporal Graph Learning
+                                                             Backpropagation
+                                                                                                                    Loss
+  Edge (u,v)
+                         +                                                                      connect     0.72
+                                      GNN                                                       execute     0.11                 connect
+ Neighbors                                                            Decoder
+                                     Encoder                                                    clone       0.10
+ in Dynamic                                                                                     …             …
+ Graph                                                Edge                         Edge Type    read        0.02      Loss
+                                                    Embedding                      Prediction                      Calculation
+
+  4                        Anomaly Detection                                   5            Attack Reconstruction
+   Thresholding +                                   Malicious Node                                     Backward                    Attack
+   Clustering                                             Detection                                     Tracing                  Summary
+                                                                                                                                   Graph
+
+      0.5   1.0   … 10.0 10.5                                  Causality Tracing
+        Anomaly Scores                                                                           Forward Tracing
+
+                                            Figure 1: Overview of O RTHRUS framework.
+
+
+thresholding technique to detect abnormal nodes. Then, we                  Logs       Attributes
+cluster the outliers to differentiate between benign anoma-                Process    name, cmd
+                                                                           File       path
+lies (i.e., infrequent patterns) and malicious ones (i.e., truly
+                                                                           Netflow    local address, local port, remote address, remote port
+malicious behaviors). This two-step approach eliminates the                Event      subject, object, event type, timestamp
+need for manual threshold setting, significantly reduces false
+positives, and enhances both precision and attribution quality.                             Table 2: Attributes of logs.
+⃝5 Attack Reconstruction (§4.5). O RTHRUS takes the output
+of the anomaly detection stage to perform causality analysis.
+It takes the nodes identified as anomalous and automatically             events between nodes. Capture systems such as CamFlow [52]
+reconstructs attack scenarios. Rather than generating multiple           and SPADE [23] can automatically handle such redundancy
+discrete alarms, it provides analysts with a concise set of              reduction during capture. O RTHRUS can operate effectively
+attack summary graphs, enabling more efficient investigation.            on top of various capture mechanisms (see §5).
+
+
+4.1     Graph Construction                                               4.2       Edge Featurization
+O RTHRUS parses raw logs generated by various capture mech-              At this stage, the provenance graph consists of various types
+anisms (e.g., ETW [1], Linux Audit [4], CamFlow [52], eAu-               of entities and relations, with entities annotated with textual
+dit [59]) to construct the input graph. We focus on three types          information such as file paths, process command lines, and
+of entities and their interactions: processes, files, and netflows.      IP addresses. This information must be converted into feature
+Table 2 outlines the information we extract from these logs.             vectors, and the provenance graph should be vectorized for the
+We reduce redundancy by performing edge pruning through                  subsequent graph learning phase. To create these feature vec-
+Causality Preserved Reduction [68], which removes redun-                 tors, we extract five features and concatenate them to generate
+dant edges while preserving the sequential information of                an edge feature vector euv (see Fig. 2).
+                                                                         of tokenized words in its attribute. As a result, file paths in the
+                                                                         same parent directory (e.g., /var/log/wdev and /var/log/xdev),
+                                                                         commands of the same process (e.g., firefox -contentproc
+                                                                         -childID 21 and firefox -contentproc -childID 23) or net-
+                                                                         flows on the same network segment (e.g., 128.55.12.110 and
+                                                                         128.55.12.118) are closely mapped in the embedding space.
+
+
+                                                                         4.3    Temporal Graph Learning
+                                                                         Provenance graphs are powerful tools for modeling system
+                                                                         activity, capturing critical structural features that enhance the
+                                                                         profiling of user behaviors. These behaviors, whether benign
+                                                                         or malicious, unfold as sequences of ordered events, repre-
+                                                                         sented as temporal edges that effectively encode temporal
+                                                                         information within the graph. Leveraging both spatial and
+                                                                         temporal dimensions is crucial for detecting attacks, as they
+Figure 2: Features extracted from system entities to create              inherently unfold across both. O RTHRUS models benign user
+edge features for graph learning.                                        behavior at the system level by analyzing interactions between
+                                                                         entities such as processes, files, and sockets, utilizing both
+                                                                         spatial and temporal dimensions.
+Encoding Types. System entities and the edges connecting                    To achieve this, O RTHRUS employs an encoder-decoder ar-
+them contain valuable information that should be integrated              chitecture specifically designed to capture the spatiotemporal
+into the graph to effectively learn interactions between spe-            context of system events within provenance graphs. The en-
+cific types of entities. We use one-hot encoding to repre-               coder utilizes a GNN architecture, which has proven effective
+sent these types, converting each type into a fixed-size vector          in detecting complex attacks [18, 36, 57, 66]. To better cap-
+where all positions are zeros except for a single one at the             ture the temporal dynamics of provenance graphs, O RTHRUS
+index corresponding to the specific type. Consequently, for              employs a dynamic graph structure, which incorporates tem-
+each edge (u, v) in the graph, three types are extracted: the            poral information by assigning timestamps to each edge, un-
+type of the event, denoted as tuv , and the types of the two             like static graphs that represent only the spatial dimension.
+endpoint entities, denoted as tu and tv .                                This design enables the encoder to learn embeddings of nodes
+Encoding Node Attributes. While the type of a system en-                 and edges that effectively preserve the structural and temporal
+tity is crucial for distinguishing between different types of            patterns generated by system entities.
+entities, such as a process and a file, it is insufficient for differ-      Our model does not rely on labeled attack data, as such
+entiating between entities of the same type. For instance, we            labels are challenging to obtain in the cybersecurity domain.
+expect to see distinct behaviors associated with /etc/passwd             Additionally, supervised learning on specific attacks can limit
+and /users/me/Downloads/file.txt. To address this, we employ             the ability of a model to generalize to unseen attacks [18].
+Word2vec [46] to transform textual attributes into feature vec-          Therefore, O RTHRUS’ encoder and decoder are trained in
+tors. We tokenize each textual attribute into a sequence of              a self-supervised manner on benign data, functioning as an
+words (w1 , w2 , ..., wk ). For example, the file path /users/me/-       anomaly detection system. Specifically, the decoder recon-
+Downloads/file.txt would be tokenized into “users, me, Down-             structs the type of each edge, as shown in Fig. 1, by learning
+loads, file, txt”. The Word2vec model is trained on the corpus           to infer the event type from its spatiotemporal context. By
+of all textual attributes, embedding each word wi into a fixed-          training on a substantial amount of benign data, the model op-
+size vector wi that captures the similarity between words                timizes this reconstruction process, enabling it to learn benign
+based on their context. Prior work [18, 75] suggests that sys-           user activity without the need for handcrafted labels.
+tem entities with similar semantics tend to share a similar                 During inference, O RTHRUS calculates reconstruction er-
+hierarchy. By using the Skip-gram approach, which predicts               rors for each incoming edge. Edges with high reconstruction
+context words based on a target word, this hierarchical rela-            errors, which deviate significantly from typical benign pat-
+tionship within attributes can be effectively captured.                  terns, are flagged as potentially malicious. The system then
+   Formally, we derive feature vectors for textual attributes by         identifies the entities responsible for the attack and the timing
+computing the average of their words’ embedding:                         of the attack by analyzing the source nodes of these high-
+                                   n                                     error edges and their associated timestamps. In a subsequent
+                            x v = ∑ wi ,                          (1)    step (see §4.5), an attack graph can be constructed from the
+                                  i=1
+                                                                         predicted nodes and edges, assisting analysts in tracing the
+where xv is the feature vector of node v and n is the number             attack’s path and reducing their workload.
+Encoder. To enhance O RTHRUS’ applicability to real-world           with valuable information that the GNN can exploit, along
+scenarios, we propose a lightweight encoder (relatively low         with the structural and temporal properties gathered during
+memory and computational complexity) that can learn use-            the previous temporal sampling step. The encoder computes
+ful temporal edge embeddings in a stateless manner while            an embedding for each node by integrating its own features,
+maintaining high detection performance. Unlike most GNN             the features of its neighboring nodes, and the associated edge
+encoders used by other systems, O RTHRUS’ encoder retains           features:
+past events involving each system entity during the aggre-                                                              
+gation process using a temporal sampling approach. While                      hv = GNN xv , {xu , euv | (u, v) ∈ SN (v)} ,      (4)
+K AIROS employs a similar approach, its encoder’s reliance
+on state memory leads to significantly higher memory usage          where xu and xv represent the feature vectors of the emitting
+(nearly threefold) and weaker performance, as shown in the          node u and receiving node v, respectively, hv is the resulting
+“Encoding” ablation in Table 7. This overhead arises because        embedding of node v, and euv denotes the edge features of
+K AIROS stores an additional memory vector for each system          edge (u, v).
+entity and directly uses it during GNN propagation, substan-            Similarly to K AIROS, we employ a variant of the Graph-
+tially increasing the memory footprint. In contrast, O RTHRUS       Transformer layer introduced by Shi et al. [60] (Equations 5
+leverages the existing node features of entities without requir-    and 6) as our GNN layer. This GraphTransformer variant is
+ing additional storage. Although the state vector in K AIROS is     particularly well-suited for learning on provenance graphs, as
+intended to capture long-range dependencies, our ablation ex-       it learns attention coefficients that weigh the importance of
+periments show that our simple temporal sampling approach           each system entity relative to others. This mechanism allows
+is sufficient.                                                      each node to focus on the most relevant neighboring informa-
+   For each incoming system event from node u to v occur-           tion during aggregation, enabling attention-based GNNs to
+ring at time t, we aim to aggregate the information from            efficiently capture essential features that distinguish between
+source node u within v. To capture the structural and temporal      benign and anomalous instances during detection, thereby
+patterns surrounding v, the aggregation process should also         enhancing attribution quality. For every edge (u, v), an atten-
+consider the edges that occurred prior to time t, ensuring that     tion coefficient αu,v is calculated using the features of both
+node v is aware of its context within the graph. We define the      the source and destination nodes, along with the edge fea-
+set of all edges that occurred prior to time t as                   tures, and is normalized with a softmax function across all
+                                                                    connected neighbors:
+            St (v) = {(u, v) ∈ E | tuv < t, tuv ∈ T },       (2)
+                                                                                              (W3 xv )⊤ (W4 xu + W5 euv )
+                                                                                                                         
+                                                                            αu,v = softmax                √                  ,   (5)
+where tuv denotes the timestamp of the edge from node u to                                                   d
+node v, E represents the set of all edges and T denotes the
+timestamps associated to edges in E. From St (v), we sample         where d represents the hidden size, and W3 , W4 , and W5 are
+the N most recent edges that interacted with node v, ensuring       learnable weight matrices. The normalized attention coeffi-
+that the temporal information of previous events is preserved.      cients are subsequently used in the aggregation step to weigh
+By using a fixed-size sample for aggregation, the amount of         the learned features of neighboring nodes:
+aggregated information is controlled. This approach enhances
+scalability and has proven highly effective in inductive set-               hv = W1 xv +     ∑        αu,v (W2 xu + W5 euv ) ,   (6)
+                                                                                           (u,v)∈SN
+tings, which involve generalizing a model to nodes that were
+not encountered during training [26]. We define the sampled         where W1 and W2 are weight matrices. Our experiments, de-
+subset as                                                           tailed in §5.4, demonstrate that setting the temporal sampling
+                                                                    parameter N between 10 and 20, with a node embedding size
+             SN (v) = SAMPLE(St (v), N , T ,t),              (3)
+                                                                    of z = 32, yields the best average performance across datasets.
+where SAMPLE is a function that selects the N last incoming         Decoder. At this stage, the node embeddings effectively cap-
+edges prior to time t.                                              ture the structural and temporal behaviors specific to each
+   The structural and temporal interactions within these sam-       entity in the provenance graph. The decoder then learns these
+pled graphs are captured using an attention-based GNN that          embeddings by computing a loss function that optimizes a
+leverages features. O RTHRUS is the first system to incorpo-        given objective. Specifically, the decoder is trained to pre-
+rate the types of both system entities and events as features       dict the edge type for all connected node pairs. By accurately
+during encoding. Specifically, system call types are encoded        predicting edge types, the model not only reinforces its un-
+as one-hot edge features, while node features are constructed       derstanding of the interactions between system entities but
+by concatenating the one-hot encoded system entity type (e.g.,      also deepens its comprehension of the relationship dynamics
+file, process, or socket) with the word embedding of that entity,   between them. This is essential for distinguishing between
+as detailed in §4.2. These combined features enrich the graph       benign and potentially malicious events. The integration of
+node and edge types as features within the graph also signifi-                        Entry 1
+cantly enhances the model’s ability to predict an event’s type          Dependency                  Another       Forward Tracing
+based on its surrounding context.                                       Graph 1                      entry
+   We have designed a simple yet effective decoder (Equa-
+tion 7) that distinguishes between source and destination enti-                                                  Backward Tracing
+ties by projecting their embeddings through distinct weight
+matrices. This approach accounts for the differing semantics
+of nodes that emit and receive information, ensuring these                                                Dependency
+roles are appropriately modeled during training. Formally,                                                Graph 2
+the predicted type of an edge (u, v) is calculated based on the
+embeddings of its end nodes such that:                                                          Node p                  Exit   2
+
+                 ŷuv = σ (Wg [Ws hu , Wd hv ]) ,             (7)
+                                                                                                         Another exit
+where ŷuv denotes the predicted edge type, [., .] is the concate-
+nation operation, σ is the Sigmoid activation function and Wg ,            Figure 3: Causality analysis from a detected node p.
+Ws and Wd denote the gate, source and destination weight
+matrices, respectively. The entire model is trained by deriving
+a loss value from the predicted edge type ŷuv and the ground        Outlier Clustering. To further differentiate between benign
+truth yuv using the Cross-Entropy (CE) loss across all edge          anomalies, which may commonly occur in real-world situ-
+types to predict:                                                    ations, and truly malicious anomalies, O RTHRUS applies a
+                                                                     K-means clustering algorithm [30] with two clusters to the
+                      Luv = CE(ŷuv , yuv ).                  (8)    set of suspicious nodes identified through thresholding. This
+                                                                     approach isolates outliers with the highest anomaly scores, ef-
+By optimizing this loss for each benign edge in the training         fectively identifying the cluster of the most suspicious anoma-
+set, the weights within the encoder and decoder are updated,         lies and thereby enhancing attribution quality. The cluster
+allowing O RTHRUS to learn the user’s normal activity. During        of the most suspicious anomalies can then be prioritized in
+inference, anomalous temporal or structural patterns in the          subsequent evaluation steps, while the cluster containing less
+graph will produce embeddings that deviate significantly from        suspicious nodes is treated as benign anomalies and not con-
+those learned during training, resulting in a high reconstruc-       sidered part of an attack. This clustering step significantly
+tion loss. This high reconstruction loss can then be leveraged       reduces false positives and alleviates the workload for ana-
+in a subsequent detection step to identify anomalies.                lysts (see §5.5).
+
+4.4    Anomaly Detection
+                                                                     4.5     Attack Reconstruction
+O RTHRUS can learn representations of benign and malicious
+nodes directly in the embedding space. Identifying malicious         O RTHRUS reconstructs the attack associated with nodes
+embeddings with minimal false positives is a crucial chal-           flagged as malicious during anomaly detection and provides
+lenge that all PIDSs must address. While some state-of-the-art       security analysts with attack summary graphs to facilitate in-
+techniques [36, 66] detect anomalies based on scores exceed-         vestigation. Intuitively, the attack should correspond to events
+ing a manually set threshold, this approach is impractical in        within a small subgraph surrounding a malicious node. This
+real-world scenarios due to concept drift and changes in un-         subgraph can be extracted using causality analysis [22, 39].
+derlying data. To address this issue, O RTHRUS employs a             However, some causal dependencies between benign and ma-
+two-step anomaly detection method designed to reduce false           licious nodes also exist (e.g., a firefox instance used to down-
+positives.                                                           load a piece of malware may continue to perform benign
+Automatic Anomaly Thresholding. Suspicious nodes are                 actions for hours after the initial incident). O RTHRUS con-
+flagged when their anomaly score exceeds a threshold, which          ducts a causality analysis for each node p identified during
+is automatically set to the highest anomaly score observed           the anomaly detection phase.
+in the validation set. Typically, an entire day of benign            Dependency Analysis. When an anomaly is detected, we ex-
+data is reserved as a validation set, ensuring it remains un-        tract a subgraph corresponding to the time window surround-
+used during training. In this step, nodes with high anomaly          ing the anomalous event. The duration of this time window
+scores—indicating significant deviation from benign activ-           is adjustable, allowing analysts to tailor it based on prefer-
+ity—can be effectively distinguished from other nodes pre-           ences, graph size, or the presence of high anomaly scores
+dicted as benign with lower scores. This approach has proven         near the malicious event. Since attack reconstruction is a post-
+highly effective in identifying deviations from normal behav-        processing step with anomaly scores already stored, analysts
+ior [29].                                                            can re-run this process using different time window sizes with-
+out incurring significant computational overhead. This flex-         to u:
+ibility facilitates the identification of attack boundaries and
+                                                                                                     1
+the discovery of relevant attack patterns. We set the default                            fA (u) =          ∑ Luv .
+                                                                                                    |Eu | uv∈E
+                                                                                                                                 (10)
+time window to 15 minutes, as this duration proved optimal                                                     u
+
+across most datasets, consistent with previous findings [18].
+                                                                     Here, we build on the insight that attack nodes are clustered
+By limiting the graph size analyzed, this approach reduces
+                                                                     in highly anomalous regions of the provenance graph (i.e.,
+computational costs. Additionally, the extracted time-window
+                                                                     regions with high reconstruction loss). Finally, the criticality
+subgraph is transformed into a directed acyclic graph (DAG)
+                                                                     score fC (e) of an entry/exit e is calculated as the average of
+to ensure all nodes along a path maintain causal relationships.
+                                                                     the normalized degree and anomaly score of all nodes within
+This is achieved by creating multiple versions of nodes as
+                                                                     the corresponding dependency graph De :
+the state of the corresponding subject or object changes [49].
+Next, we identify potential attack entry and exit nodes. An                                    1
+entry point could be the attacker’s IP address used to infiltrate                  fC (e) =          ∑ ( fˆD (u) + fˆA (u)),
+                                                                                              |Ve | u∈V
+                                                                                                                                 (11)
+                                                                                                       e
+the system by delivering a malicious payload, while an exit
+point might be a file that has been stealthily relocated to a        where Ve is the set of nodes in the dependency graph De , fˆD (u)
+hidden directory within the system. An entry node, which             and fˆA (u) denote the degree and anomaly scores normalized
+does not have parents, serves as the root of a path. Conversely,     with min-max normalization, to eliminate the difference in
+exit nodes are without children, marking the end of a path.          magnitude between scores.
+Entries and exits define the boundaries of an attack path. We
+identify entry and exit nodes by traversing the graph from p
+using backward tracing and forward tracing, as illustrated in        5   Evaluation
+Fig. 3.
+                                                                     O RTHRUS’ design fulfills two objectives: (1) detecting all
+   We define a dependency graph as the set of all paths be-          attacks occurring within a system, and (2) minimizing the
+tween an entry/exit node and p. In Fig. 3, the dependency            amount of data that security analysts need to review. Given
+graph De1 includes all paths generated through tracing be-           the significant imbalance in the datasets (with ratios of ma-
+tween entry e1 and p, while the dependency graph De2 in-             licious nodes ranging from 1:10,000 to 1:1,000,000), it is
+cludes paths traced between exit e2 and p. We repeat this            crucial to carefully choose our optimization criteria. As Dong
+operation until all dependency graphs between p and all pos-         et al. [20] highlight, a practical system must minimize false
+sible entry/exit are identified.                                     positives (i.e., ensure high precision) as long as all attacks
+Critical Dependency Identification. After identifying all            are detected, rather than focusing on identifying every single
+potential entries and exits, along with the dependency graphs        node involved in an attack (i.e., high recall). Additionally, the
+connecting them to p, we select the most anomalous entry             significant dataset imbalance must be considered when select-
+and exit to reconstruct the attack graph. To do this, we assign      ing evaluation metrics. We assess O RTHRUS’ ability to meet
+a criticality score fC (ei ) to each entry/exit ei . The entry and   these objectives. We begin by introducing the datasets and
+exit with the highest criticality scores are identified as the       baselines, we then address the following research questions:
+critical entry and critical exit, respectively. The union of their   RQ1: Is O RTHRUS able to detect all attacks?
+dependency graphs is then mapped back to the original prove-         RQ2: What is the quality of attribution?
+nance graph and reported as the attack graph to the security         RQ3: Is O RTHRUS computationally efficient?
+analyst.                                                             RQ4: How do hyperparameters influence performance?
+                                                                     RQ5: How the different O RTHRUS’ components contribute
+Calculating the Criticality Score. We associate every node
+                                                                     to overall performance?
+in a dependency graph with two scores: (1) a degree score
+                                                                     RQ6: How robust is O RTHRUS against mimicry attacks?
+ fD (u); and (2) an anomaly score fA (u). The degree score
+                                                                        All training and evaluation were conducted on a server
+ fD (u) measures the relevance of a node u to the dependency
+                                                                     running Ubuntu 22.04, equipped with a 3.2GHz 16-core AMD
+graph:
+                                                                     EPYC 7343 CPU, 1024 GB of memory, and an NVIDIA
+                                                                     GA100 GPU with 80GB of memory.
+            fD (u) = OutDegree(u)/InDegree(u).                (9)
+                                                                     Datasets
+This approach builds on the insight from Fang et al. [22]            To the best of our knowledge, the only large datasets that are
+that nodes with a high degree score exert strong influence on        publicly and widely available are those associated with the
+data flow, enabling more accurate identification of key nodes        DARPA Transparent Computing Program [7]. Other datasets
+within a dependency graph. The anomaly score fA (u) is the           are either small (Manzoor et al. [44] and Han et al. [27]),
+average reconstruction loss (from §4.3) of all edges connected       not publicly available (Zeng et al. [72] and Wang et al. [65]),
+or designed primarily for attack matching, lacking sufficient                             Dataset              System          E3         E5
+                                                                                                               O RTHRUS        ✓ 3/3      ✓ 2/2
+benign behavior to properly train and evaluate anomaly-based                                                   Kairos          ✗ 0/3      ✗ 0/2
+systems (Alsaheel et al. [13]).                                                              CADETS
+                                                                                                               ThreaTrace      ✓ 3/3      ✓ 2/2
+   Consequently, we leverage the publicly available                                                            SIGL            ✗ 0/3      ✗ 0/2
+                                                                                                               MAGIC           ✓ 3/3      ✓ 2/2
+datasets [8, 9] from the DARPA TC program, which are                                                           Flash           ✓ 3/3      ✓ 2/2
+widely used throughout the literature as benchmarks for                                                        O RTHRUS        ✓ 2/2      ✓ 1/1
+PIDSs [18, 24, 27, 36, 57, 65, 73]. During the TC program,                                                     Kairos          ~ 1/2      ✗ 0/1
+                                                                                                               ThreaTrace      ✓ 2/2      ✓ 1/1
+a team of security experts organized several adversarial                                         THEIA
+                                                                                                               SIGL            ~ 1/2      ✗ 0/1
+engagements simulating real-world attacks on an enterprise                                                     MAGIC           ✓ 2/2      ✓ 1/1
+network targeting critical service infrastructure (e.g., SSH,                                                  Flash           ✓ 2/2      ✓ 1/1
+                                                                                                               O RTHRUS        ✓ 1/1      ✓ 3/3
+email, or web servers). These attacks occurred alongside                                                       Kairos          ✗ 0/1      ~ 1/3
+benign activities such as browsing the internet, checking                                                      ThreaTrace      ✓ 1/1      ✓ 3/3
+                                                                                          CLEARSCOPE
+and responding to emails, and performing SSH logins. The                                                       SIGL            ✓ 1/1      ~ 2/3
+                                                                                                               MAGIC           ✓ 1/1      ✓ 3/3
+data was captured by three different mechanisms—CADETS,                                                        Flash           ✗ 0/1      ✓ 3/3
+THEIA, and CLEARSCOPE—operating in three distinct
+environments: FreeBSD, Linux, and Android. These datasets                      Table 3: Attack detection performance on DARPA datasets.
+are highly imbalanced, as indicated by the low prevalence of
+malicious nodes outlined in the dataset statistics in Table 1.
+We give further details about how we split the datasets in                     ThreaTrace [66]. ThreaTrace trains a GraphSAGE [26]
+Appendix A.                                                                    model to predict node type and reports misclassified nodes
+                                                                               as anomalous. We use the publicly available ThreaTrace’s
+Evaluated Systems                                                              source code [6].
+                                                                               SIGL [29]. SIGL detects malicious graphs by assigning a
+We select five state-of-the-art PIDSs [18, 29, 36, 57, 66] as                  normality score to each node (see §4.5 in their paper) using
+baselines. To the best of our knowledge, this is the most ex-                  a Graph-LSTM architecture [55]. Since SIGL is not open-
+tensive comparison performed to date, focusing on recent                       sourced, we re-implemented it following prior work [24].
+(2021–2024) anomaly-based systems. We exclude older sys-                       MAGIC [36]. MAGIC employs a Graph Attention Net-
+tems that cannot provide node-level anomaly scores (e.g.,                      work [64] based autoencoder to embed nodes and performs
+UNICORN [27] and Streamspot [44]). We note that our                            outlier detection to identify anomalies We use the publicly
+selected baselines were evaluated against those approaches                     available MAGIC code [5] and their proposed thresholding
+and outperform them. We also exclude systems that require                      method, which relies on ground truth labels.3
+attack samples and/or descriptions (e.g., ATLAS [13] and
+                                                                               Flash [57]. Flash utilizes a GNN model with positional encod-
+ProvG-Searcher [14]), as they cannot be fairly compared to
+                                                                               ing [63] to detect anomalous nodes based on type prediction.
+anomaly-based systems. Furthermore, we exclude systems
+                                                                               We use the publicly available Flash code [2], which speci-
+that were not fully open-sourced, did not function, or could
+                                                                               fies a confidence threshold for each dataset. For datasets that
+not be re-implemented based on the paper (e.g., ProvDetec-
+                                                                               Flash did not evaluate, we follow the paper’s guidelines to
+tor [65], ShadeWatcher [73], and R-CAID [25]).2 We ensure
+                                                                               determine the appropriate threshold.
+that our comparison includes all three open-source state-of-
+                                                                               O RTHRUS-full. We run O RTHRUS from the provenance
+the-art anomaly detection systems published in 2024 (i.e.,
+                                                                               graph construction step to the attack reconstruction step
+Kairos [18], MAGIC [36], and Flash [57]). Further details on
+                                                                               (§4.1~§4.5).
+past evaluations are provided in Appendix B.
+                                                                               O RTHRUS-ano. We run O RTHRUS without the attack recon-
+   To ensure consistent evaluation across all baseline methods,
+                                                                               struction step described in §4.5.
+we use the original code for each system whenever possible,
+modifying only the final evaluation step to use our evaluation
+strategy. We follow the original papers’ instructions and pa-                  5.1     Attack Detection Performance
+rameterize the systems to achieve the best possible outcome
+under our evaluation methodology.                                              First, we evaluate O RTHRUS’ ability to detect all attacks
+Kairos [18]. Kairos, based on a TGN encoder [58], is trained                   within each dataset and compare its performance with the
+to predict edge types using node state vectors and a 4-layer                   selected baselines. An attack is considered detected if the sys-
+MLP decoder. We use the original Kairos code [3], modifying                    tem flags any node directly involved in the attack as malicious.
+only its time window-level evaluation to a node-level evalua-                  The results presented in Table 3 demonstrate O RTHRUS’ abil-
+tion (corresponding to the output described in §4.3.1 of their                 ity to detect all attacks. When other systems fail to detect
+paper).
+                                                                                  3 This approach may present potential issues, but it is the method followed
+  2 This should not be seen as a reflection on the quality of these systems.   by the authors.
+ Dataset         System          TP    FP     TN        FN    Precision   MCC      Dataset         System          TP    FP     TN     FN    Precision   MCC
+                 O RTHRUS-full   25    23     268k      43    0.52        0.44                     O RTHRUS-full   2     10     3M     121   0.17        0.05
+                 O RTHRUS-ano    10    0      268k      58    1.00        0.38                     O RTHRUS-ano    1     5      3M     122   0.17        0.04
+                 Kairos          0     9      268k      68    0.00        0.00                     Kairos          0     6      3M     123   0.00        0.00
+   E3-CADETS     Threatrace      61    252k   16k       7     0.00        0.00       E5-CADETS     Threatrace      91    3M     7k     32    0.00        -0.03
+                 SIGL            0     80     268k      68    0.00        0.00                     SIGL            0     66     3M     123   0.00        0.00
+                 MAGIC           63    80k    188k      5     0.00        0.02                     MAGIC           123   3M     541    0     0.00        0.00
+                 Flash           13    2.4k   266k      55    0.01        0.03                     Flash           45    34k    3M     78    0.00        0.02
+                 O RTHRUS-full   48    11     699k      70    0.81        0.57                     O RTHRUS-full   13    2      747k   56    0.87        0.4
+                 O RTHRUS-ano    8     0      699k      110   1.00        0.26                     O RTHRUS-ano    2     0      747k   67    1.00        0.17
+                 Kairos          4     0      699k      114   1.00        0.18                     Kairos          0     2      747k   69    0.00        0.00
+    E3-THEIA
+                 Threatrace      88    672k   27k       30    0.00        -0.01         E5-THEIA   Threatrace      66    739k   8k     3     0.00        0.00
+                 SIGL            1     29     699k      117   0.03        0.02
+                                                                                                   SIGL            0     23     747k   69    0.00        0.00
+                 MAGIC           115   395k   304k      3     0.00        0.01
+                                                                                                   MAGIC           1     297k   451k   68    0.00        -0.01
+                 Flash           22    32k    667k      96    0.00        0.01
+                                                                                                   Flash           43    296k   452k   26    0.00        0.00
+                 O RTHRUS-full   2     6      111,347   39    0.25        0.11
+                                                                                                   O RTHRUS-full   4     8      151k   47    0.33        0.16
+                 O RTHRUS-ano    1     1      111k      40    0.50        0.11
+                 Kairos          0     7      111k      41    0.00        0.00
+                                                                                                   O RTHRUS-ano    2     7      151k   49    0.22        0.09
+ E3-CLEARSCOPE                                                                                     Kairos          1     3      151k   50    0.25        0.07
+                 Threatrace      41    88k    24k       0     0.00        0.01
+                 SIGL            1     11k    100k      40    0.00        0.00     E5-CLEARSCOPE   Threatrace      41    142k   8k     10    0.00        -0.01
+                 MAGIC           40    102k   9.6k      1     0.00        0.00                     SIGL            10    63     151k   41    0.14        0.16
+                 Flash           0     15k    96k       41    0.00        -0.01                    MAGIC           51    139k   11k    0     0.00        0.01
+                                                                                                   Flash           15    4.6k   146k   36    0.00        0.03
+
+Table 4: Comparison of node-level detection performance on
+                                                                                  Table 5: Comparison of node-level detection performance on
+DARPA E3 datasets. The raw data is available in Appendix F.
+                                                                                  DARPA E5 datasets. The raw data is available in Appendix F.
+
+attacks, they typically flag nodes in the attack’s vicinity rather                all negative samples are predicted as positive and vice versa.
+than nodes directly involved. This aligns with §2 hypothesis.                     However, MCC is dataset-dependent (i.e., an MCC of 0.5 on
+                                                                                  two different datasets does not imply equal performance). It
+5.2        Attribution Quality                                                    should only be used to compare the relative performance of
+                                                                                  two models on the same dataset. Tables 4 and 5 show that
+In RQ1, we observed that most state-of-the-art detection sys-                     O RTHRUS outperforms all other baselines in both MCC and
+tems can successfully identify the majority of attacks. Next,                     precision.
+we aim to assess the quality of attribution. Using E3-CADETS                         These results could be attributed to poor threshold selection
+as an example, as described in Table 1, we identified 68 nodes                    by state-of-the-art systems. However, Fig. 4 and our analysis
+that are directly relevant to the attacks. As shown in Table 4,                   suggest a different conclusion. Fig. 4 shows that previous
+O RTHRUS-full flagged a total of 48 nodes (25 true positives,                     systems struggle to distinguish between malicious and be-
+23 false positives) as malicious, while Flash flagged 2,394                       nign nodes, often assigning them similar anomaly scores. In
+nodes (13 true positives, 2,381 false positives).                                 contrast, O RTHRUS is capable of clearly identifying a few
+   Given the imbalanced nature of our datasets (i.e., attacks                     malicious nodes as outliers (see Fig. 4a). Further analysis
+constitute a very small portion of system activity) and our                       reveals that ThreaTrace, Flash, and MAGIC tend to flag large
+objectives, precision is the most relevant metric, provided that                  areas of the graph containing and surrounding anomalies, cre-
+all attacks are detected. Precision measures the probability                      ating an unnecessary volume of data for analysts. SIGL and
+that a node flagged as malicious is actually part of an attack.                   Kairos flag nodes in the vicinity of an attack but not necessar-
+O RTHRUS achieves a precision of 52%, compared to less than                       ily within it. In particular, Kairos identifies nodes occurring
+1% for Flash.                                                                     concurrently with attacks, aligning with their evaluation strat-
+   Metrics like accuracy, ROC-AUC, and F1 score are com-                          egy. This supports our hypothesis that the choice of evaluation
+monly used in binary classification tasks but can yield overly                    approach contributes to system report quality.
+optimistic results, especially with imbalanced datasets (e.g.,
+a classifier that always predicts negatives could achieve over
+                                                                                  5.3        Computational Efficiency
+99% accuracy). In contrast, the Matthews correlation coeffi-
+cient (MCC) [45] (see §5.2) is a more reliable measure [56],                      When evaluating the practicality of a PIDS, training runtime
+as it produces high scores only when predictions perform                          and memory consumption are crucial metrics [20]. Figures
+well across all four categories of the confusion matrix: True                     5, 6 and 7 show the efficiency differences between the base-
+Positive (TP), False Positive (FP), True Negative (TN), and                       lines. O RTHRUS often outperforms the other baselines in
+False Negative (FN).                                                              both runtime and GPU memory usage due to its lightweight
+   By accounting for both positive and negative elements pro-                     architecture designed to avoid costly operations.
+portionally, MCC is particularly well-suited for evaluating                          In contrast, many other models rely on resource-intensive
+binary classifiers on highly imbalanced datasets. An MCC                          architectures that negatively impact training time, testing
+value of 1 indicates perfect classification, 0 reflects random                    time, and memory consumption. For instance, Kairos ex-
+guessing, and -1 signifies complete misclassification, where                      hibits longer training time (see Tables 10 and 11) due to its
+                           (a) O RTHRUS.                    (b) Threatrace.                                   (c) Kairos.
+
+
+
+
+                             (d) SIGL.                        (e) Magic.                                      (f) Flash.
+
+Figure 4: Anomaly detection systems distinguish between benign and anomalous elements by attributing a reconstruction error
+to each element.A benign element’s reconstruction error should be close to zero, while an anomalous element’s error should be
+large. The discriminative power of an anomaly detection system is defined by its ability to clearly separate benign and malicious
+categories. This figures display node reconstruction errors on the E3-CADETS dataset, with benign elements in green and
+malicious ones in red. Larger gaps between anomalous and benign nodes indicates better systems. Red circles indicate elements
+with the highest anomaly score within each attack.
+Normalized Runtime
+
+
+
+
+                                                                       Normalized Runtime
+                      1                                                                      1
+
+
+                     0.5                                                                    0.5
+
+
+                 0                                                                     0
+                     S      A     E     S       A     E                                    S       A    E     S       A     E
+              C A DET 3-THEI RSCOP CADET 5-THEI RSCOP                               C A DET 3-THEI RSCOP CADET 5-THEI RSCOP
+         E3 -        E       A   E5 -   E        A                              E3 -       E        A  E5-    E        A
+                          LE                  LE                                                 LE                 LE
+                      E3-C               E5-C                                               E3-C               E5-C
+
+Figure 5: Comparison of normalized training time (the lower           Figure 6: Comparison of normalized testing times (the lower
+the better) between ■ Orthrus, ■ Kairos, ■ Threatrace,                the better) between ■ Orthrus, ■ Kairos, ■ Threatrace,
+■ SIGL, ■ MAGIC, and ■ Flash. Normalization is performed              ■ SIGL, ■ MAGIC, and ■ Flash. Normalization is performed
+within each dataset by dividing each system’s training time           within each dataset by dividing each system’s testing time
+by the maximum training time for that dataset (raw data in            by the maximum testing time for that dataset (raw data in
+Appendix F).                                                          Appendix F).
+
+
+                                                                      5.4                   Hyperparameters Study
+use of RNNs to update node memory vectors—an operation                Hyperparameters are critical to the success of any machine
+that is computationally expensive and difficult to parallelize        learning model. Fig. 8 illustrates the impact of different hy-
+on GPUs. Similarly, SIGL applies RNN operations to ev-                perparameters on the number of detected attacks, including a
+ery node within each time window, leading to high training            breakdown of true positives (TPs) and false positives (FPs).
+times. The use of Graph Attention Networks [64] by MAGIC              The overall detection performance is summarized by the
+in both the encoder and decoder results in high computa-              MCC score, and the evolution of memory consumption is
+tional complexity due to the need for calculating attention           also shown.
+weights. Likewise, Flash requires substantial memory as it            Node Dropout: Regularization through node dropout signif-
+maintains feature vector lists for every edge for positional en-      icantly enhances detection performance during O RTHRUS’
+coding, limiting its training to small batches. Finally, although     training. While most dropout rates yield similar results, we
+ThreaTrace achieves the best testing time performance, it             observe an increase in true positives when the dropout rate is
+continues training until a True-Negative-based metric meets           set to 25%.
+a specified threshold, requiring a high number of training            Learning Rate: Choosing the right learning rate is essential
+epochs and thus extending training time.                              for smooth training. Our experiments show that a learning
+                                                                    Component                  With Component (✓)                             Without Component (✗)
+Normalized Memory
+
+                     1                                              Featurization              O RTHRUS’ Word2vec embedding                   Hierarchical hashing as in
+                                                                                               (§4.2)                                         Kairos
+                                                                    Encoding                   O RTHRUS’ encoder (§4.3)                       Kairos’ TGN encoder
+                                                                    Clustering                 O RTHRUS’ anomaly detection algo-              Automatic        anomaly
+                    0.5                                                                        rithm (§4.4)                                   thresholding only
+                                                                    Reconstruction             O RTHRUS’ attack reconstruction al-            No tracing algorithm used
+                                                                                               gorithm (§4.5)
+
+               0                                                              Table 6: Description of the ablations performed.
+                 TS     EIA  PE    TS     EIA   PE
+              ADE E3-TH ARSCO -CADE E5-TH ARSCO
+          E3-C         L E   E 5          L E
+                   E3-C              E5-C                          Dataset     Featurization    Encoding   Clustering   Reconstruction   TP     FP       Precision   Memory
+                                                                                    ✗              ✓           ✓              ✓          51     13       0.79        2.03GB
+                                                                                    ✓              ✗           ✓              ✓          41     772      0.05        5.75GB
+                                                                   E3-THEIA         ✓              ✓           ✗              ✓          48     11       0.81        2.03GB
+Figure 7: Comparison of normalized memory usage (the lower                          ✓              ✓           ✓              ✗          8      0        1.00        2.03GB
+                                                                                    ✓              ✓           ✓              ✓          48     11       0.81        2.03GB
+the better) between ■ Orthrus, ■ Kairos, ■ Threatrace,                              ✗              ✓           ✓              ✓          0      155      0.00        4.23GB
+■ SIGL, ■ MAGIC, and ■ Flash. Normalization is performed           E5-THEIA
+                                                                                    ✓
+                                                                                    ✓
+                                                                                                   ✗
+                                                                                                   ✓
+                                                                                                               ✓
+                                                                                                               ✗
+                                                                                                                              ✓
+                                                                                                                              ✓
+                                                                                                                                         13
+                                                                                                                                         20
+                                                                                                                                                53
+                                                                                                                                                11,420
+                                                                                                                                                         0.20
+                                                                                                                                                         0.00
+                                                                                                                                                                     11.10GB
+                                                                                                                                                                     4.23GB
+within each dataset by dividing each system’s GPU memory                            ✓
+                                                                                    ✓
+                                                                                                   ✓
+                                                                                                   ✓
+                                                                                                               ✓
+                                                                                                               ✓
+                                                                                                                              ✗
+                                                                                                                              ✓
+                                                                                                                                         2
+                                                                                                                                         13
+                                                                                                                                                0
+                                                                                                                                                2
+                                                                                                                                                         1.00
+                                                                                                                                                         0.87
+                                                                                                                                                                     4.23GB
+                                                                                                                                                                     4.23GB
+footprint by the maximum GPU memory footprint for that
+dataset (raw data in Appendix F).                                  Table 7: Ablation results. The darker the precision score, the
+                                                                   more important a component is.
+
+rate of lr = 1e − 4 delivers optimal results across datasets.
+Word2vec Embedding Size (x): The Word2vec embedding                experiments on the E3-THEIA and E5-THEIA datasets pre-
+size must be large enough to capture the semantics of tokens       sented in Table 7.
+representing file paths, command lines, or IP addresses, with-        First, replacing O RTHRUS’ Word2vec Featurization compo-
+out being so large that it hinders generalization. For example,    nent has minimal impact on the smaller E3-THEIA dataset but
+embedding sizes of x = 32 or x = 64 result in 10 true positives    is essential for E5-THEIA, which features larger and denser
+with no false positives, while increasing the size to x = 128 or   provenance graphs. Similarly, removing O RTHRUS’ Cluster-
+x = 256 decreases true positives and increases false positives.    ing component has no effect on E3-THEIA but is crucial for
+This highlights the critical role of the Word2vec embedding.       E5-THEIA, where standalone thresholding detects only two
+Additionally, we observe a significant increase in memory          true positives. Substituting O RTHRUS’ encoder with the TGN
+usage as the embedding size increases.                             encoder from Kairos negatively affects performance on both
+GNN Embedding Size (z): The GNN embedding size is                  datasets, as seen by the significant increase in false positives
+essential for capturing the structural and temporal features of    (this corroborates the lower detection quality of Kairos seen
+the graph through message passing. A size of z = 32 performs       in Fig. 4). Additionally, using a memory vector for each node
+well on small datasets, while z = 64 typically yields better       with TGN results in higher memory consumption. Lastly,
+results on larger datasets.                                        while the Reconstruction component in O RTHRUS-full gener-
+Neighborhood Size (N ): The neighborhood size controls             ates more false positives than O RTHRUS-ano, it helps analysts
+the amount of information aggregated during each message-          by identifying significantly more true positives. The use of
+passing step. A small neighborhood (e.g., N = 5) detects 0         this component remains optional, depending on the specific
+TP, while larger values (10 ≤ N ≤ 50) detect between 6 and         needs of the security analyst.
+10 TPs.
+   These experiments demonstrate that O RTHRUS can detect
+all three attacks in this dataset in most cases, even with sig-    5.6        Robustness Against Mimicry Attacks
+nificant changes in hyperparameter values. This highlights         To evaluate O RTHRUS’ robustness against adversarial attacks,
+O RTHRUS’ robust detection capability, which is not heavily        we conducted adversarial mimicry attacks on PIDSs, follow-
+reliant on hyperparameter tuning. Our findings suggest that        ing the methodology outlined by Goyal et al. [24]. Their
+these hyperparameter trends are consistent across datasets,        research highlights the vulnerability of granular PIDSes, such
+enabling O RTHRUS to effectively detect attacks on diverse         as StreamSpot [44], Unicorn [27], ProvDetector [65], and
+datasets with minimal tuning.                                      SIGL [29], to adversarial attacks. This strategy involves ma-
+                                                                   nipulating the distributional graph encoding to execute an
+5.5                 Ablation Study                                 evasion attack on PIDSs, aiming to create deceptive similari-
+                                                                   ties between the node neighborhood distributions in the attack
+We conduct an ablation study to evaluate the individual contri-    graph and those in benign provenance graphs. Following on
+butions of each component in O RTHRUS. We systematically           previous work [18, 57] footsteps, we use the publicly avail-
+replace or remove one component at a time. The specific            able code from Goyal et al. to manipulate the E3-CADETS
+ablations are detailed in Table 6, with the results of these       dataset. We show the effect it has on O RTHRUS’s detection
+    # of instances
+
+                                 15                           15                           15                          15                             15
+
+                                 10                           10                           10                          10                             10
+
+                                 5                             5                            5                           5                              5
+
+                                 0                        0    0                     0      0                   0       0                  0           0                  0
+                                       0   0.1 0.25 0.5             1e-6 1e-5 1e-4              32 64 128 256               16 32 64 128                   5   10 20 50
+    GB (left) / MCC (right)
+
+
+
+
+                                                              8                      1      8                   1       8                  1           8                  1
+                                 8                        1
+                                                              6                             6                           6                              6
+                                 6
+                                                              4                             4                           4                              4
+                                 4
+                                                              2                             2                           2                              2
+                                 2
+                                                              0                      0      0                   0       0                  0           0                  0
+                                 0                        0        1e-6 1e-5 1e-4               32 64 128 256               16 32 64 128                   5   10 20 50
+                                       0   0.1 0.25 0.5
+
+                                      Node dropout                 Learning rate         Word2vec emb size (x)         GNN emb size (z)           Neighborhood size (N )
+
+
+Figure 8: Hyperparameters study of O RTHRUS on E3-CADETS. We show ■ TP, ■ FP, ■ detected attacks, ■ memory
+consumption (GB), and ■ MCC.
+
+
+15                                                                                                       E5-CLEARSCOPE, 5 of the 7 false positives detected by O R -
+                                                                                                         THRUS-ano are netflow nodes sharing the same IP address as
+10                                                                                                       attack nodes.4 The two others are temporally distant and lack
+    5
+                                                                                                         direct connections. The false positives within the surrounding
+                                                                                                         of attacks arise because GNN message passing propagates
+    0                                                                                                    malicious signals to neighboring nodes via outgoing edges,
+                                 1,000            2,000        3,000          4,000       5,000          a phenomenon previously noted in T HREAT RACE [66]. A
+                                                                                                         common mitigation is to adopt an evaluation strategy that
+Figure 9: Effect of adversary mimicry attacks [24] against
+                                                                                                         labels nodes within the two-hop neighborhood of malicious
+our system. We show the number of edges added to the attack
+                                                                                                         nodes as malicious. However, as discussed in §2, this is sim-
+graph (x-axis) and the number of ■ TP and ■ FP (y-axis).
+                                                                                                         ply ignoring the core issue and directly leads to systems with
+                                                                                                         reduced attribution quality. Addressing this limitation through
+                                                                                                         better false-positive mitigation strategies remains an open and
+performance in Fig. 9. O RTHRUS proves robust against such
+                                                                                                         critical research direction.
+manipulation. This confirms recent findings from Cheng et
+                                                                                                         Impact of the Capture Mechanism. In Table 5, we observe
+al. [18] and Rehman et al. [57] that more complex GNN-based
+                                                                                                         poor performance of O RTHRUS and other systems on E5-
+detection strategies are resistant to such attacks.
+                                                                                                         CADETS. Several factors may explain this: (1) each capture
+                                                                                                         system (CADETS, THEIA, CLEARSCOPE) represents sys-
+6                             Discussion, Limitations & Future Work                                      tem execution differently and reports varying information
+                                                                                                         (e.g., CADETS omits the paths of most files and processes,
+Open-source Availability. While the literature presents a                                                while CLEARSCOPE lacks process paths and remote ad-
+wealth of innovative PIDSs, not all related code has been                                                dresses of netflows); (2) the attacks in each dataset differ,
+publicly released, often for legitimate reasons (e.g., Shade-                                            with some being more stealthy than others; and (3) some
+Watcher [73] relies on proprietary software). Sadly, re-                                                 graph elements appear to be missing, possibly due to crashes
+implementing a system based solely on the descriptions pro-                                              reported in DARPA’s documentation or flaws in the capture
+vided in a paper is often challenging, limiting the scope of                                             mechanism, as identified by Sekar et al. [59]. Understanding
+evaluations that can be conducted. We strongly encourage                                                 the influence of capture mechanisms on downstream intru-
+the community to adopt open-sourcing as the default practice.                                            sion detection performance is an important research question,
+In line with this, we have made our own artifacts publicly                                               beyond the scope of this paper.
+available (see §9).                                                                                      The Importance of Training Time. Discussions with col-
+Analysis of False Positives. On certain datasets, O RTHRUS                                               leagues in industry have emphasized the importance of regu-
+produces false positives. Examining their positions in the                                               larly retraining intrusion detection models to address concept
+graph reveals patterns that inform potential improvements.                                               drift. As new software is deployed or updates are rolled out,
+We observe that false positives frequently occur within the                                                 4 This could be benign activity from the attacker machine and/or attack
+
+one-hop neighborhood of malicious nodes. For example, in                                                 steps not appearing in the DARPA textual ground truth (see Appendix C).
+the number of false positives tends to increase, necessitating     and ProTracker [42], generate alerts by assigning scores to
+retraining. While machine learning techniques exist to man-        events based on their causal context. NoDoze and Swift as-
+age these issues, they have not been thoroughly explored in        sign anomaly scores to each event in the provenance graph
+the context of PIDS and cannot be readily applied [18].            based on the frequency of related events. ProTracker com-
+   As shown in §5.3, O RTHRUS is the fastest PIDS among            putes priority scores for system events based on their rarity
+the systems we evaluated, making it well-suited for regular        and fanout, while DEPIMPACT calculates edge scores using
+retraining. However, a comprehensive evaluation of this prob-      multiple features, including timing, data flow amount, and
+lem, along with various approaches to address it, remains          node degree. They then aggregate the scores along neighbor-
+difficult due to the lack of dedicated datasets [18]. We leave     ing edges to reconstruct the attack graph. O RTHRUS tightly
+such exploration for future work.                                  integrates anomaly detection and attack investigation into a
+                                                                   single system.
+7   Related Work
+                                                                   8    Conclusion
+For a comprehensive overview of provenance-based security,
+we refer readers to the SoK by Inam et al. [35].                   We identified limitations in the evaluation strategy of
+Anomaly Detection. Early anomaly-based works [27, 44, 65]          provenance-based intrusion detection systems, showing that
+identify and report coarse-grained anomalies by clustering         this has led to the design of systems with poor attribution
+statistical graph summaries. More recent approaches [18,           quality, which directly contributes to security analysts’ alert
+29, 36, 66, 73] have leveraged advances in learning graph-         fatigue. We proposed an alternative, conservative evaluation
+structured data to model fine-grained, contextualized relation-    strategy that favors systems generating fewer alerts. We then
+ships between nodes in provenance graphs. ThreaTrace [66]          designed a lightweight anomaly detection pipeline, O RTHRUS,
+and Flash [57] train GraphSAGE [26] and GNN models,                and demonstrated its superiority over state-of-the-art systems
+respectively, to predict node types and report misclassified       on well-established benchmark datasets.
+nodes as anomalous. ThreaTrace removes correctly predicted
+nodes and re-trains on misclassified nodes until none re-
+                                                                   9    Compliance with the Open Science Policy
+main. Flash incorporates positional encoding from Transform-
+ers [63] into the node embedding step to capture temporal          Datasets Availability. The DARPA datasets are publicly avail-
+information from the sequential order of tokens. MAGIC [36]        able [8, 9] and come with textual description of the attacks.
+leverages a masked auto-encoder, utilizing a Graph Attention       We manually analyzed the datasets and annotated nodes (as
+Network [64] in both the encoder and decoder to embed node         benign or part of an attack). The annotations are publicly avail-
+features, identifying anomalies using a K-D tree search tech-      able at https://zenodo.org/records/14641608. To the
+nique. Kairos [18] models long-term temporal relationships of      best of our knowledge this is the first time such annotations
+system entities by assigning them state vectors using Tempo-       are publicly released.
+ral Graph Networks (TGNs) [58], then detects malicious time        Software Artifacts Availability. The source code is publicly
+windows when their scores exceed a specified threshold. Sim-       available at https://zenodo.org/records/14641606.
+ilarly, SIGL [29] captures temporal dependencies of entities       We also provide detailed instructions to reproduce the results
+using a Graph Long Short-Term Memory (Graph LSTM) [55]             presented in §5.
+model to detect malicious software installations. R-CAID [25]
+combines GNN and Root Cause Analysis (RCA) techniques
+to learn global causal relationships between nodes and their       10    Ethics Considerations
+root causes. While state-of-the-art methods have made sig-
+nificant progress in fine-grained anomaly detection, they of-      To the best of our knowledge this work does not raise any
+ten overlook the attribution quality of detection signals. O R -   ethical issues. All experiments have been performed on pub-
+THRUS is the first to achieve meaningful node-level detection
+                                                                   licly available datasets that have been acquired in an ethical
+without overwhelming false positives.                              manners and not contain any sensitive information.
+Attack Investigation. Attack investigation is the oldest ap-
+plication of provenance in security [39]. OmegaLog [34]            Acknowledgments
+and ALchemist [71] combine system-layer provenance data
+with higher-layer application logs to provide more seman-          We would like to thank USENIX Security 2025 reviewers
+tic context for event investigation. UIScope [70] focuses on       from their helpful feedback. We acknowledge the support of
+reconstructing Graphical User Interface-related attacks by         the Natural Sciences and Engineering Research Council of
+correlating provenance data with User Interface events. Re-        Canada (NSERC). Nous remercions le Conseil de recherches
+cent alert investigation systems based purely on provenance        en sciences naturelles et en génie du Canada (CRSNG) de son
+data, such as DEPIMPACT [22], NoDoze [31], Swift [33],             soutien. We thank Shreya Gangopadhyay for her assistance
+in re-implementing SIGL. Her contribution was supported       [12] Bushra A Alahmadi, Louise Axon, and Ivan Martinovic.
+by the Mitacs Globalink Research Internships program. This         99% False Positives: A Qualitative Study of SOC An-
+work was partially supported by research funding from the          alysts’ Perspectives on Security Alarms. In Security
+National Research Council Canada (NRC). Research reported          Symposium (USENIX Sec’22). USENIX, 2022.
+in this publication was partially supported by an Amazon
+Research Award. Any opinions, findings, and conclusions or    [13] Abdulellah Alsaheel, Yuhong Nan, Shiqing Ma, Le Yu,
+recommendations expressed in this material are those of the        Gregory Walkup, Z Berkay Celik, Xiangyu Zhang, and
+authors and do not reflect the views of Amazon.                    Dongyan Xu. ATLAS: A Sequence-based Learning Ap-
+                                                                   proach for Attack Investigation. In Security Symposium
+                                                                   (USENIX Sec’21). USENIX, 2021.
+References
+                                                              [14] Enes Altinisik, Fatih Deniz, and Hüsrev Taha Sencar.
+ [1] Event Tracing for Windows (ETW), Accessed                     ProvG-Searcher: A Graph Representation Learning Ap-
+     29th January 2025.   https://docs.microsoft.                  proach for Efficient Provenance Graph Search. In Con-
+     com/en-us/windows-hardware/drivers/devtest/                   ference on Computer and Communications Security
+     event-tracing-for-windows--etw-.                              (CCS’23). ACM, 2023.
+
+ [2] Flash code, Accessed 29th January 2025. https://         [15] Daniel Arp, Erwin Quiring, Feargus Pendlebury, Alexan-
+     github.com/DART-Laboratory/Flash-IDS.                         der Warnecke, Fabio Pierazzi, Christian Wressnegger,
+                                                                   Lorenzo Cavallaro, and Konrad Rieck. Dos and Don’ts
+ [3] Kairos code, Accessed 29th January 2025. https://             of Machine Learning in Computer Security. In Security
+     github.com/ProvenanceAnalytics/kairos.                        Symposium (USENIX Sec’22). USENIX, 2022.
+
+ [4] Linux System Audit (auditd), Accessed 29th Jan-          [16] Adam Bates, Dave Jing Tian, Kevin RB Butler, and
+     uary 2025. https://man7.org/linux/man-pages/                  Thomas Moyer. Trustworthy Whole-System Provenance
+     man8/auditd.8.html.                                           for the Linux Kernel. In Security Symposium (USENIX
+                                                                   Sec’15). USENIX, 2015.
+ [5] MAGIC code, Accessed 29th January 2025. https:
+     //github.com/FDUDSDE/MAGIC.                              [17] Zijun Cheng, Qiujian Lv, Jinyuan Liang, Yan Wang,
+                                                                   Degang Sun, Thomas Pasquier, and Xueyuan Han.
+ [6] ThreaTrace code, Accessed 29th January 2025.                  KAIROS: Practical Intrusion Detection and Inves-
+     https://github.com/threaTrace-detector/                       tigation using Whole-system Provenance (Supple-
+     threaTrace.                                                   mentary Material), 2023.     https://tfjmp.org/
+                                                                   publications/2024-sp-supp.pdf.
+ [7] Transparent Computing, Accessed 29th    Jan-
+     uary 2025.   https://www.darpa.mil/program/              [18] Zijun Cheng, Qiujian Lv, Jinyuan Liang, Yan Wang, De-
+     transparent-computing.                                        gang Sun, Thomas Pasquier, and Xueyuan Han. Kairos:
+                                                                   Practical Intrusion Detection and Investigation using
+ [8] Transparent Computing Engagement 3 Data Release,              Whole-system Provenance. In Symposium on Security
+     Accessed 29th January 2025.   https://github.                 and Privacy (S&P’24). IEEE, 2024.
+     com/darpa-i2o/Transparent-Computing/blob/
+     master/README-E3.md.                                     [19] Kaize Ding, Jundong Li, Nitin Agarwal, and Huan Liu.
+                                                                   Inductive Anomaly Detection on Attributed Networks.
+ [9] Transparent Computing Engagement 5 Data Release,              In International Joint Conference on Artificial Intelli-
+     Accessed 29th January 2025. https://github.com/               gence (IJCAI’20), 2020.
+     darpa-i2o/Transparent-Computing.
+                                                              [20] Feng Dong, Shaofei Li, Peng Jiang, Ding Li, Haoyu
+[10] Jaime D. Acevedo-Viloria, Luisa Roa, Soji Adeshina,           Wang, Liangyi Huang, Xusheng Xiao, Jiedong Chen,
+     Cesar Charalla Olazo, Andrés Rodríguez-Rey, Jose Al-          Xiapu Luo, Yao Guo, and Xiangqun Chen. Are we
+     berto Ramos, and Alejandro Correa Bahnsen. Rela-              there yet? An Industrial Viewpoint on Provenance-based
+     tional Graph Neural Networks for Fraud Detection in a         Endpoint Detection and Response Tools. In Conference
+     Super-App environment. In KDD Workshop on Machine             on Computer and Communications Security (CCS’23).
+     Learning in Finance. ACM, 2023.                               ACM, 2023.
+
+[11] Leman Akoglu, Hanghang Tong, and Danai Koutra.           [21] Dongsheng Duan, Lingling Tong, Yangxi Li, Jie Lu,
+     Graph-based Anomaly Detection and Description: A              Lei Shi, and Cheng Zhang. AANE: Anomaly Aware
+     Survey. Data Mining and Knowledge Discovery, 2015.            Network Embedding For Anomalous Link Detection. In
+     International Conference on Data Mining (ICDM’20).                   NoDoze: Combatting Threat Alert Fatigue with Auto-
+     IEEE, 2020.                                                          mated Provenance Triage. In Network and Distributed
+                                                                          System Security Symposium (NDSS’19). The Internet
+[22] Pengcheng Fang, Peng Gao, Changlin Liu, Erman Ay-                    Society, 2019.
+     day, Kangkook Jee, Ting Wang, Yanfang Fanny Ye,
+     Zhuotao Liu, and Xusheng Xiao. Back-Propagating                 [32] Wajih Ul Hassan, Mark Lemay, Nuraini Aguse, Adam
+     System Dependency Impact for Attack Investigation. In                Bates, and Thomas Moyer. Towards Scalable Cluster
+     Security Symposium (USENIX Sec’22). USENIX, 2022.                    Auditing through Grammatical Inference over Prove-
+                                                                          nance Graphs. In Network and Distributed System Secu-
+[23] Ashish Gehani and Dawood Tariq. SPADE: Support                       rity Symposium (NDSS’18). The Internet Society, 2018.
+     for Provenance Auditing in Distributed Environments.
+     In International Conference on Distributed Systems              [33] Wajih Ul Hassan, Ding Li, Kangkook Jee, Xiao Yu, Kex-
+     Platforms and Open Distributed Processing. ACM/I-                    uan Zou, Dawei Wang, Zhengzhang Chen, Zhichun Li,
+     FIP/USENIX, 2012.                                                    Junghwan Rhee, Jiaping Gui, and Adam Bates. This
+                                                                          is Why We Can’t Cache Nice Things: Lightning-Fast
+[24] Akul Goyal, Xueyuan Han, Gang Wang, and Adam                         Threat Hunting using Suspicion-Based Hierarchical
+     Bates. Sometimes, You Aren’t What You Do: Mimicry                    Storage. In Annual Computer Security Applications
+     Attacks against Provenance Graph Host Intrusion De-                  Conference (ACSAC’20). ACM, 2020.
+     tection Systems. In Network and Distributed System
+                                                                     [34] Wajih Ul Hassan, Mohammad Ali Noureddine, Pubali
+     Security Symposium, (NDSS’23). The Internet Society,
+                                                                          Datta, and Adam Bates. Omegalog: High-fidelity attack
+     2023.
+                                                                          investigation via transparent multi-layer log analysis. In
+[25] Akul Goyal, Gang Wang, and Adam Bates. R-CAID:                       Network and Distributed System Security Symposium
+     Embedding Root Cause Analysis within Provenance-                     (NDSS’20). The Internet Society, 2020.
+     based Intrusion Detection. In Symposium on Security
+                                                                     [35] Muhammad Adil Inam, Yinfang Chen, Akul Goyal, Ja-
+     and Privacy (S&P’24). IEEE, 2024.
+                                                                          son Liu, Jason Mink, Noor Michael, Sneha Gaur, Adam
+[26] William L. Hamilton, Zhitao Ying, and Jure Leskovec.                 Bates, and Wajih Ul Hassan. SoK: History is a Vast
+     Inductive Representation Learning on Large Graphs. In                Early Warning System: Auditing the Provenance of Sys-
+     Annual Conference on Neural Information Processing                   tem Intrusions. In Symposium on Security and Privacy
+     Systems (NeurIPS’17), 2017.                                          (S&P’22). IEEE, 2022.
+                                                                     [36] Zian Jia, Yun Xiong, Yuhong Nan, Yao Zhang, Jinjing
+[27] Xueyuan Han, Thomas Pasquier, Adam Bates, James
+                                                                          Zhao, and Mi Wen. MAGIC: Detecting Advanced Per-
+     Mickens, and Margo I. Seltzer. Unicorn: Runtime
+                                                                          sistent Threats via Masked Graph Representation Learn-
+     Provenance-Based Detector for Advanced Persistent
+                                                                          ing. In Security Symposium (USENIX Sec’24). USENIX,
+     Threats. In Network and Distributed System Security
+                                                                          2024.
+     Symposium (NDSS’20). The Internet Society, 2020.
+                                                                     [37] Maya Kapoor, Joshua Melton, Michael Ridenhour, Sid-
+[28] Xueyuan Han, Thomas Pasquier, Tanvi Ranjan, Mark
+                                                                          dharth Krishnan, and Thomas Moyer. PROV-GEM: Au-
+     Goldstein, and Margo I. Seltzer. FRAPpuccino: Fault-
+                                                                          tomated provenance analysis framework using graph
+     detection through Runtime Analysis of Provenance. In
+                                                                          embeddings. In International Conference on Machine
+     Workshop on Hot Topics in Cloud Computing (Hot-
+                                                                          Learning and Applications (ICMLA’21). IEEE, 2021.
+     Cloud’17). USENIX, 2017.
+                                                                     [38] Isaiah J King, Xiaokui Shu, Jiyong Jang, Kevin Eykholt,
+[29] Xueyuan Han, Xiao Yu, Thomas Pasquier, Ding Li,                      Taesung Lee, and H Howie Huang. EdgeTorrent: Real-
+     Junghwan Rhee, James W. Mickens, Margo I. Seltzer,                   time Temporal Graph Representations for Intrusion De-
+     and Haifeng Chen. SIGL: Securing Software Installa-                  tection. In International Symposium on Research in At-
+     tions Through Deep Graph Learning. In Security Sym-                  tacks, Intrusions and Defenses (RAID’23). ACM, 2023.
+     posium (USENIX Sec’21). USENIX, 2021.
+                                                                     [39] Samuel T King and Peter M Chen. Backtracking intru-
+[30] John A Hartigan and Manchek A Wong. Algorithm                        sions. In Symposium on Operating systems Principles
+     AS 136: A k-means clustering algorithm. Journal of                   (SOSP’03). ACM, 2003.
+     the royal statistical society. series c (applied statistics),
+     1979.                                                           [40] Shaofei Li, Feng Dong, Xusheng Xiao, Haoyu Wang,
+                                                                          Fei Shao, Jiedong Chen, Yao Guo, Xiangqun Chen, and
+[31] Wajih Ul Hassan, Shengjian Guo, Ding Li, Zhengzhang                  Ding Li. NODLINK: An Online System for Fine-
+     Chen, Kangkook Jee, Zhichun Li, and Adam Bates.                      Grained APT Attack Detection and Investigation. In
+     Network and Distributed System Security Symposium,           [51] Riccardo Paccagnella, Kevin Liao, Dave Tian, and Adam
+     (NDSS’24). The Internet Society, 2024.                            Bates. Logging to the Danger Zone: Race Condi-
+                                                                       tion Attacks and Defenses on System Audit Frame-
+[41] Zhenyuan Li, Qi Alfred Chen, Runqing Yang, Yan Chen,              works. In Conference on Computer and Communica-
+     and Wei Ruan. Threat detection and investigation with             tions (CCS’20). ACM, 2020.
+     system-level provenance graphs: A survey. Elsevier
+     Computers & Security, 2021.                                  [52] Thomas Pasquier, Xueyuan Han, Mark Goldstein,
+                                                                       Thomas Moyer, David M. Eyers, Margo I. Seltzer, and
+[42] Yushan Liu, Mu Zhang, Ding Li, Kangkook Jee, Zhichun
+                                                                       Jean Bacon. Practical Whole-system Provenance Cap-
+     Li, Zhenyu Wu, Junghwan Rhee, and Prateek Mittal. To-
+                                                                       ture. In Symposium on Cloud Computing (SoCC’17).
+     wards a timely causality analysis for enterprise security.
+                                                                       ACM, 2017.
+     In Network and Distributed System Security Symposium
+     (NDSS’18). The Internet Society, 2018.                       [53] Thomas Pasquier, Xueyuan Han, Thomas Moyer, Adam
+[43] Xiaoxiao Ma, Jia Wu, Shan Xue, Jian Yang, Chuan Zhou,             Bates, Olivier Hermant, David M. Eyers, Jean Bacon,
+     Quan Z Sheng, Hui Xiong, and Leman Akoglu. A Com-                 and Margo Seltzer. Runtime Analysis of Whole-System
+     prehensive Survey on Graph Anomaly Detection With                 Provenance. In Conference on Computer and Commu-
+     Deep Learning. IEEE Transactions on Knowledge and                 nications Security (CCS’18). ACM, 2018.
+     Data Engineering, 2021.
+                                                                  [54] Feargus Pendlebury, Fabio Pierazzi, Roberto Jordaney,
+[44] Emaad Manzoor, Sadegh Momeni, Venkat Venkatakr-                   Johannes Kinder, and Lorenzo Cavallaro. TESSERACT:
+     ishnan, and Leman Akoglu. Fast Memory-efficient                   Eliminating Experimental Bias in Malware Classifica-
+     Anomaly Detection in Streaming Heterogeneous                      tion across Space and Time. In Security Symposium
+     Graphs. In International Conference on Knowledge                  (USENIX Sec’19). USENIX, 2019.
+     Discovery and Data Mining (KDD’16). ACM, 2016.
+                                                                  [55] Nanyun Peng, Hoifung Poon, Chris Quirk, Kristina
+[45] Brian W Matthews. Comparison of the predicted and                 Toutanova, and Wen-tau Yih. Cross-Sentence N-ary
+     observed secondary structure of T4 phage lysozyme.                Relation Extraction with Graph LSTMs. MIT Press
+     Elsevier Biochimica et Biophysica Acta (BBA)-Protein              Transactions of the Association for Computational Lin-
+     Structure, 1975.                                                  guistics, 2017.
+[46] Tomas Mikolov, Kai Chen, Greg Corrado, and Jeffrey           [56] David MW Powers. Evaluation: from precision, recall
+     Dean. Efficient Estimation of Word Representations in             and F-measure to ROC, informedness, markedness and
+     Vector Space. arXiv preprint arXiv:1301.3781, 2013.               correlation. arXiv preprint arXiv:2010.16061, 2020.
+[47] Sadegh M. Milajerdi, Birhanu Eshete, Rigel Gjomemo,
+                                                                  [57] Mati Ur Rehman, Hadi Ahmadi, and Wajih Ul Hassan.
+     and V. N. Venkatakrishnan. POIROT: Aligning Attack
+                                                                       FLASH: A Comprehensive Approach to Intrusion De-
+     Behavior with Kernel Audit Records for Cyber Threat
+                                                                       tection via Provenance Graph Representation Learning.
+     Hunting. In Conference on Computer and Communica-
+                                                                       In Symposium on Security and Privacy (S&P’24). IEEE,
+     tions Security (CCS’19). ACM, 2019.
+                                                                       2024.
+[48] Sadegh Momeni Milajerdi, Rigel Gjomemo, Birhanu
+     Eshete, R. Sekar, and V. N. Venkatakrishnan. HOLMES:         [58] Emanuele Rossi, Ben Chamberlain, Fabrizio Frasca, Da-
+     real-time APT detection through correlation of suspi-             vide Eynard, Federico Monti, and Michael Bronstein.
+     cious information flows. In Symposium on Security and             Temporal Graph Networks for Deep Learning on Dy-
+     Privacy, (S&P’19). IEEE, 2019.                                    namic Graphs. In International Conference on Machine
+                                                                       Learning (ICML’20). PMLR, 2020.
+[49] Kiran-Kumar Muniswamy-Reddy, David Holland, Uri
+     Braun, and Margo Seltzer. Provenance-aware Storage           [59] R Sekar, Hanke Kimm, and Rohit Aich. eAudit: A fast,
+     Systems. In Annual Technical Conference (ATC’06).                 Scalable and Deployable Audit Data Collection System.
+     USENIX, 2006.                                                     In Symposium on Security and Privacy (S&P’24). IEEE,
+                                                                       2023.
+[50] Riccardo Paccagnella, Pubali Datta, Wajih Ul Hassan,
+     Adam Bates, Christopher W. Fletcher, Andrew Miller,          [60] Yunsheng Shi, Zhengjie Huang, Wenjin Wang, Hui
+     and Dave Tian. Custos: Practical Tamper-Evident Au-               Zhong, Shikun Feng, and Yu Sun. Masked Label
+     diting of Operating Systems Using Trusted Execution.              Prediction: Unified Massage Passing Model for Semi-
+     In Network and Distributed System Security Symposium              Supervised Classification. In International Joint Con-
+     (NDSS’20). The Internet Society, 2020.                            ferences on Artificial Intelligence (IJCAI), 2021.
+[61] Sathya Chandran Sundaramurthy, Alexandru G Bar-           [70] Runqing Yang, Shiqing Ma, Haitao Xu, Xiangyu Zhang,
+     das, Jacob Case, Xinming Ou, Michael Wesch, John               and Yan Chen. UIScope: Accurate, Instrumentation-free,
+     McHugh, and S Raj Rajagopalan. A Human Capital                 and Visible Attack Investigation for GUI Applications.
+     Model for Mitigating Security Analyst Burnout. In Sym-         In Network and Distributed System Security Symposium
+     posium On Usable Privacy and Security (SOUPS’15).              (NDSS’20). The Internet Society, 2020.
+     USENIX, 2015.
+                                                               [71] Le Yu, Shiqing Ma, Zhuo Zhang, Guanhong Tao, Xi-
+[62] Jianheng Tang, Jiajin Li, Ziqi Gao, and Jia Li. Re-            angyu Zhang, Dongyan Xu, Vincent E Urias, Han Wei
+     thinking Graph Neural Networks for Anomaly Detec-              Lin, Gabriela F Ciocarlie, Vinod Yegneswaran, and
+     tion. In International Conference on Machine Learning          Ashish Gehani. ALchemist: Fusing Application and
+     (ICML’22). PMLR, 2022.                                         Audit Logs for Precise Attack Provenance without In-
+                                                                    strumentation. In Network and Distributed System Secu-
+[63] Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob               rity Symposium (NDSS’21). The Internet Society, 2021.
+     Uszkoreit, Llion Jones, Aidan N. Gomez, Lukasz Kaiser,
+     and Illia Polosukhin. Attention Is All You Need.          [72] Jun Zeng, Zheng Leong Chua, Yinfang Chen, Kaihang
+     Advances in Neural Information Processing Systems              Ji, Zhenkai Liang, and Jian Mao. WATSON: Abstracting
+     (NeurIPS’17), 2017.                                            Behaviors from Audit Logs via Aggregation of Contex-
+                                                                    tual Semantics. In Annual Network and Distributed
+[64] Petar Veličković, Guillem Cucurull, Arantxa Casanova,        System Security Symposium (NDSS’21). Internet Soci-
+     Adriana Romero, Pietro Lio, and Yoshua Bengio. Graph           ety, 2021.
+     Attention Networks. In International Conference on
+     Learning Representations (ICLR’18), 2018.                 [73] Jun Zengy, Xiang Wang, Jiahao Liu, Yinfang Chen,
+                                                                    Zhenkai Liang, Tat-Seng Chua, and Zheng Leong Chua.
+[65] Qi Wang, Wajih Ul Hassan, Ding Li, Kangkook Jee,               ShadeWatcher: Recommendation-guided Cyber Threat
+     Xiao Yu, Kexuan Zou, Junghwan Rhee, Zhengzhang                 Analysis using System Audit Records. In Symposium
+     Chen, Wei Cheng, Carl A. Gunter, and Haifeng Chen.             on Security and Privacy (S&P’22). IEEE, 2022.
+     You Are What You Do: Hunting Stealthy Malware via
+     Data Provenance Analysis. In Network and Distributed      [74] Ge Zhang, Zhao Li, Jiaming Huang, Jia Wu, Chuan
+     System Security Symposium (NDSS’20). The Internet              Zhou, Jian Yang, and Jianliang Gao. eFraudCom: An
+     Society, 2020.                                                 E-commerce Fraud Detection System via Competitive
+                                                                    Graph Neural Networks. ACM Transactions on Infor-
+[66] Su Wang, Zhiliang Wang, Tao Zhou, Xia Yin, Dongqi              mation Systems, 2022.
+     Han, Han Zhang, Hongbin Sun, Xingang Shi, and Ji-
+     ahai Yang. THREATRACE: Detecting and Tracing              [75] Zhaoqi Zhang, Panpan Qi, and Wei Wang. Dynamic
+     Host-Based Threats in Node Level Through Provenance            malware analysis with feature engineering and feature
+     Graph Learning. IEEE Transactions on Information               learning. AAAI Conference on Artificial Intelligence,
+     Forensics and Security, 2022.                                  2021.
+[67] Ziyu Wang, Nanqing Luo, and Pan Zhou. GuardHealth:
+                                                               [76] Michael Zipperle, Florian Gottwalt, Elizabeth Chang,
+     Blockchain Empowered Secure Data Management and
+                                                                    and Tharam Dillon. Provenance-based intrusion de-
+     Graph Convolutional Network Enabled Anomaly De-
+                                                                    tection systems: A survey. ACM Computing Surveys
+     tection in Smart Healthcare. Journal of Parallel and
+                                                                    (CSUR), 2022.
+     Distributed Computing, 2020.
+
+[68] Zhang Xu, Zhenyu Wu, Zhichun Li, Kangkook Jee,            A    Datasets Details
+     Junghwan Rhee, Xusheng Xiao, Fengyuan Xu, Haining
+     Wang, and Guofei Jiang. High Fidelity Data Reduc-         We summarize in Table 8 how we split the datasets for train-
+     tion for Big Data Security Dependency Analyses. In        ing, validation, and detection.
+     Conference on Computer and Communications Security
+                                                               B    Past Evaluations
+     (CCS’16). ACM, 2016.
+                                                               Table 9 shows anomaly detection systems we select to com-
+[69] Fan Yang, Jiacen Xu, Chunlin Xiong, Zhou Li, and Ke-      pare against O RTHRUS. We use the same node-level detection
+     huan Zhang. PROGRAPHER: An Anomaly Detection              performance with the same evaluation approach to ensure a
+     System based on Provenance Graph Embedding. In            fair comparison. Based on our knowledge, this is the most
+     Security Symposium (USENIX Sec’23). USENIX, 2023.         comprehensive comparison to date.
+                                Training Data                        Validation Data                       Test Data
+        Datasets
+                                (yyyy-mm-dd)                         (yyyy-mm-dd)                        (yyyy-mm-dd)
+                                                                                                         2018-04-06
+                                                                                                         2018-04-11
+        E3-CADETS        2018-04-03/04/05/07/08/09/10                2018-04-02
+                                                                                                         2018-04-12
+                                                                                                         2018-04-13
+                                                                                                         2018-04-10
+        E3-THEIA         2018-04-02/03/04/05/06/07/08                2018-04-09                          2018-04-12
+                                                                                                         2018-04-13
+                                                                                                         2018-04-11
+        E3-CLEARSCOPE    2018-04-03/04/05/07/08/09/10                2018-04-02
+                                                                                                         2018-04-12
+                                                                                                         2019-05-16
+        E5-CADETS        2019-05-08/09/11                            2019-05-12
+                                                                                                         2019-05-17
+                                                                                                         2019-05-14
+        E5-THEIA         2019-05-08/09/10                            2019-05-11
+                                                                                                         2019-05-15
+                                                                                                         2019-05-14
+        E5-CLEARSCOPE    2019-05-08/09                               2019-05-11                          2019-05-15
+                                                                                                         2019-05-17
+
+
+
+Table 8: DARPA data used for training, validation, and test.                                                                          (a) Neighborhood. 7,661 mali- (b) Batch. 16,425 malicious
+Bold days refer to as attack days in which both benign and                                                                            cious nodes.                  nodes.
+attack activities exist. The remaining days are benign days
+with only benign activities.
+                                                ThreaTrace [66]
+
+                                                                  SIGL [29]
+
+                                                                              Kairos [18]
+
+                                                                                            MAGIC [36]
+
+                                                                                                           Flash [57]
+                                                                                                                        Orthrus
+
+
+
+
+        2016        Steamspot [44]              ✓                 ✓                         ✓
+        2017        Frappuccino [28]                              ✓
+                    Unicorn [27]                ✓                             ✓             ✓              ✓
+        2020                                                                                                                       (c) Source. 5,248 malicious (d) Ours. 58 malicious nodes.
+                    ProvDetector [65]           ✓
+        2021        Prov-Gem [37]                                                           ✓                                      nodes.
+                    SIGL [29]                                                                                            ✓
+        2022
+                    ThreaTrace [66]                                           ✓             ✓              ✓             ✓
+                    Kairos [18]                                                                                          ✓
+                                                                                                                                  Figure 10: Visualized ground truth for attack Firefox Back-
+        2024        MAGIC [36]                                                                                           ✓        door w/ Drakon In-Memory on E3-THEIA. We note that the
+                    Flash [57]                                                                                           ✓        only Fig. 10d is legible.
+Table 9: Comparison of baselines used in past publications.
+Horizontal – systems used as baselines in past evaluations.                                                                       evaluated against such baselines to achieve better attribution
+Vertical – O RTHRUS and past publications used as baselines                                                                       quality. Once the methodology was established, the process
+in this paper.                                                                                                                    required only a few days to complete. Researchers applying
+                                                                                                                                  this methodology should be able to generate similar ground
+                                                                                                                                  truth results. To support reproducibility, we have made the
+C    Ground Truth Construction                                                                                                    ground truth publicly available; see §9.
+We constructed our ground truth by loading the DARPA                                                                              D      Example Ground Truth Vizualiation
+datasets into a database. Using the textual ground truth de-
+                                                                                                                                  Fig. 10 shows the visualization of an E3-THEIA attack for
+scriptions provided by the DARPA team [8, 9], we queried
+                                                                                                                                  four approaches above. Three current evaluation approaches
+nodes based on name and timestamps. The results were man-
+                                                                                                                                  label too many irrelevant nodes, making it difficult to visually
+ually analyzed to remove incorrect matches (e.g., excluding
+                                                                                                                                  present and analyze reported attacks, even when a system
+instances of software unrelated to the attacks when multiple
+                                                                                                                                  performs well in detecting and reconstructing them.
+instances were running).
+   The textual descriptions occasionally omitted nodes, caus-                                                                     E      Matthews Correlation Coefficient
+ing attacks to be fragmented into multiple subgraphs. To                                                                          The Matthews Correlation Coefficient [45] is used in Machine
+address this, we retrieved the shortest paths connecting nodes                                                                    Learning to measure of the quality of binary classifications.
+across these subgraphs, merging them into a single, larger
+attack graph. Finally, we manually reviewed the results again,
+removing any erroneous nodes or edges.                                                                                                                     T P × T N − FP × FN
+                                                                                                                                   MCC = p
+   When uncertain about a graph element, we erred on the side                                                                                    (T P + FP)(T P + FN)(T N + FP)(T N + FN)
+of caution and excluded it (this occured only for a few nodes                                                                                                                          (12)
+on two datasets). In the worst-case scenario, this may lead
+to underestimating a system’s detection performance. How-
+                                                                                                                                  F     Raw Results
+ever, as discussed in §2, we believe this approach is prefer-                                                                     Table 10 and Table 11 show the raw data presented in Table 4,
+able to overestimating performance, as it encourages systems                                                                      Table 5, Fig. 5, and Fig. 7.
+Dataset         System          TP     FP         TN          FN     Precision    MCC      Training Time    Testing Time   GPU Memory
+                O RTHRUS-full   25     23         268,062     43     0.52         0.44
+                                                                                           4min40           52min31        3.82GB
+                O RTHRUS-ano    10     0          268,085     58     1.00         0.38
+                Kairos          0      9          268,076     68     0.00         0.00     22min49          36min26        3.93GB
+  E3-CADETS     Threatrace      61     252,117    15,968      7      0.00         0.00     28min28          21min51        5.22GB
+                SIGL            0      80         268,005     68     0.00         0.00     4h48             1h15           10.07GB
+                MAGIC           63     79,766     188,319     5      0.00         0.02     13h18            13h01          4.22GB
+                Flash           13     2,381      265,704     55     0.01         0.03     10h33            8h52           19.18GB
+                O RTHRUS-full   48     11         699,166     70     0.81         0.57
+                                                                                           3min58           41min39        2.03GB
+                O RTHRUS-ano    8      0          699,177     110    1.00         0.26
+                Kairos          4      0          699,177     114    1.00         0.18     24min21          1h07           2.53GB
+   E3-THEIA
+                Threatrace      88     671,883    27,294      30     0.00         -0.01    10min19          8min17         4.51GB
+                SIGL            1      29         699,148     117    0.03         0.02     14h07            24h04          10.44GB
+                MAGIC           115    394,906    304,271     3      0.00         0.01     11h39            11h41          5.35GB
+                Flash           22     32,082     667,095     96     0.00         0.01     6h51             5h30           36.93GB
+                O RTHRUS-full   2      6          111,347     39     0.25         0.11
+                                                                                           2min50           5min56         0.65GB
+                O RTHRUS-ano    1      1          111,352     40     0.50         0.11
+                Kairos          0      7          111,346     41     0.00         0.00     9min52           16min25        0.74GB
+E3-CLEARSCOPE
+                Threatrace      41     87,501     23,852      0      0.00         0.01     3min55           2min04         4.90GB
+                SIGL            1      11,372     99,981      40     0.00         0.00     1h01             31min17        9.71GB
+                MAGIC           40     101,737    9,616       1      0.00         0.00     1h37             36min56        9.75GB
+                Flash           0      15,137     96,216      41     0.00         -0.01    19h01            18h16          11.60GB
+
+                  Table 10: Comparison of node-level detection performance on DARPA E3 datasets.
+
+
+
+
+Dataset         System          TP    FP          TN           FN     Precision    MCC      Training Time   Testing Time   GPU Memory
+                O RTHRUS-full   2     10          3,111,245    121    0.17         0.05
+                                                                                            42min35         6h01           21.10GB
+                O RTHRUS-ano    1     5           3,111,250    122    0.17         0.04
+                Kairos          0     6           3,111,249    123    0.00         0.00     4h03            10h22          23.85GB
+  E5-CADETS
+                Threatrace      91    3,104,018   7,237        32     0.00         -0.03    5h45            3h05           17.31GB
+                SIGL            0     66          3,111,189    123    0.00         0.00     38h00           36h58          22.72GB
+                MAGIC           123   3,110,714   541          0      0.00         0.00     77h13           10h38          79.36GB
+                Flash           45    33,941      3,077,314    78     0.00         0.02     101h26          105h06         80.19GB
+                O RTHRUS-full   13    2           747,381      56     0.87         0.4
+                                                                                            14min30         6h29           4.23GB
+                O RTHRUS-ano    2     0           747,383      67     1.00         0.17
+                Kairos          0     2           747,381      69     0.00         0.00     1h02            3h27           4.16GB
+   E5-THEIA
+                Threatrace      66    739,322     8,061        3      0.00         0.00     2h51            51min13        11.59GB
+                SIGL            0     23          747,360      69     0.00         0.00     40h20           37h59          24.44GB
+                MAGIC           1     296,554     450,829      68     0.00         -0.01    13h21           10h16          16.95GB
+                Flash           43    295,729     451,654      26     0.00         0.00     47h50           51h37          80.18GB
+                O RTHRUS-full   4     8           150,666      47     0.33         0.16
+                                                                                            22min19         3h30           1.72GB
+                O RTHRUS-ano    2     7           150,667      49     0.22         0.09
+                Kairos          1     3           150,671      50     0.25         0.07     1h06            3h02           2.26GB
+E5-CLEARSCOPE
+                Threatrace      41    142,487     8,187        10     0.00         -0.01    44min53         37min46        5.94GB
+                SIGL            10    63          150,610      41     0.14         0.16     82h50           69h16          16.38GB
+                MAGIC           51    139,385     11,289       0      0.00         0.01     11h39           4h03           48.24GB
+                Flash           15    4,552       146,122      36     0.00         0.03     25h34           24h00          11.60GB
+
+                  Table 11: Comparison of node-level detection performance on DARPA E5 datasets.
+

@@ -1,0 +1,44 @@
+{
+  "version": "tgnn-final-encoder-v1",
+  "stage": "encoder-only",
+  "selected_encoder": "Original corrected V3 PackedEncoder",
+  "output_dim": 64,
+  "sources": [
+    {
+      "source": "orthrus_comparison/universal.py",
+      "source_sha256": "f31af3ead3add5999506dcc2681185692111a5db5594961eef8b589fc180a58f",
+      "snapshot": "_universal.py",
+      "snapshot_sha256": "f31af3ead3add5999506dcc2681185692111a5db5594961eef8b589fc180a58f",
+      "changes": {}
+    },
+    {
+      "source": "sliding_node_mem_upgrade/encoding.py",
+      "source_sha256": "b220fa25448f545d257ab67801869e1253760aa48629e1f624f9de3c55a0b4bd",
+      "snapshot": "_encoding_upgrade.py",
+      "snapshot_sha256": "e1bad809f65f553ea277b22b58312e6cfd6e461670b5936a3066fddfbe15570e",
+      "changes": {
+        "from orthrus_comparison.universal import": "from ._universal import"
+      }
+    },
+    {
+      "source": "sliding_node_mem_v2/encoding.py",
+      "source_sha256": "d936babdd54ecfb188cc2bf07f3ebd3589bc301b307e925d28f9fa0a94864b8e",
+      "snapshot": "_encoding_v2.py",
+      "snapshot_sha256": "e2973fff8c678c118feebb45306232ed91d7685bd0d2b8143b65aae7a73fae30",
+      "changes": {
+        "from sliding_node_mem_upgrade.encoding import": "from ._encoding_upgrade import"
+      }
+    },
+    {
+      "source": "sliding_node_mem_v3/tokens.py",
+      "source_sha256": "5c5adb3c73d04dba57dfe75e08b691473524dc822e7ee3ad34535c0d301ba1af",
+      "snapshot": "encoder.py",
+      "snapshot_sha256": "518b7fefd4425a95c0038516abb59ac275d3679100c0f5e4b9a8474fb7f260f6",
+      "changes": {
+        "from orthrus_comparison.universal import": "from ._universal import",
+        "from sliding_node_mem_v2.encoding import": "from ._encoding_v2 import"
+      }
+    }
+  ],
+  "weights": "No trained weights bundled; compatible encoder state_dict can be loaded"
+}

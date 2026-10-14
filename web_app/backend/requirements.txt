@@ -1,0 +1,8 @@
+# Runtime dependencies; model checkpoints are verified separately.
+fastapi
+uvicorn
+pydantic
+numpy
+torch
+scikit-learn
+python-multipart

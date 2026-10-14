@@ -4,9 +4,9 @@ import time
 import numpy as np
 import pytest
 from fastapi.testclient import TestClient
-from dashboard.backend import app
-from dashboard import graph_datasets as graphs
-from dashboard.cadets import DATA, EVENT_DTYPE
+from web_app.backend.backend import app
+from web_app.backend import graph_datasets as graphs
+from web_app.backend.cadets import DATA, EVENT_DTYPE
 
 client=TestClient(app)
 
@@ -94,7 +94,7 @@ def test_parsing_formats_errors_and_ignores_supplied_verdicts():
 
 def test_upload_losses_match_original_gpu_prefix(tmp_path,monkeypatch):
     import sqlite3
-    from dashboard.cadets import EDGE_DTYPE
+    from web_app.backend.cadets import EDGE_DTYPE
     monkeypatch.setattr(graphs,'STORE',tmp_path)
     response=client.post('/api/graph-datasets?name=actual-cadets-prefix.json',content=json.dumps(events_from_prepared(1024)))
     assert response.status_code==202,response.text

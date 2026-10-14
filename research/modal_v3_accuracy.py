@@ -41,7 +41,7 @@ def train(arm):
 def main(v3_only:bool=False):
     import json
     calls={arm:train.spawn(arm) for arm in (('V3',) if v3_only else ('V3','ORTHRUS'))}
-    out=Path(__file__).resolve().parents[1]/'artifacts/v3_vs_orthrus';out.mkdir(parents=True,exist_ok=True)
+    out=Path(__file__).resolve().parent/'artifacts/v3_vs_orthrus';out.mkdir(parents=True,exist_ok=True)
     (out/('v3_retry_calls.json' if v3_only else 'calls.json')).write_text(json.dumps({k:v.object_id for k,v in calls.items()},indent=2))
     results={}
     for arm,call in calls.items():

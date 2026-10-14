@@ -2,8 +2,8 @@
 import math
 import numpy as np
 from fastapi.testclient import TestClient
-from dashboard.backend import app
-from dashboard.cadets import DATA, EVENT_DTYPE, EDGE_DTYPE, RELATIONS, result
+from web_app.backend.backend import app
+from web_app.backend.cadets import DATA, EVENT_DTYPE, EDGE_DTYPE, RELATIONS, result
 
 client = TestClient(app)
 
@@ -132,7 +132,7 @@ def test_constructed_chains_are_directed_chronological_and_label_free():
 
 
 def test_detection_graph_predictions_ips_and_observed_connections():
-    from dashboard.cadets import database
+    from web_app.backend.cadets import database
     graph_response = client.get('/api/cadets/detection-graph')
     assert graph_response.status_code == 200, graph_response.text
     graph = graph_response.json()

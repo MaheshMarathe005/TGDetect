@@ -27,7 +27,7 @@ def measure():
 def main():
     import json
     result,trace=measure.remote()
-    root=Path(__file__).resolve().parents[1]/'artifacts/sliding_v3/encoder_profile'
+    root=Path(__file__).resolve().parent/'artifacts/sliding_v3/encoder_profile'
     root.mkdir(parents=True,exist_ok=True)
     (root/'result.json').write_text(json.dumps(result,indent=2))
     (root/'trace.json').write_bytes(trace)

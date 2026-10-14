@@ -1,0 +1,12 @@
+{
+  "source": "sliding_node_mem_v3/run.py",
+  "original_sha256": "b273a0d81c3ec71aba4be491949a9778338ba67635f24bece61f93281383ae77",
+  "copy_sha256": "8826b85e9027ea06cbab4f604eba9e1b0f22bafaa6a5596c855388236d75c1c1",
+  "changes": {
+    "from .tokens import TokenBank": "from sliding_node_mem_v3.tokens import TokenBank",
+    "from .model import TGNNSlidingNodeMem": "from .model import StudyV3 as TGNNSlidingNodeMem",
+    "from .prepare import read_batches": "from sliding_node_mem_v3.prepare import read_batches",
+    "from .pretrain import pretrain": "from sliding_node_mem_v3.pretrain import pretrain",
+    "('sliding_node_mem_v3','sliding_node_mem_v2','sliding_node_mem_upgrade','orthrus_comparison')": "('sliding_node_mem_v3','sliding_node_mem_v2','sliding_node_mem_upgrade','orthrus_comparison','gat_study')"
+  }
+}

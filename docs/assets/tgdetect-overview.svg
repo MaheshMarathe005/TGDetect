@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440" role="img" aria-labelledby="title desc">
+<title id="title">TG-Detect: temporal graphs, connected evidence</title>
+<desc id="desc">An architecture illustration connects event logs to temporal graph inference and an investigation workspace.</desc>
+<defs>
+<linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0c1325"/><stop offset="1" stop-color="#111d35"/></linearGradient>
+<linearGradient id="accent"><stop stop-color="#55ddc9"/><stop offset="1" stop-color="#83a7ff"/></linearGradient>
+<pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#8ba8d4" stroke-opacity=".07"/></pattern>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="#7fa5cc"/></marker>
+</defs>
+<rect width="1200" height="440" rx="24" fill="url(#bg)"/>
+<rect width="1200" height="440" rx="24" fill="url(#grid)"/>
+<g font-family="Arial, Helvetica, sans-serif">
+<rect x="56" y="46" width="102" height="30" rx="15" fill="#55ddc9" fill-opacity=".12"/>
+<text x="107" y="66" text-anchor="middle" font-size="12" font-weight="700" letter-spacing="2" fill="#68e2d1">TG-DETECT</text>
+<text x="56" y="140" font-size="48" font-weight="700" fill="#f0f5ff">Temporal graphs.</text>
+<text x="56" y="197" font-size="48" font-weight="700" fill="url(#accent)">Connected evidence.</text>
+<text x="58" y="241" font-size="18" fill="#a7b8d1">From event streams to an investigation workspace</text>
+<g transform="translate(58 280)" font-size="13" fill="#d0deef">
+<rect width="119" height="34" rx="8" fill="#1c2d47"/><text x="59" y="22" text-anchor="middle">Temporal graphs</text>
+<rect x="131" width="110" height="34" rx="8" fill="#1c2d47"/><text x="186" y="22" text-anchor="middle">Node memory</text>
+<rect x="253" width="114" height="34" rx="8" fill="#1c2d47"/><text x="310" y="22" text-anchor="middle">Graph exploration</text>
+</g>
+<g fill="none" stroke="#537694" stroke-width="2">
+<path d="M770 107L890 159L1014 94L1080 228L930 295L805 248L770 107"/>
+<path d="M890 159L805 248M890 159L1080 228M890 159L930 295M1014 94L930 295"/>
+</g>
+<g stroke-width="3">
+<circle cx="770" cy="107" r="19" fill="#183e49" stroke="#56d9c5"/>
+<circle cx="890" cy="159" r="28" fill="#244476" stroke="#85a6ff"/>
+<circle cx="1014" cy="94" r="15" fill="#183e49" stroke="#56d9c5"/>
+<circle cx="1080" cy="228" r="21" fill="#473043" stroke="#f09aa7"/>
+<circle cx="930" cy="295" r="17" fill="#244476" stroke="#85a6ff"/>
+<circle cx="805" cy="248" r="14" fill="#183e49" stroke="#56d9c5"/>
+</g>
+<g fill="#c6d5e8" font-size="12"><text x="727" y="76">EVENTS</text><text x="863" y="209">ENTITIES</text><text x="1053" y="275">EVIDENCE</text></g>
+<path d="M57 359H1140" stroke="#2a3c56"/>
+<g font-size="14" font-weight="700" text-anchor="middle">
+<text x="176" y="400" fill="#68e2d1">EVENT LOGS</text><text x="490" y="400" fill="#93b1ff">TEMPORAL INFERENCE</text><text x="962" y="400" fill="#e6edf8">INVESTIGATION</text>
+</g>
+<g stroke="#7fa5cc" stroke-width="2" marker-end="url(#arrow)"><path d="M266 394H352"/><path d="M668 394H815"/></g>
+</g></svg>

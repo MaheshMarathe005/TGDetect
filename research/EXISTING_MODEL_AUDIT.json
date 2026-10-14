@@ -1,0 +1,3589 @@
+{
+  "scope": "CPU synthetic diagnostics; not accuracy experiments",
+  "seed": 0,
+  "models": {
+    "modal_common.Pomsathit_GCN": {
+      "parameters": 168453,
+      "trainable_parameters": 168453,
+      "parameters_by_name": {
+        "feat.0.weight": {
+          "shape": [
+            128,
+            22
+          ],
+          "count": 2816
+        },
+        "feat.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "feat.3.weight": {
+          "shape": [
+            128,
+            128
+          ],
+          "count": 16384
+        },
+        "feat.3.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.0.weight": {
+          "shape": [
+            128,
+            256
+          ],
+          "count": 32768
+        },
+        "W.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.1.weight": {
+          "shape": [
+            128,
+            256
+          ],
+          "count": 32768
+        },
+        "W.1.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.2.weight": {
+          "shape": [
+            128,
+            256
+          ],
+          "count": 32768
+        },
+        "W.2.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "att.0.weight": {
+          "shape": [
+            1,
+            256
+          ],
+          "count": 256
+        },
+        "att.0.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "att.1.weight": {
+          "shape": [
+            1,
+            256
+          ],
+          "count": 256
+        },
+        "att.1.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "att.2.weight": {
+          "shape": [
+            1,
+            256
+          ],
+          "count": 256
+        },
+        "att.2.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "head.0.weight": {
+          "shape": [
+            128,
+            384
+          ],
+          "count": 49152
+        },
+        "head.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "head.3.weight": {
+          "shape": [
+            2,
+            128
+          ],
+          "count": 256
+        },
+        "head.3.bias": {
+          "shape": [
+            2
+          ],
+          "count": 2
+        }
+      },
+      "leaf_forward_shapes": [
+        {
+          "module": "feat.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              22
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.1",
+          "class": "ReLU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.2",
+          "class": "Dropout",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.3",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              384
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.1",
+          "class": "ReLU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.2",
+          "class": "Dropout",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.3",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            2
+          ]
+        }
+      ],
+      "output_shape": [
+        [
+          3
+        ],
+        null
+      ],
+      "unused_leaf_modules": [
+        "drop"
+      ],
+      "finite_output": true,
+      "earliest_event_logit_change_when_later_event_features_change": 0.3586616516113281,
+      "parameters_without_gradient_from_current_batch_loss": []
+    },
+    "modal_common.TGDetect_TGN": {
+      "parameters": 374948,
+      "trainable_parameters": 374948,
+      "parameters_by_name": {
+        "feat.0.weight": {
+          "shape": [
+            128,
+            22
+          ],
+          "count": 2816
+        },
+        "feat.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "feat.3.weight": {
+          "shape": [
+            128,
+            128
+          ],
+          "count": 16384
+        },
+        "feat.3.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "tenc.w": {
+          "shape": [
+            32
+          ],
+          "count": 32
+        },
+        "tenc.b": {
+          "shape": [
+            32
+          ],
+          "count": 32
+        },
+        "mproj.weight": {
+          "shape": [
+            128,
+            128
+          ],
+          "count": 16384
+        },
+        "mproj.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.0.weight": {
+          "shape": [
+            128,
+            288
+          ],
+          "count": 36864
+        },
+        "W.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.1.weight": {
+          "shape": [
+            128,
+            288
+          ],
+          "count": 36864
+        },
+        "W.1.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.2.weight": {
+          "shape": [
+            128,
+            288
+          ],
+          "count": 36864
+        },
+        "W.2.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "att.0.weight": {
+          "shape": [
+            1,
+            288
+          ],
+          "count": 288
+        },
+        "att.0.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "att.1.weight": {
+          "shape": [
+            1,
+            288
+          ],
+          "count": 288
+        },
+        "att.1.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "att.2.weight": {
+          "shape": [
+            1,
+            288
+          ],
+          "count": 288
+        },
+        "att.2.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "ln.0.weight": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "ln.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "ln.1.weight": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "ln.1.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "ln.2.weight": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "ln.2.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "cell.weight_ih": {
+          "shape": [
+            384,
+            288
+          ],
+          "count": 110592
+        },
+        "cell.weight_hh": {
+          "shape": [
+            384,
+            128
+          ],
+          "count": 49152
+        },
+        "cell.bias_ih": {
+          "shape": [
+            384
+          ],
+          "count": 384
+        },
+        "cell.bias_hh": {
+          "shape": [
+            384
+          ],
+          "count": 384
+        },
+        "head.0.weight": {
+          "shape": [
+            128,
+            512
+          ],
+          "count": 65536
+        },
+        "head.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "head.3.weight": {
+          "shape": [
+            1,
+            128
+          ],
+          "count": 128
+        },
+        "head.3.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        }
+      },
+      "leaf_forward_shapes": [
+        {
+          "module": "feat.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              22
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.1",
+          "class": "ReLU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.2",
+          "class": "Dropout",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.3",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "tenc",
+          "class": "TimeEnc",
+          "in": [
+            [
+              3
+            ]
+          ],
+          "out": [
+            3,
+            32
+          ]
+        },
+        {
+          "module": "mproj",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "mproj",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "ln.0",
+          "class": "LayerNorm",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "ln.1",
+          "class": "LayerNorm",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              288
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "ln.2",
+          "class": "LayerNorm",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              512
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.1",
+          "class": "ReLU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.2",
+          "class": "Dropout",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.3",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "cell",
+          "class": "GRUCell",
+          "in": [
+            [
+              3,
+              288
+            ],
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        }
+      ],
+      "output_shape": [
+        [
+          3
+        ],
+        [
+          3,
+          128
+        ]
+      ],
+      "unused_leaf_modules": [
+        "drop"
+      ],
+      "finite_output": true,
+      "earliest_event_logit_change_when_later_event_features_change": 0.09977349638938904,
+      "parameters_without_gradient_from_current_batch_loss": [
+        "cell.weight_ih",
+        "cell.weight_hh",
+        "cell.bias_ih",
+        "cell.bias_hh"
+      ]
+    },
+    "modal_bench_real.PomsathitGCN": {
+      "parameters": 168453,
+      "trainable_parameters": 168453,
+      "parameters_by_name": {
+        "feat.0.weight": {
+          "shape": [
+            128,
+            22
+          ],
+          "count": 2816
+        },
+        "feat.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "feat.2.weight": {
+          "shape": [
+            128,
+            128
+          ],
+          "count": 16384
+        },
+        "feat.2.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.0.weight": {
+          "shape": [
+            128,
+            256
+          ],
+          "count": 32768
+        },
+        "W.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.1.weight": {
+          "shape": [
+            128,
+            256
+          ],
+          "count": 32768
+        },
+        "W.1.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "W.2.weight": {
+          "shape": [
+            128,
+            256
+          ],
+          "count": 32768
+        },
+        "W.2.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "att.0.weight": {
+          "shape": [
+            1,
+            256
+          ],
+          "count": 256
+        },
+        "att.0.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "att.1.weight": {
+          "shape": [
+            1,
+            256
+          ],
+          "count": 256
+        },
+        "att.1.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "att.2.weight": {
+          "shape": [
+            1,
+            256
+          ],
+          "count": 256
+        },
+        "att.2.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "head.0.weight": {
+          "shape": [
+            128,
+            384
+          ],
+          "count": 49152
+        },
+        "head.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "head.2.weight": {
+          "shape": [
+            2,
+            128
+          ],
+          "count": 256
+        },
+        "head.2.bias": {
+          "shape": [
+            2
+          ],
+          "count": 2
+        }
+      },
+      "leaf_forward_shapes": [
+        {
+          "module": "feat.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              22
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.1",
+          "class": "ReLU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "feat.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.1",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "att.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        },
+        {
+          "module": "W.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              256
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              384
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.1",
+          "class": "ReLU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "head.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            2
+          ]
+        }
+      ],
+      "output_shape": [
+        [
+          3
+        ],
+        null
+      ],
+      "unused_leaf_modules": [],
+      "finite_output": true
+    },
+    "modal_train_v16.V13_GNN_Rehearsal": {
+      "parameters": 743457,
+      "trainable_parameters": 743457,
+      "parameters_by_name": {
+        "tenc.fine_freqs": {
+          "shape": [
+            16
+          ],
+          "count": 16
+        },
+        "tenc.coarse_freqs": {
+          "shape": [
+            16
+          ],
+          "count": 16
+        },
+        "layers.0.Wq.weight": {
+          "shape": [
+            64,
+            64
+          ],
+          "count": 4096
+        },
+        "layers.0.Wq.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.0.Wk.weight": {
+          "shape": [
+            64,
+            160
+          ],
+          "count": 10240
+        },
+        "layers.0.Wk.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.0.Wv.weight": {
+          "shape": [
+            64,
+            160
+          ],
+          "count": 10240
+        },
+        "layers.0.Wv.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.0.Wo.weight": {
+          "shape": [
+            64,
+            64
+          ],
+          "count": 4096
+        },
+        "layers.0.Wo.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.0.ffn.0.weight": {
+          "shape": [
+            128,
+            64
+          ],
+          "count": 8192
+        },
+        "layers.0.ffn.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "layers.0.ffn.2.weight": {
+          "shape": [
+            64,
+            128
+          ],
+          "count": 8192
+        },
+        "layers.0.ffn.2.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.1.Wq.weight": {
+          "shape": [
+            64,
+            64
+          ],
+          "count": 4096
+        },
+        "layers.1.Wq.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.1.Wk.weight": {
+          "shape": [
+            64,
+            160
+          ],
+          "count": 10240
+        },
+        "layers.1.Wk.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.1.Wv.weight": {
+          "shape": [
+            64,
+            160
+          ],
+          "count": 10240
+        },
+        "layers.1.Wv.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.1.Wo.weight": {
+          "shape": [
+            64,
+            64
+          ],
+          "count": 4096
+        },
+        "layers.1.Wo.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "layers.1.ffn.0.weight": {
+          "shape": [
+            128,
+            64
+          ],
+          "count": 8192
+        },
+        "layers.1.ffn.0.bias": {
+          "shape": [
+            128
+          ],
+          "count": 128
+        },
+        "layers.1.ffn.2.weight": {
+          "shape": [
+            64,
+            128
+          ],
+          "count": 8192
+        },
+        "layers.1.ffn.2.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "anom_head.0.weight": {
+          "shape": [
+            64,
+            192
+          ],
+          "count": 12288
+        },
+        "anom_head.0.bias": {
+          "shape": [
+            64
+          ],
+          "count": 64
+        },
+        "anom_head.2.weight": {
+          "shape": [
+            1,
+            64
+          ],
+          "count": 64
+        },
+        "anom_head.2.bias": {
+          "shape": [
+            1
+          ],
+          "count": 1
+        },
+        "n_emb.weight": {
+          "shape": [
+            10000,
+            64
+          ],
+          "count": 640000
+        }
+      },
+      "leaf_forward_shapes": [
+        {
+          "module": "n_emb",
+          "class": "Embedding",
+          "in": [
+            [
+              3
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "n_emb",
+          "class": "Embedding",
+          "in": [
+            [
+              3
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "tenc",
+          "class": "MultiResTimeEncoder",
+          "in": [
+            [
+              3
+            ]
+          ],
+          "out": [
+            3,
+            32
+          ]
+        },
+        {
+          "module": "layers.0.Wq",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.0.Wk",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              160
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.0.Wv",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              160
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.0.Wo",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.0.ffn.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "layers.0.ffn.1",
+          "class": "GELU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "layers.0.ffn.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.1.Wq",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.1.Wk",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              160
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.1.Wv",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              160
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.1.Wo",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "layers.1.ffn.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "layers.1.ffn.1",
+          "class": "GELU",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            128
+          ]
+        },
+        {
+          "module": "layers.1.ffn.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              128
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "anom_head.0",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              192
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "anom_head.1",
+          "class": "GELU",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            64
+          ]
+        },
+        {
+          "module": "anom_head.2",
+          "class": "Linear",
+          "in": [
+            [
+              3,
+              64
+            ]
+          ],
+          "out": [
+            3,
+            1
+          ]
+        }
+      ],
+      "output_shape": [
+        [
+          3
+        ],
+        [
+          3,
+          64
+        ]
+      ],
+      "unused_leaf_modules": [],
+      "finite_output": true
+    }
+  },
+  "registry": {
+    "PlainMLP": {
+      "class": "PlainMLP",
+      "parameters": 36097,
+      "uses_mem": false,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {}
+    },
+    "Pomsathit_GCN": {
+      "class": "PomsathitGCN",
+      "parameters": 168453,
+      "uses_mem": false,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {}
+    },
+    "TGDetect_TGN": {
+      "class": "TGDetectTGN",
+      "parameters": 374948,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {}
+    },
+    "TGDetect_Drift": {
+      "class": "TGDetectDrift",
+      "parameters": 413496,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {}
+    },
+    "R_Off": {
+      "class": "R_Off",
+      "parameters": 375332,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": false,
+        "memdrop": 0.0,
+        "memhard": false
+      }
+    },
+    "R_MemNorm": {
+      "class": "R_MemNorm",
+      "parameters": 375332,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": true,
+        "memdrop": 0.0,
+        "memhard": false
+      }
+    },
+    "R_MemDrop": {
+      "class": "R_MemDrop",
+      "parameters": 375332,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": false,
+        "memdrop": 0.15,
+        "memhard": false
+      }
+    },
+    "R_Both": {
+      "class": "R_Both",
+      "parameters": 375332,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": true,
+        "memdrop": 0.15,
+        "memhard": false
+      }
+    },
+    "RD_Off": {
+      "class": "RD_Off",
+      "parameters": 413880,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": false,
+        "memdrop": 0.0,
+        "memhard": false
+      }
+    },
+    "RD_Both": {
+      "class": "RD_Both",
+      "parameters": 413880,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": true,
+        "memdrop": 0.15,
+        "memhard": false
+      }
+    },
+    "R_MemHard": {
+      "class": "R_MemHard",
+      "parameters": 375332,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": false,
+        "memdrop": 0.0,
+        "memhard": true
+      }
+    },
+    "R_HardDrop": {
+      "class": "R_HardDrop",
+      "parameters": 375332,
+      "uses_mem": true,
+      "uses_ctx": false,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": false,
+        "memdrop": 0.15,
+        "memhard": true
+      }
+    },
+    "RD_MemHard": {
+      "class": "RD_MemHard",
+      "parameters": 413880,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "memnorm": false,
+        "memdrop": 0.0,
+        "memhard": true
+      }
+    },
+    "V2_Off": {
+      "class": "V2_Off",
+      "parameters": 374948,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "zs": 0,
+        "film": false,
+        "sync": false,
+        "pair": false,
+        "beacon": false
+      }
+    },
+    "V2_Drift": {
+      "class": "V2_Drift",
+      "parameters": 430264,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "zs": 1,
+        "film": true,
+        "sync": false,
+        "pair": false,
+        "beacon": false
+      }
+    },
+    "V2_N1_Beacon": {
+      "class": "V2_N1_Beacon",
+      "parameters": 393124,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": true,
+      "flags": {
+        "zs": 0,
+        "film": false,
+        "sync": false,
+        "pair": false,
+        "beacon": true
+      }
+    },
+    "V2_N2_Pair": {
+      "class": "V2_N2_Pair",
+      "parameters": 426596,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": true,
+      "flags": {
+        "zs": 0,
+        "film": false,
+        "sync": false,
+        "pair": true,
+        "beacon": false
+      }
+    },
+    "V2_N4_Z3": {
+      "class": "V2_N4_Z3",
+      "parameters": 435896,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "zs": 3,
+        "film": true,
+        "sync": false,
+        "pair": false,
+        "beacon": false
+      }
+    },
+    "V2_N5_Sync": {
+      "class": "V2_N5_Sync",
+      "parameters": 411582,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "zs": 0,
+        "film": true,
+        "sync": true,
+        "pair": false,
+        "beacon": false
+      }
+    },
+    "V2_N1N2": {
+      "class": "V2_N1N2",
+      "parameters": 428132,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": true,
+      "flags": {
+        "zs": 0,
+        "film": false,
+        "sync": false,
+        "pair": true,
+        "beacon": true
+      }
+    },
+    "V2_N4N5": {
+      "class": "V2_N4N5",
+      "parameters": 436670,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": false,
+      "flags": {
+        "zs": 3,
+        "film": true,
+        "sync": true,
+        "pair": false,
+        "beacon": false
+      }
+    },
+    "V2_All": {
+      "class": "V2_All",
+      "parameters": 473214,
+      "uses_mem": true,
+      "uses_ctx": true,
+      "uses_ex": true,
+      "flags": {
+        "zs": 3,
+        "film": true,
+        "sync": true,
+        "pair": true,
+        "beacon": true
+      }
+    }
+  },
+  "symbols": {
+    "audit_environment.py": {
+      "sha256": "a96f0acfa4d959a138b889aeafa3dd5cf52895b5a1aa4a34df2e8988b8da2fe0",
+      "definitions": [
+        {
+          "name": "sha256",
+          "kind": "FunctionDef",
+          "line": 21,
+          "end_line": 26
+        },
+        {
+          "name": "command_version",
+          "kind": "FunctionDef",
+          "line": 29,
+          "end_line": 33
+        },
+        {
+          "name": "audit",
+          "kind": "FunctionDef",
+          "line": 36,
+          "end_line": 111
+        }
+      ]
+    },
+    "audit_models.py": {
+      "sha256": "e104e96e67af71bed010aa474fe30e9e4f27039e19c73d88b43d5315e17e5011",
+      "definitions": [
+        {
+          "name": "load_legacy_classes",
+          "kind": "FunctionDef",
+          "line": 19,
+          "end_line": 35
+        },
+        {
+          "name": "shapes",
+          "kind": "FunctionDef",
+          "line": 38,
+          "end_line": 43
+        },
+        {
+          "name": "profile",
+          "kind": "FunctionDef",
+          "line": 46,
+          "end_line": 65
+        },
+        {
+          "name": "audit",
+          "kind": "FunctionDef",
+          "line": 68,
+          "end_line": 115
+        },
+        {
+          "name": "hook",
+          "kind": "FunctionDef",
+          "line": 50,
+          "end_line": 51
+        }
+      ]
+    },
+    "data_gen_v6.py": {
+      "sha256": "6fb197829b6cd17fd39f3af29752000df7e5123e68371690c22722edeff26070",
+      "definitions": [
+        {
+          "name": "generate_v6_data",
+          "kind": "FunctionDef",
+          "line": 34,
+          "end_line": 168
+        },
+        {
+          "name": "main",
+          "kind": "FunctionDef",
+          "line": 171,
+          "end_line": 175
+        },
+        {
+          "name": "spawn_apt",
+          "kind": "FunctionDef",
+          "line": 48,
+          "end_line": 73
+        }
+      ]
+    },
+    "modal_bench_real.py": {
+      "sha256": "f538e8b55d42496a6d331c3c47cacdc810c1ebb46580404de4a51ba03ab0ad24",
+      "definitions": [
+        {
+          "name": "bench",
+          "kind": "FunctionDef",
+          "line": 53,
+          "end_line": 519
+        },
+        {
+          "name": "main",
+          "kind": "FunctionDef",
+          "line": 523,
+          "end_line": 526
+        },
+        {
+          "name": "build_folds",
+          "kind": "FunctionDef",
+          "line": 114,
+          "end_line": 139
+        },
+        {
+          "name": "cat",
+          "kind": "FunctionDef",
+          "line": 141,
+          "end_line": 142
+        },
+        {
+          "name": "TimeEnc",
+          "kind": "ClassDef",
+          "line": 145,
+          "end_line": 153
+        },
+        {
+          "name": "seg_softmax",
+          "kind": "FunctionDef",
+          "line": 155,
+          "end_line": 162
+        },
+        {
+          "name": "PlainMLP",
+          "kind": "ClassDef",
+          "line": 164,
+          "end_line": 175
+        },
+        {
+          "name": "PomsathitGCN",
+          "kind": "ClassDef",
+          "line": 177,
+          "end_line": 210
+        },
+        {
+          "name": "TGDetectTGN",
+          "kind": "ClassDef",
+          "line": 213,
+          "end_line": 263
+        },
+        {
+          "name": "Reservoir",
+          "kind": "ClassDef",
+          "line": 266,
+          "end_line": 278
+        },
+        {
+          "name": "run_epoch",
+          "kind": "FunctionDef",
+          "line": 280,
+          "end_line": 356
+        },
+        {
+          "name": "metrics_at",
+          "kind": "FunctionDef",
+          "line": 358,
+          "end_line": 370
+        },
+        {
+          "name": "pick_thr",
+          "kind": "FunctionDef",
+          "line": 372,
+          "end_line": 376
+        },
+        {
+          "name": "span_days_of",
+          "kind": "FunctionDef",
+          "line": 378,
+          "end_line": 386
+        },
+        {
+          "name": "h",
+          "kind": "FunctionDef",
+          "line": 94,
+          "end_line": 96
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 147,
+          "end_line": 150
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 151,
+          "end_line": 153
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 169,
+          "end_line": 172
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 174,
+          "end_line": 175
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 184,
+          "end_line": 189
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 191,
+          "end_line": 210
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 222,
+          "end_line": 231
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 233,
+          "end_line": 263
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 267,
+          "end_line": 268
+        },
+        {
+          "name": "add",
+          "kind": "FunctionDef",
+          "line": 269,
+          "end_line": 276
+        },
+        {
+          "name": "sample",
+          "kind": "FunctionDef",
+          "line": 277,
+          "end_line": 278
+        },
+        {
+          "name": "agg",
+          "kind": "FunctionDef",
+          "line": 473,
+          "end_line": 475
+        }
+      ]
+    },
+    "modal_common.py": {
+      "sha256": "4178a3267e3cc1289cf02f321454409ed24858550a8f5be8cadb779dbbebdcd3",
+      "definitions": [
+        {
+          "name": "feature_mask",
+          "kind": "FunctionDef",
+          "line": 118,
+          "end_line": 133
+        },
+        {
+          "name": "_ewma",
+          "kind": "FunctionDef",
+          "line": 171,
+          "end_line": 183
+        },
+        {
+          "name": "_first_occurrence",
+          "kind": "FunctionDef",
+          "line": 186,
+          "end_line": 192
+        },
+        {
+          "name": "pair_hash",
+          "kind": "FunctionDef",
+          "line": 195,
+          "end_line": 206
+        },
+        {
+          "name": "_group_cumcount",
+          "kind": "FunctionDef",
+          "line": 209,
+          "end_line": 222
+        },
+        {
+          "name": "_group_cumsum_excl",
+          "kind": "FunctionDef",
+          "line": 225,
+          "end_line": 239
+        },
+        {
+          "name": "build_context",
+          "kind": "FunctionDef",
+          "line": 242,
+          "end_line": 328
+        },
+        {
+          "name": "prior_adapt",
+          "kind": "FunctionDef",
+          "line": 333,
+          "end_line": 389
+        },
+        {
+          "name": "get_models",
+          "kind": "FunctionDef",
+          "line": 394,
+          "end_line": 993
+        },
+        {
+          "name": "adjust",
+          "kind": "FunctionDef",
+          "line": 374,
+          "end_line": 377
+        },
+        {
+          "name": "TimeEnc",
+          "kind": "ClassDef",
+          "line": 401,
+          "end_line": 408
+        },
+        {
+          "name": "seg_softmax",
+          "kind": "FunctionDef",
+          "line": 410,
+          "end_line": 416
+        },
+        {
+          "name": "PomsathitGCN",
+          "kind": "ClassDef",
+          "line": 418,
+          "end_line": 451
+        },
+        {
+          "name": "TGDetectTGN",
+          "kind": "ClassDef",
+          "line": 453,
+          "end_line": 546
+        },
+        {
+          "name": "TGDetectDrift",
+          "kind": "ClassDef",
+          "line": 548,
+          "end_line": 599
+        },
+        {
+          "name": "BeaconEnc",
+          "kind": "ClassDef",
+          "line": 601,
+          "end_line": 670
+        },
+        {
+          "name": "TGDetectV2",
+          "kind": "ClassDef",
+          "line": 672,
+          "end_line": 765
+        },
+        {
+          "name": "PlainMLP",
+          "kind": "ClassDef",
+          "line": 767,
+          "end_line": 777
+        },
+        {
+          "name": "TGDetectRobust",
+          "kind": "ClassDef",
+          "line": 779,
+          "end_line": 893
+        },
+        {
+          "name": "TGDetectDriftRobust",
+          "kind": "ClassDef",
+          "line": 895,
+          "end_line": 914
+        },
+        {
+          "name": "rb",
+          "kind": "FunctionDef",
+          "line": 916,
+          "end_line": 922
+        },
+        {
+          "name": "v2",
+          "kind": "FunctionDef",
+          "line": 924,
+          "end_line": 931
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 402,
+          "end_line": 405
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 406,
+          "end_line": 408
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 424,
+          "end_line": 432
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 433,
+          "end_line": 451
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 459,
+          "end_line": 471
+        },
+        {
+          "name": "encode",
+          "kind": "FunctionDef",
+          "line": 473,
+          "end_line": 474
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 476,
+          "end_line": 512
+        },
+        {
+          "name": "mem_read",
+          "kind": "FunctionDef",
+          "line": 514,
+          "end_line": 520
+        },
+        {
+          "name": "head_in",
+          "kind": "FunctionDef",
+          "line": 522,
+          "end_line": 523
+        },
+        {
+          "name": "head_hidden",
+          "kind": "FunctionDef",
+          "line": 525,
+          "end_line": 535
+        },
+        {
+          "name": "head_out",
+          "kind": "FunctionDef",
+          "line": 537,
+          "end_line": 538
+        },
+        {
+          "name": "score",
+          "kind": "FunctionDef",
+          "line": 540,
+          "end_line": 541
+        },
+        {
+          "name": "pair_update",
+          "kind": "FunctionDef",
+          "line": 543,
+          "end_line": 546
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 580,
+          "end_line": 590
+        },
+        {
+          "name": "encode",
+          "kind": "FunctionDef",
+          "line": 592,
+          "end_line": 596
+        },
+        {
+          "name": "head_in",
+          "kind": "FunctionDef",
+          "line": 598,
+          "end_line": 599
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 654,
+          "end_line": 657
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 659,
+          "end_line": 670
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 698,
+          "end_line": 730
+        },
+        {
+          "name": "ctx",
+          "kind": "FunctionDef",
+          "line": 732,
+          "end_line": 733
+        },
+        {
+          "name": "zsel",
+          "kind": "FunctionDef",
+          "line": 735,
+          "end_line": 738
+        },
+        {
+          "name": "encode",
+          "kind": "FunctionDef",
+          "line": 740,
+          "end_line": 754
+        },
+        {
+          "name": "score",
+          "kind": "FunctionDef",
+          "line": 756,
+          "end_line": 760
+        },
+        {
+          "name": "pair_update",
+          "kind": "FunctionDef",
+          "line": 762,
+          "end_line": 765
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 772,
+          "end_line": 775
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 776,
+          "end_line": 777
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 849,
+          "end_line": 856
+        },
+        {
+          "name": "mem_read",
+          "kind": "FunctionDef",
+          "line": 858,
+          "end_line": 893
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 905,
+          "end_line": 912
+        }
+      ]
+    },
+    "modal_data_real.py": {
+      "sha256": "d0a57a5586813057b54cf2df8f87b241deee4b1f29833ca6c7b9ec12ab6ad494",
+      "definitions": [
+        {
+          "name": "prepare",
+          "kind": "FunctionDef",
+          "line": 67,
+          "end_line": 259
+        },
+        {
+          "name": "stats",
+          "kind": "FunctionDef",
+          "line": 263,
+          "end_line": 277
+        },
+        {
+          "name": "main",
+          "kind": "FunctionDef",
+          "line": 281,
+          "end_line": 283
+        },
+        {
+          "name": "parse_port",
+          "kind": "FunctionDef",
+          "line": 76,
+          "end_line": 83
+        },
+        {
+          "name": "parse_ts",
+          "kind": "FunctionDef",
+          "line": 85,
+          "end_line": 88
+        }
+      ]
+    },
+    "modal_diag.py": {
+      "sha256": "e8fcb6d3654a51e749d1e392720fb59aef11f7e9a0ed45f567d5f285d94d933c",
+      "definitions": [
+        {
+          "name": "diag",
+          "kind": "FunctionDef",
+          "line": 61,
+          "end_line": 324
+        },
+        {
+          "name": "main",
+          "kind": "FunctionDef",
+          "line": 328,
+          "end_line": 329
+        },
+        {
+          "name": "cat",
+          "kind": "FunctionDef",
+          "line": 112,
+          "end_line": 113
+        },
+        {
+          "name": "drift_per_scenario",
+          "kind": "FunctionDef",
+          "line": 138,
+          "end_line": 149
+        },
+        {
+          "name": "pbis",
+          "kind": "FunctionDef",
+          "line": 182,
+          "end_line": 187
+        },
+        {
+          "name": "evaluate",
+          "kind": "FunctionDef",
+          "line": 211,
+          "end_line": 231
+        },
+        {
+          "name": "fit_eval",
+          "kind": "FunctionDef",
+          "line": 233,
+          "end_line": 250
+        },
+        {
+          "name": "rank_norm",
+          "kind": "FunctionDef",
+          "line": 268,
+          "end_line": 277
+        },
+        {
+          "name": "rk",
+          "kind": "FunctionDef",
+          "line": 269,
+          "end_line": 276
+        }
+      ]
+    },
+    "modal_lab.py": {
+      "sha256": "a22c58d3c1a52950442edaf0eaffedd44b3fee15898c15075b3a5630b7236328",
+      "definitions": [
+        {
+          "name": "_Tee",
+          "kind": "ClassDef",
+          "line": 53,
+          "end_line": 66
+        },
+        {
+          "name": "tee",
+          "kind": "FunctionDef",
+          "line": 69,
+          "end_line": 80
+        },
+        {
+          "name": "load_streams",
+          "kind": "FunctionDef",
+          "line": 163,
+          "end_line": 306
+        },
+        {
+          "name": "suite_eta",
+          "kind": "FunctionDef",
+          "line": 493,
+          "end_line": 518
+        },
+        {
+          "name": "make_folds",
+          "kind": "FunctionDef",
+          "line": 521,
+          "end_line": 583
+        },
+        {
+          "name": "concat",
+          "kind": "FunctionDef",
+          "line": 586,
+          "end_line": 588
+        },
+        {
+          "name": "last_write",
+          "kind": "FunctionDef",
+          "line": 591,
+          "end_line": 626
+        },
+        {
+          "name": "mem_leak_probe",
+          "kind": "FunctionDef",
+          "line": 629,
+          "end_line": 709
+        },
+        {
+          "name": "gru_gate_stats",
+          "kind": "FunctionDef",
+          "line": 712,
+          "end_line": 735
+        },
+        {
+          "name": "LabCPU",
+          "kind": "ClassDef",
+          "line": 742,
+          "end_line": 1030
+        },
+        {
+          "name": "LabGPU",
+          "kind": "ClassDef",
+          "line": 1040,
+          "end_line": 2794
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 54,
+          "end_line": 55
+        },
+        {
+          "name": "write",
+          "kind": "FunctionDef",
+          "line": 57,
+          "end_line": 60
+        },
+        {
+          "name": "flush",
+          "kind": "FunctionDef",
+          "line": 62,
+          "end_line": 63
+        },
+        {
+          "name": "isatty",
+          "kind": "FunctionDef",
+          "line": 65,
+          "end_line": 66
+        },
+        {
+          "name": "_cm",
+          "kind": "FunctionDef",
+          "line": 73,
+          "end_line": 79
+        },
+        {
+          "name": "ln",
+          "kind": "FunctionDef",
+          "line": 684,
+          "end_line": 685
+        },
+        {
+          "name": "setup",
+          "kind": "FunctionDef",
+          "line": 748,
+          "end_line": 762
+        },
+        {
+          "name": "_evaluate",
+          "kind": "FunctionDef",
+          "line": 765,
+          "end_line": 809
+        },
+        {
+          "name": "_fit_eval",
+          "kind": "FunctionDef",
+          "line": 811,
+          "end_line": 829
+        },
+        {
+          "name": "info",
+          "kind": "FunctionDef",
+          "line": 833,
+          "end_line": 840
+        },
+        {
+          "name": "diag",
+          "kind": "FunctionDef",
+          "line": 843,
+          "end_line": 848
+        },
+        {
+          "name": "_diag",
+          "kind": "FunctionDef",
+          "line": 850,
+          "end_line": 1030
+        },
+        {
+          "name": "setup",
+          "kind": "FunctionDef",
+          "line": 1047,
+          "end_line": 1053
+        },
+        {
+          "name": "_refit_scalers",
+          "kind": "FunctionDef",
+          "line": 1055,
+          "end_line": 1077
+        },
+        {
+          "name": "_dro_state",
+          "kind": "FunctionDef",
+          "line": 1080,
+          "end_line": 1099
+        },
+        {
+          "name": "_vrex_state",
+          "kind": "FunctionDef",
+          "line": 1101,
+          "end_line": 1124
+        },
+        {
+          "name": "_run_epoch",
+          "kind": "FunctionDef",
+          "line": 1126,
+          "end_line": 1519
+        },
+        {
+          "name": "smoke",
+          "kind": "FunctionDef",
+          "line": 1522,
+          "end_line": 1529
+        },
+        {
+          "name": "_smoke",
+          "kind": "FunctionDef",
+          "line": 1531,
+          "end_line": 1795
+        },
+        {
+          "name": "bench",
+          "kind": "FunctionDef",
+          "line": 1798,
+          "end_line": 1820
+        },
+        {
+          "name": "suite",
+          "kind": "FunctionDef",
+          "line": 1823,
+          "end_line": 1901
+        },
+        {
+          "name": "_suite_table",
+          "kind": "FunctionDef",
+          "line": 1904,
+          "end_line": 1999
+        },
+        {
+          "name": "_Reservoir",
+          "kind": "ClassDef",
+          "line": 2002,
+          "end_line": 2018
+        },
+        {
+          "name": "_macro_ap",
+          "kind": "FunctionDef",
+          "line": 2021,
+          "end_line": 2039
+        },
+        {
+          "name": "_val_select_score",
+          "kind": "FunctionDef",
+          "line": 2041,
+          "end_line": 2060
+        },
+        {
+          "name": "_one",
+          "kind": "FunctionDef",
+          "line": 2062,
+          "end_line": 2314
+        },
+        {
+          "name": "_say",
+          "kind": "FunctionDef",
+          "line": 2316,
+          "end_line": 2351
+        },
+        {
+          "name": "_ensemble_row",
+          "kind": "FunctionDef",
+          "line": 2353,
+          "end_line": 2430
+        },
+        {
+          "name": "_bench",
+          "kind": "FunctionDef",
+          "line": 2432,
+          "end_line": 2575
+        },
+        {
+          "name": "_basin_report",
+          "kind": "FunctionDef",
+          "line": 2579,
+          "end_line": 2653
+        },
+        {
+          "name": "ablate",
+          "kind": "FunctionDef",
+          "line": 2656,
+          "end_line": 2669
+        },
+        {
+          "name": "_ablate",
+          "kind": "FunctionDef",
+          "line": 2671,
+          "end_line": 2794
+        },
+        {
+          "name": "drift_per_scenario",
+          "kind": "FunctionDef",
+          "line": 889,
+          "end_line": 899
+        },
+        {
+          "name": "pbis",
+          "kind": "FunctionDef",
+          "line": 927,
+          "end_line": 931
+        },
+        {
+          "name": "rk",
+          "kind": "FunctionDef",
+          "line": 972,
+          "end_line": 979
+        },
+        {
+          "name": "fake",
+          "kind": "FunctionDef",
+          "line": 1536,
+          "end_line": 1550
+        },
+        {
+          "name": "sim",
+          "kind": "FunctionDef",
+          "line": 1657,
+          "end_line": 1678
+        },
+        {
+          "name": "dprime",
+          "kind": "FunctionDef",
+          "line": 1680,
+          "end_line": 1682
+        },
+        {
+          "name": "train_toy",
+          "kind": "FunctionDef",
+          "line": 1711,
+          "end_line": 1729
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 2006,
+          "end_line": 2008
+        },
+        {
+          "name": "add",
+          "kind": "FunctionDef",
+          "line": 2009,
+          "end_line": 2016
+        },
+        {
+          "name": "sample",
+          "kind": "FunctionDef",
+          "line": 2017,
+          "end_line": 2018
+        },
+        {
+          "name": "draw",
+          "kind": "FunctionDef",
+          "line": 1659,
+          "end_line": 1665
+        },
+        {
+          "name": "stat",
+          "kind": "FunctionDef",
+          "line": 1930,
+          "end_line": 1934
+        }
+      ]
+    },
+    "modal_train_v16.py": {
+      "sha256": "ecb2518049563751502fdef64cb9f2692001705f8bb908867c49dc795d63ac49",
+      "definitions": [
+        {
+          "name": "train",
+          "kind": "FunctionDef",
+          "line": 29,
+          "end_line": 466
+        },
+        {
+          "name": "main",
+          "kind": "FunctionDef",
+          "line": 469,
+          "end_line": 470
+        },
+        {
+          "name": "MemBank",
+          "kind": "ClassDef",
+          "line": 63,
+          "end_line": 93
+        },
+        {
+          "name": "MultiResTimeEncoder",
+          "kind": "ClassDef",
+          "line": 95,
+          "end_line": 103
+        },
+        {
+          "name": "UniversalEncoder",
+          "kind": "ClassDef",
+          "line": 105,
+          "end_line": 122
+        },
+        {
+          "name": "GradientReversalFunction",
+          "kind": "ClassDef",
+          "line": 124,
+          "end_line": 131
+        },
+        {
+          "name": "GRL",
+          "kind": "ClassDef",
+          "line": 133,
+          "end_line": 138
+        },
+        {
+          "name": "CausalHTAConv",
+          "kind": "ClassDef",
+          "line": 140,
+          "end_line": 165
+        },
+        {
+          "name": "BaseModel",
+          "kind": "ClassDef",
+          "line": 167,
+          "end_line": 209
+        },
+        {
+          "name": "FocalBCE",
+          "kind": "ClassDef",
+          "line": 211,
+          "end_line": 220
+        },
+        {
+          "name": "SupervisedContrastiveLoss",
+          "kind": "ClassDef",
+          "line": 222,
+          "end_line": 237
+        },
+        {
+          "name": "RehearsalBuffer",
+          "kind": "ClassDef",
+          "line": 239,
+          "end_line": 255
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 64,
+          "end_line": 65
+        },
+        {
+          "name": "reset",
+          "kind": "FunctionDef",
+          "line": 66,
+          "end_line": 67
+        },
+        {
+          "name": "get",
+          "kind": "FunctionDef",
+          "line": 68,
+          "end_line": 79
+        },
+        {
+          "name": "get_raw",
+          "kind": "FunctionDef",
+          "line": 80,
+          "end_line": 87
+        },
+        {
+          "name": "gts",
+          "kind": "FunctionDef",
+          "line": 88,
+          "end_line": 89
+        },
+        {
+          "name": "up",
+          "kind": "FunctionDef",
+          "line": 90,
+          "end_line": 93
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 96,
+          "end_line": 100
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 101,
+          "end_line": 103
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 106,
+          "end_line": 115
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 117,
+          "end_line": 122
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 126,
+          "end_line": 128
+        },
+        {
+          "name": "backward",
+          "kind": "FunctionDef",
+          "line": 130,
+          "end_line": 131
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 134,
+          "end_line": 136
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 137,
+          "end_line": 138
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 141,
+          "end_line": 149
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 150,
+          "end_line": 165
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 168,
+          "end_line": 181
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 183,
+          "end_line": 209
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 212,
+          "end_line": 214
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 215,
+          "end_line": 220
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 223,
+          "end_line": 225
+        },
+        {
+          "name": "forward",
+          "kind": "FunctionDef",
+          "line": 226,
+          "end_line": 237
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 240,
+          "end_line": 243
+        },
+        {
+          "name": "add",
+          "kind": "FunctionDef",
+          "line": 244,
+          "end_line": 252
+        },
+        {
+          "name": "sample",
+          "kind": "FunctionDef",
+          "line": 253,
+          "end_line": 255
+        }
+      ]
+    },
+    "pomsathit_baseline.py": {
+      "sha256": "1820c30793b0a0e3fca9afba87ce2b62def9d0e4f316f0caa6169eb127142ec2",
+      "definitions": [
+        {
+          "name": "UnresolvedPaperSpecification",
+          "kind": "ClassDef",
+          "line": 13,
+          "end_line": 14
+        },
+        {
+          "name": "PaperSpecification",
+          "kind": "ClassDef",
+          "line": 18,
+          "end_line": 34
+        },
+        {
+          "name": "architecture_manifest",
+          "kind": "FunctionDef",
+          "line": 47,
+          "end_line": 71
+        },
+        {
+          "name": "PomsathitPaperSpec",
+          "kind": "ClassDef",
+          "line": 74,
+          "end_line": 78
+        },
+        {
+          "name": "PomsathitAdapted",
+          "kind": "ClassDef",
+          "line": 81,
+          "end_line": 88
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 77,
+          "end_line": 78
+        },
+        {
+          "name": "__init__",
+          "kind": "FunctionDef",
+          "line": 84,
+          "end_line": 88
+        }
+      ]
+    },
+    "test_research_foundation.py": {
+      "sha256": "75338dabc0ea3f5a2496d9e966d687acd635d986effc38d02999f8cf8c329e13",
+      "definitions": [
+        {
+          "name": "test_paper_contract_and_persisted_manifest",
+          "kind": "FunctionDef",
+          "line": 21,
+          "end_line": 35
+        },
+        {
+          "name": "test_missing_spec_never_silently_becomes_an_exact_model",
+          "kind": "FunctionDef",
+          "line": 39,
+          "end_line": 41
+        },
+        {
+          "name": "test_fixture_default_is_outside_preserved_dataset",
+          "kind": "FunctionDef",
+          "line": 44,
+          "end_line": 58
+        },
+        {
+          "name": "inputs",
+          "kind": "FunctionDef",
+          "line": 61,
+          "end_line": 67
+        },
+        {
+          "name": "test_existing_baseline_shape_and_binary_head_equivalence",
+          "kind": "FunctionDef",
+          "line": 70,
+          "end_line": 82
+        },
+        {
+          "name": "test_legacy_model_does_not_see_later_event_features",
+          "kind": "FunctionDef",
+          "line": 87,
+          "end_line": 94
+        },
+        {
+          "name": "test_legacy_gru_receives_gradient_across_two_detached_steps",
+          "kind": "FunctionDef",
+          "line": 98,
+          "end_line": 109
+        },
+        {
+          "name": "test_context_is_invariant_to_appending_future_events",
+          "kind": "FunctionDef",
+          "line": 113,
+          "end_line": 121
+        }
+      ]
+    },
+    "trigger.py": {
+      "sha256": "04eb09694a5f2cdcbfa032c14644cbfbff3b380bc9924dac9c3570b4c83a4a5d",
+      "definitions": [
+        {
+          "name": "_instance",
+          "kind": "FunctionDef",
+          "line": 45,
+          "end_line": 55
+        },
+        {
+          "name": "_save",
+          "kind": "FunctionDef",
+          "line": 58,
+          "end_line": 63
+        },
+        {
+          "name": "_report",
+          "kind": "FunctionDef",
+          "line": 66,
+          "end_line": 71
+        },
+        {
+          "name": "_launch",
+          "kind": "FunctionDef",
+          "line": 74,
+          "end_line": 86
+        },
+        {
+          "name": "_poll",
+          "kind": "FunctionDef",
+          "line": 89,
+          "end_line": 107
+        },
+        {
+          "name": "main",
+          "kind": "FunctionDef",
+          "line": 110,
+          "end_line": 344
+        },
+        {
+          "name": "add_detach",
+          "kind": "FunctionDef",
+          "line": 114,
+          "end_line": 123
+        }
+      ]
+    }
+  }
+}

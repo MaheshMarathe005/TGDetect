@@ -59,6 +59,6 @@ def measure():
 def main():
     import json
     result=measure.remote()
-    path=root.parent/'artifacts/sliding_v3/gpu_latency.json';path.parent.mkdir(parents=True,exist_ok=True)
+    path=root/'artifacts/sliding_v3/gpu_latency.json';path.parent.mkdir(parents=True,exist_ok=True)
     path.write_text(json.dumps(result,indent=2))
     print('Saved',path)

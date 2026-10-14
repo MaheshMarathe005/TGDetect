@@ -1,62 +1,214 @@
-# TGDetect — V3 and ORTHRUS package
+<p align="center">
+  <img src="docs/assets/tgdetect-overview.svg" alt="TG-Detect — temporal graphs and connected evidence" width="100%">
+</p>
 
-This directory is an independent snapshot of the V3 research, recorded V3/ORTHRUS comparison results, and the complete dashboard application. Its local CADETS E3 data and trained V3 checkpoint are supplied as a checksum-verified GitHub release asset; large data files are excluded from Git history. No file links point back to the parent project.
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-55ddc9?style=flat-square"></a>
+  <img alt="Backend: FastAPI" src="https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square">
+  <img alt="Frontend: Next.js" src="https://img.shields.io/badge/Frontend-Next.js-111827?style=flat-square">
+  <img alt="Models: PyTorch" src="https://img.shields.io/badge/Models-PyTorch-ee4c2c?style=flat-square">
+</p>
 
-- `research/sliding_node_mem_v3/`: complete V3 implementation, preparation, pretraining, training, inference, profiling, ablations and comparison.
-- `research/architectures/`: V3 and ORTHRUS diagrams and component descriptions.
-- `research/orthrus_official/`: authors' ORTHRUS source/configuration snapshot; `orthrus_comparison/` contains the comparison adapter and protocol.
-- `research/references/ORTHRUS-paper.pdf`: ORTHRUS reference paper.
-- `results/v3_vs_orthrus/`: unchanged recorded accuracy, latency and provenance JSON files.
-- `results/sliding_v3/`: V3 profiling and development measurements.
-- `results/dashboard_validation/`: recorded browser evidence and local data verification.
-- `dashboard/`: full backend, frontend, runtime, upload graphs and attack-chain investigation code.
-- `dashboard/data/cadets_v3/`: local checkpoint, tokens, event arrays, saved scores and investigation database.
-- `artifacts/`: compatibility copy of result directories used by existing experiment scripts.
+<p align="center">
+  <a href="#what-you-can-do">Features</a> ·
+  <a href="#how-it-works">Architecture</a> ·
+  <a href="#run-locally">Run locally</a> ·
+  <a href="#research-and-verification">Research</a> ·
+  <a href="#license">License</a>
+</p>
 
-V3 imports code from `sliding_node_mem_v2`, `sliding_node_mem_upgrade`, `sliding_node_mem`, and several shared research modules. These are required compatibility dependencies, not additional selected research versions. Frozen files are unchanged so checkpoint source-hash validation still works. V4 experiments/results and unrelated research drafts are excluded.
+# TG-Detect
 
-## Start the dashboard
+TG-Detect combines temporal graph research with a local security investigation
+workspace. The CADETS V3 pipeline scores endpoint events and entities; the web
+application lets analysts explore connected observations, inspect evidence and
+trace chronological candidate paths.
 
-From **this directory**, use Python 3.10+ with the dependencies in `requirements.txt`. `environment-record.json` records the versions used to verify this copy. Choose the appropriate Torch CPU/CUDA wheel for your machine; the dashboard runs on CPU. Modal is needed only for existing cloud scripts and downloading artifacts, not for normal dashboard operation.
+**This repository publishes source code.** Datasets, reference papers, trained
+weights, experiment artifacts and archived project copies stay local. Supply the
+prepared data and checkpoint before using inference or data-backed API features.
 
-```sh
-python -m venv .venv
-. .venv/bin/activate
-pip install -r requirements.txt
-python scripts/download_local_data.py
-python -m uvicorn dashboard.backend:app --host 127.0.0.1 --port 8000
+## What you can do
+
+| Workspace | What it provides |
+| --- | --- |
+| Detection graph | Search entities, focus connected neighborhoods, filter predictions and export graphs. |
+| Investigation | Inspect scored nodes, contributing events and chronological candidate paths. |
+| Event explorer | Browse dataset splits and inspect endpoint attributes and relations. |
+| Model validation | Replay the CADETS checkpoint against recorded scores. |
+| Dataset uploads | Import supported JSON, JSONL or CSV events and explore an isolated scored graph. |
+| Research | Compare model versions, investigate encoders and graph attention, and reproduce documented experiments. |
+
+Predictions require analyst review. Connected paths describe investigative
+hypotheses; anomaly evidence is not a probability of compromise. Recorded
+experiment findings retain their original scope and limitations.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A[Endpoint event logs] --> B[Typed event encoding]
+    B --> C[Causal graph context]
+    C --> D[Temporal processing and node memory]
+    D --> E[Event evidence and entity scores]
+    E --> F[FastAPI investigation APIs]
+    F --> G[Next.js workspace]
+    G --> H[Search · inspect · trace · export]
+
+    classDef input fill:#e0f7f2,stroke:#148b78,color:#102b27
+    classDef model fill:#e7edff,stroke:#5c73c5,color:#172440
+    classDef app fill:#fff0f2,stroke:#b66b7b,color:#3c2029
+    class A,B input
+    class C,D,E model
+    class F,G,H app
 ```
+
+The backend reads the prepared corpus, checkpoint and investigation index from
+`datasets/application/cadets_v3/`. Model definitions live in `web_app/model/`;
+experiment implementations live in `research/`. The browser uses the frontend's
+`/api` proxy to communicate with FastAPI.
+
+```mermaid
+sequenceDiagram
+    actor Analyst
+    participant UI as Next.js UI
+    participant API as FastAPI
+    participant Data as Local graph index
+    participant Model as V3 checkpoint
+    Analyst->>UI: Search an entity or upload events
+    UI->>API: Request graph or submit upload
+    alt Prepared CADETS graph
+        API->>Data: Read saved scores and observations
+        Data-->>API: Nodes, events and evidence
+    else Uploaded events
+        API->>Model: Run checkpoint inference
+        Model-->>API: Event evidence
+        API->>Data: Store isolated dataset graph
+    end
+    API-->>UI: Connected graph and explanations
+    UI-->>Analyst: Inspect evidence and candidate paths
+```
+
+## Repository layout
+
+```text
+TG-Detect/
+├── web_app/
+│   ├── frontend/          Next.js application and shared UI
+│   ├── backend/           FastAPI APIs and preparation commands
+│   └── model/             Inference definitions and preprocessing
+├── research/              Experiments, audits, comparisons and regression tests
+│   ├── support/           Regression fixture helper
+│   ├── artifacts/         Local experiment outputs                  [ignored]
+│   └── archives/          Preserved historical project versions     [ignored]
+├── datasets/              Raw/prepared data, weights and uploads    [ignored]
+├── research paper/        PDFs, manuscript and presentation assets  [ignored]
+├── docs/assets/           README illustrations
+├── pytest.ini             Active test discovery configuration
+├── LICENSE                MIT license for original TGDetect work
+└── NOTICE.md              Component attribution and license scope
+```
+
+Trained model formats such as `.pt`, `.pth`, `.ckpt`, `.safetensors` and `.onnx`
+are ignored throughout the repository. The GAT notebook with an embedded corpus
+and encoder weights stays local; its Python source and notebook builder remain
+available. Ignore rules do not remove assets from earlier Git history.
+
+## Run locally
+
+Use Python 3.10+ and a Node.js version compatible with the installed Next.js
+release. The existing project environment is supported; a fresh environment can
+be created as follows:
+
+```bash
+git clone https://github.com/MaheshMarathe005/TGDetect.git
+cd TGDetect
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r web_app/backend/requirements.txt
+```
+
+Install an appropriate PyTorch CPU/CUDA build for your machine when needed.
+The local web application does not require a GPU. Research/cloud scripts may
+require additional packages and a configured Modal account.
+
+### 1. Supply local application assets
+
+Place the prepared CADETS corpus, token bank, trained checkpoint, saved result
+and investigation index under `datasets/application/cadets_v3/`. Consult the
+[CADETS guide](web_app/backend/CADETS.md) for preparation commands and schema.
+These files are intentionally excluded from this source push.
+
+### 2. Start the backend
+
+From the repository root:
+
+```bash
+python -m uvicorn web_app.backend.backend:app --host 127.0.0.1 --port 8000
+```
+
+### 3. Start the frontend
 
 In another terminal:
 
-```sh
-cd dashboard/frontend
+```bash
+cd web_app/frontend
 npm ci
 npm run build
 npm run start
 ```
 
-Open http://localhost:3000. Use **Detection graph** to select local CADETS, upload endpoint-event logs, select IPs/hosts/processes/files, and follow connected malicious or benign predictions. See `dashboard/CADETS.md` for upload schemas and investigation details. If ports 8000/3000 are already occupied, stop those services or change the ports and `TGDETECT_API_ORIGIN`.
+Open **http://localhost:3000**. FastAPI's interactive API documentation is at
+**http://127.0.0.1:8000/docs**. For development, use `npm run dev` and add `--reload`
+to the backend command. Set `TGDETECT_API_ORIGIN` when the backend uses a different
+address; rebuild/restart the frontend after changing it.
 
-The complete legacy Sysmon dashboard source is retained, but its independent DEDALE model artifacts are outside this V3-only research package. The default CADETS workspace is fully supplied.
+## Research and verification
 
-## Research and results
+[Codebase notes](research/CODEBASE_NOTES.md) explain the script families and
+application dependencies. The [script inventory](research/SCRIPT_INVENTORY.md)
+and [relocation manifest](research/RESTRUCTURE_MANIFEST.json) document the source
+scan, path changes and removal of 14 temporary checks. Regression tests remain.
 
-`research/architectures/README.md` identifies the tested configurations. `results/README.md` explains the result files and protocol limitations. Original manifests retain historical `/study/...` Modal paths as provenance; these are not links to local parent files. V3 local training accepts the copied prepared corpus:
+Run model tests without application assets:
 
-```sh
-PYTHONPATH=research python -m sliding_node_mem_v3.run --help
+```bash
+python -m pip install pytest
+python -m pytest -q research/test_sliding_v3.py research/test_node_memory_v3.py
 ```
 
-Cloud scripts are included for reproducibility but have not been launched by this packaging task. Their Modal volume names and account access must exist before use. ORTHRUS source and measured comparison results are included; an ORTHRUS trained checkpoint is not present locally in this snapshot.
+For CADETS API/inference checks after supplying local assets:
 
-## Verify
-
-```sh
-python scripts/verify_package.py
-python -m pytest research/test_sliding_v3.py research/test_orthrus_universal.py research/test_cadets_dashboard.py research/test_graph_uploads.py -q
+```bash
+python -m pip install pytest httpx
+python -m pytest -q research/test_cadets_dashboard.py research/test_graph_uploads.py
 ```
 
-`PACKAGE_MANIFEST.json` lists the packaged files and SHA-256 checksums. Python caches, Git history and frontend build/dependency caches are excluded from the manifest. `VALIDATION.json` records checks performed on this independent copy.
+Run experiment commands from `research/`. For scripts using the older `data/`
+default, create a local link after providing raw datasets:
 
-The release asset URL, size and SHA-256 are recorded in `DATA_BUNDLE.json`. Run `python scripts/download_local_data.py` after cloning. It downloads the approximately 262 MiB bundle, checks its checksum, extracts only the expected data directory, and verifies each extracted file against the package manifest. No Modal account or GPU is required.
+```bash
+cd research
+ln -s ../datasets/raw data
+```
+
+| Latest local verification | Result |
+| --- | --- |
+| CADETS/API/upload/model/foundation selection | 47 passed; 4 documented expected failures |
+| Encoder/GAT/slice/upgrade selection | 73 passed; overlaps the first selection on V3 tests |
+| Active test collection | 261 tests collected without errors |
+| Frontend production build | Passed, including TypeScript and static routes |
+| Existing frontend lint | 13 errors in unchanged frontend source |
+| Optional legacy Sysmon tests | 10 failures because separate DEDALE result artifacts are absent |
+
+The optional `/legacy` UI uses independent Sysmon/DEDALE artifacts. Its missing
+results do not affect the prepared CADETS pipeline; its regression tests remain
+available. Archived project copies and generated source snapshots are excluded
+from active test collection.
+
+## License
+
+Original TGDetect code and documentation are released under the [MIT License](LICENSE).
+Existing third-party notices remain applicable; see [NOTICE.md](NOTICE.md) and the
+[frontend's original license](web_app/frontend/LICENSE). Source licensing does not
+cover dataset contents, trained weights or published research papers.

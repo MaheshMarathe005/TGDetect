@@ -1,3 +1,0 @@
-[submodule "Ground_Truth/darpa"]
-	path = Ground_Truth/darpa
-	url = https://github.com/ProvenanceAnalytics/ground-truth.git
