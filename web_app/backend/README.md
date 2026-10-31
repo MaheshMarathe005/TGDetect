@@ -10,7 +10,13 @@ The active Next.js interface is in `../frontend/`; its MIT license is retained
 there. Inference models are in `../model/`. Historical project versions live in
 `../../research/archives/`.
 
-Start the backend from the repository root:
+Start the backend from this directory (with `main_env` activated):
+
+```sh
+python3 backend.py
+```
+
+This serves the API at http://127.0.0.1:8000. Alternatively, start from the repository root:
 
 ```sh
 /home/mahesh/main_env/bin/python -m uvicorn web_app.backend.backend:app --host 127.0.0.1 --port 8000

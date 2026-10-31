@@ -18,12 +18,15 @@ import {
   Play,
   Search,
   Shield,
+  Sun,
+  Moon,
   Sparkles,
   TriangleAlert,
 } from "lucide-react";
 import styles from "./console.module.css";
 import { AttackGraph, AttackChainBuilder } from "./AttackInvestigation";
 import { DetectionGraph } from "./DetectionGraph";
+import { useTheme } from "@/lib/theme-context";
 
 type Node = {
   id: number;
@@ -181,6 +184,7 @@ function download(data: unknown, filename: string) {
 }
 
 export function CadetsConsole() {
+  const { theme, toggleTheme } = useTheme();
   const [tab, setTab] = useState("overview");
   const summary = useResource<Summary>("/summary");
   const [selectedNode, setSelectedNode] = useState<number | null>(null);
@@ -255,7 +259,7 @@ export function CadetsConsole() {
         </a>
         <div className={styles.workspace}>
           <span className={styles.dot} />
-          CADETS / Research workspace<small>V3 • verified checkpoint</small>
+          CADETS / Research workspace<small>Final V3 · 30-epoch checkpoint</small>
         </div>
         <p className={styles.navLabel}>WORKSPACE</p>
         <nav aria-label="Workspace navigation">
@@ -284,6 +288,7 @@ export function CadetsConsole() {
           <a href="/legacy">
             Open Sysmon workspace <ArrowRight size={14} />
           </a>
+          <a href="/inference">Final V3 · 30 epochs <ArrowRight size={14} /></a>
         </div>
       </aside>
       <main className={styles.main}>
@@ -292,10 +297,22 @@ export function CadetsConsole() {
             <span className={styles.breadcrumb}>Workspace / </span>
             {tabs.find((t) => t.id === tab)?.label}
           </div>
+          <div className={styles.topbarActions}>
           <span className={styles.status}>
             <span className={styles.dot} />
             {s ? "Dataset indexed" : "Connecting"}
           </span>
+          <button
+            type="button"
+            className={styles.themeToggle}
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+            <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+          </button>
+          </div>
         </header>
         <div className={styles.content}>
           <div className={styles.heading}>
@@ -321,7 +338,7 @@ export function CadetsConsole() {
                       ? "Trace contributing events and reconstruct candidate attack chains."
                       : tab === "events"
                         ? "Search the complete prepared CADETS dataset with aligned model scores."
-                        : "Original V3 architecture, recorded results and a real checkpoint replay."}
+                        : `${s?.model || "V3"}: saved architecture, recorded results and checkpoint replay.`}
               </p>
             </div>
             <span className={styles.datasetBadge}>
@@ -513,6 +530,15 @@ export function CadetsConsole() {
                       </button>
                     </section>
                   </div>
+                  <section className={styles.panel}>
+                    <PanelTitle eyebrow="FINAL V3 · EPOCH 30 · PAPER THRESHOLD" title="Node confusion matrix" />
+                    <p className={styles.muted}>Actual classes in rows; predicted classes in columns. Threshold: {s.threshold.toFixed(6)}.</p>
+                    <div className={styles.tableWrap}><table><thead><tr><th>Actual / Predicted</th><th>Benign</th><th>Malicious</th></tr></thead><tbody>
+                      <tr><th scope="row">Benign</th><td>TN {number(s.metrics.tn)}</td><td>FP {number(s.metrics.fp)}</td></tr>
+                      <tr><th scope="row">Malicious</th><td>FN {number(s.metrics.fn)}</td><td>TP {number(s.metrics.tp)}</td></tr>
+                    </tbody></table></div>
+                    <a href="/inference">View all scoring methods and the relation confusion matrix →</a>
+                  </section>
                 </>
               )}
               {tab === "detection" && (
@@ -532,7 +558,7 @@ export function CadetsConsole() {
                       title="Triage queue"
                     />
                     <p className={styles.muted}>
-                      Ranked by calibrated node evidence.
+                      Ranked by maximum raw relation CE for the 30-epoch checkpoint.
                     </p>
                     <Notice loading={nodes.loading} error={nodes.error} />
                     <div className={styles.nodeList}>
@@ -707,7 +733,7 @@ export function CadetsConsole() {
                                 ).toFixed(2)}
                                 ×
                               </strong>{" "}
-                              the validation threshold in this 15-minute window.
+                              the validation threshold across the test capture.
                             </p>
                             <div className={styles.evidenceRuler}>
                               <i
@@ -973,7 +999,7 @@ export function CadetsConsole() {
                   <div className={styles.modelGrid}>
                     <section className={styles.panel}>
                       <PanelTitle
-                        eyebrow="ORIGINAL TRAINED V3"
+                        eyebrow="FINAL V3 · COMBINED · 30 EPOCHS"
                         title="Model architecture"
                       />
                       <div className={styles.architecture}>
@@ -983,8 +1009,8 @@ export function CadetsConsole() {
                             "Two-hash embeddings → 64D identities",
                           ],
                           [
-                            "Balanced endpoint history",
-                            "4 + 4 historical events + current query",
+                            "Hybrid endpoint history",
+                            "9-event hybrid window · 2 predecessor slots",
                           ],
                           [
                             "Two event-line GAT layers",
@@ -996,19 +1022,19 @@ export function CadetsConsole() {
                           ],
                           [
                             "Selective short memory",
-                            "8 compressed slots per endpoint · CNN readout",
+                            "8 slots · 2 recent events + query retrieval",
                           ],
                           [
-                            "Affine node-memory scan",
-                            "128D fast / slow states · pre-event reads",
+                            "Time-budget sparse node memory",
+                            "Pre-event reads · age-availability read gate",
                           ],
                           [
                             "Relation + pair heads",
-                            "10 relations + pair-plausibility evidence",
+                            "10 relations · 130D head · pre-event source-memory pair context",
                           ],
                           [
-                            "Validation calibration",
-                            "Top-3 evidence / 15-minute node windows",
+                            "Paper-threshold evaluation",
+                            "Maximum raw relation CE per node > maximum validation CE",
                           ],
                         ].map(([title, body], i) => (
                           <div key={title}>
@@ -1088,10 +1114,9 @@ export function CadetsConsole() {
                       </button>
                     </div>
                     <p className={styles.muted}>
-                      Runs the actual trained V3 weights on CPU from empty
-                      state. Each replay is isolated and keeps the original
-                      evaluation batch boundaries. Initial encoder
-                      precomputation may take a moment.
+                      Runs the saved epoch-30 Final V3 weights on CPU from empty
+                      state. This isolated 1,024-event preview reports neural
+                      scores; full-capture node evaluation is shown on the overview.
                     </p>
                     <Notice loading={replaying} error={replayError} />
                     {replay && (

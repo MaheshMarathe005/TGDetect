@@ -8,6 +8,11 @@ import json
 import math
 import sqlite3
 import time
+from pathlib import Path
+import sys
+
+if not __package__:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 import numpy as np
 from web_app.backend.cadets import DATA, ROOT, EVENT_DTYPE, EDGE_DTYPE, CHECKPOINT_SHA, digest, research_imports

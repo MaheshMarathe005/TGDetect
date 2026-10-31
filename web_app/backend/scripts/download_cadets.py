@@ -4,6 +4,12 @@ Requires the existing Modal account/profile and local Modal Python package.
 Then run: python -m web_app.backend.scripts.prepare_cadets
 """
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import sys
+
+if not __package__:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
 import modal
 from web_app.backend.cadets import DATA, ROOT, digest, CHECKPOINT_SHA
 

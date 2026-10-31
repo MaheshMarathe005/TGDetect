@@ -2,12 +2,18 @@
 import asyncio
 import hashlib
 import json
+import sys
 import threading
 import time
 import uuid
 from collections import defaultdict, deque
 from datetime import datetime, timezone
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+if not __package__ and str(ROOT) not in sys.path:
+    # Support direct execution and `uvicorn backend:app` from this directory.
+    sys.path.insert(0, str(ROOT))
 
 import numpy as np
 import torch
@@ -20,7 +26,6 @@ from web_app.model.node_memory_models import make_mem_model as make_old
 from web_app.model.node_memory_v3 import make_mem_model as make_v3
 from web_app.model.windows_apt_models import make_model as make_gnn
 
-ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'datasets/application'
 ARTIFACTS = ROOT / 'research/artifacts'
 torch.set_num_threads(4)
@@ -528,10 +533,19 @@ def index(request: Request):
 
 
 from web_app.backend.teammate_api import register as register_teammate_api
-register_teammate_api(app)
+register_teammate_api(app, sys.modules[__name__])
 
 from web_app.backend.cadets import router as cadets_router
 app.include_router(cadets_router)
 
 from web_app.backend.graph_datasets import router as graph_datasets_router
 app.include_router(graph_datasets_router)
+
+from web_app.backend.final_v3_30 import router as final_v3_30_router
+app.include_router(final_v3_30_router)
+
+
+if __name__ == '__main__':
+    import uvicorn
+
+    uvicorn.run(app, host='127.0.0.1', port=8000)

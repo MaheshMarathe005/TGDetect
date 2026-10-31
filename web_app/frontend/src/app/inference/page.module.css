@@ -1,0 +1,30 @@
+.page { max-width: 1380px; margin: auto; padding: 32px; color: hsl(var(--foreground)); min-height: 100vh; }
+.page nav { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 40px; }
+.page nav a, .eyebrow { color: #9b7adb; }
+.page h1 { font-size: clamp(26px, 4vw, 40px); font-weight: 700; margin: 8px 0; }
+.page h2 { font-size: 22px; font-weight: 650; margin-bottom: 16px; }
+.page h3 { font-weight: 650; margin: 18px 0 12px; }
+.page p { margin: 12px 0; line-height: 1.7; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; }
+.panel { border: 1px solid hsl(var(--border)); background: hsl(var(--card)); padding: 26px; border-radius: 16px; margin: 24px 0; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 24px 0; }
+.cards article { padding: 18px; border: 1px solid hsl(var(--border)); border-radius: 10px; }
+.cards span, .architecture span { display: block; font-size: 13px; margin-bottom: 8px; }
+.cards strong { font-size: 24px; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.page select, .page button { padding: 10px 16px; border: 1px solid hsl(var(--border)); border-radius: 8px; background: hsl(var(--card)); color: inherit; }
+.page select { margin-left: 12px; max-width: 100%; }
+.page button { background: #7653b7; color: white; cursor: pointer; }
+.page button:disabled { opacity: .6; cursor: wait; }
+.page table { width: 100%; text-align: left; border-collapse: collapse; font-size: 13px; }
+.page th, .page td { padding: 12px; border-bottom: 1px solid hsl(var(--border)); white-space: nowrap; }
+.page caption { text-align: left; padding: 10px 0; }
+.scroll { overflow-x: auto; }
+.architecture { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; padding: 0; list-style-position: inside; }
+.architecture li { padding: 20px; border: 1px solid hsl(var(--border)); border-radius: 10px; }
+.architecture span { margin: 12px 0 0; line-height: 1.6; }
+.hash { display: block; overflow-wrap: anywhere; font-size: 12px; }
+.page pre { overflow-x: auto; font-size: 12px; padding: 20px 0; }
+.notice { padding: 16px; border: 1px solid #b57d35; border-radius: 8px; }
+.page summary { cursor: pointer; margin-top: 20px; }
+@media (max-width: 700px) { .page { padding: 18px; } .panel { padding: 18px; } .columns { grid-template-columns: 1fr; } .page select { margin: 12px 0 0; display: block; } }

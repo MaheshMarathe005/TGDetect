@@ -5,18 +5,17 @@ import {
   ArrowDownToLine,
   ArrowRight,
   CircleCheck,
-  FileText,
-  Globe,
   Loader2,
   Network,
   Search,
   ShieldAlert,
-  Terminal,
+  TriangleAlert,
   X,
-  ZoomIn,
-  ZoomOut,
 } from "lucide-react";
 import styles from "./detection.module.css";
+import { Graph3D } from "./Graph3D";
+import { RecordedEntityDetails } from "./RecordedEntityDetails";
+import { nodeRisk, RISK_COLORS, WARNING_RATIO } from "./graph-risk";
 
 type Entity = {
   id: number;
@@ -45,6 +44,7 @@ type Dataset = {
   nodes?: number;
   error?: string;
   scoring?: string;
+  prediction_rule?: string;
 };
 type EntityOptions = {
   items: { label: string; count: number; alert: number }[];
@@ -78,98 +78,6 @@ const label = (n: Entity) =>
       n.attributes.name ||
       `${n.attributes.type || "entity"} #${n.id}`,
   );
-function nodeIcon(n: Entity) {
-  return n.ip
-    ? Globe
-    : String(n.attributes.type) === "subject"
-      ? Terminal
-      : FileText;
-}
-
-function layout(nodes: Entity[], edges: Event[]) {
-  const width = 1100,
-    height = 700;
-  const points = new Map(
-    nodes.map((n, i) => [
-      n.id,
-      {
-        x: width / 2 + Math.cos(i * 2.399) * (100 + Math.sqrt(i) * 55),
-        y: height / 2 + Math.sin(i * 2.399) * (90 + Math.sqrt(i) * 38),
-      },
-    ]),
-  );
-  const unique = [
-    ...new Map(
-      edges.map((e) => [
-        `${Math.min(e.src, e.dst)}:${Math.max(e.src, e.dst)}`,
-        e,
-      ]),
-    ).values(),
-  ];
-  // Deterministic spring layout: real relationships, no synthetic graph edges.
-  for (let tick = 0; tick < 300; tick++) {
-    const force = new Map(nodes.map((n) => [n.id, { x: 0, y: 0 }]));
-    for (let i = 0; i < nodes.length; i++)
-      for (let j = i + 1; j < nodes.length; j++) {
-        const a = points.get(nodes[i].id)!,
-          b = points.get(nodes[j].id)!;
-        const dx = a.x - b.x,
-          dy = a.y - b.y,
-          d = Math.max(20, Math.hypot(dx, dy)),
-          push = 18000 / (d * d);
-        // Reserve room for the IP/name plate as well as the circular icon.
-        if (Math.abs(dx) < 195 && Math.abs(dy) < 110) {
-          const overlapX = 195 - Math.abs(dx),
-            overlapY = 110 - Math.abs(dy);
-          if (overlapX < overlapY) {
-            const shift = (Math.sign(dx) || 1) * overlapX * 0.4;
-            force.get(nodes[i].id)!.x += shift;
-            force.get(nodes[j].id)!.x -= shift;
-          } else {
-            const shift = (Math.sign(dy) || 1) * overlapY * 0.4;
-            force.get(nodes[i].id)!.y += shift;
-            force.get(nodes[j].id)!.y -= shift;
-          }
-        }
-        force.get(nodes[i].id)!.x += (dx / d) * push;
-        force.get(nodes[i].id)!.y += (dy / d) * push;
-        force.get(nodes[j].id)!.x -= (dx / d) * push;
-        force.get(nodes[j].id)!.y -= (dy / d) * push;
-      }
-    for (const e of unique) {
-      const a = points.get(e.src),
-        b = points.get(e.dst);
-      if (!a || !b || e.src === e.dst) continue;
-      const dx = b.x - a.x,
-        dy = b.y - a.y,
-        d = Math.hypot(dx, dy) || 1,
-        pull = (d - 165) * 0.025;
-      force.get(e.src)!.x += (dx / d) * pull;
-      force.get(e.src)!.y += (dy / d) * pull;
-      force.get(e.dst)!.x -= (dx / d) * pull;
-      force.get(e.dst)!.y -= (dy / d) * pull;
-    }
-    for (const n of nodes) {
-      const p = points.get(n.id)!,
-        f = force.get(n.id)!;
-      p.x = Math.max(
-        100,
-        Math.min(
-          width - 100,
-          p.x + Math.max(-5, Math.min(5, f.x + (width / 2 - p.x) * 0.003)),
-        ),
-      );
-      p.y = Math.max(
-        70,
-        Math.min(
-          height - 75,
-          p.y + Math.max(-5, Math.min(5, f.y + (height / 2 - p.y) * 0.003)),
-        ),
-      );
-    }
-  }
-  return points;
-}
 export function DetectionGraph({
   investigate,
 }: {
@@ -182,7 +90,6 @@ export function DetectionGraph({
     [query, setQuery] = useState(""),
     [filter, setFilter] = useState("all"),
     [selected, setSelected] = useState<number | null>(null),
-    [zoom, setZoom] = useState(1),
     [truth, setTruth] = useState(false);
   const [datasets, setDatasets] = useState<Dataset[]>([]),
     [dataset, setDataset] = useState("cadets"),
@@ -190,7 +97,8 @@ export function DetectionGraph({
     [value, setValue] = useState(""),
     [anchor, setAnchor] = useState<number | null>(null),
     [options, setOptions] = useState<EntityOptions | null>(null),
-    [hops, setHops] = useState(2),
+    [hops, setHops] = useState(3),
+    [nodeLimit, setNodeLimit] = useState(240),
     [upload, setUpload] = useState<Dataset | null>(null),
     [uploadError, setUploadError] = useState(""),
     [uploading, setUploading] = useState(false);
@@ -245,7 +153,7 @@ export function DetectionGraph({
       kind,
       value,
       prediction: filter,
-      limit: "24",
+      limit: String(nodeLimit),
       hops: String(hops),
     });
     if (anchor !== null) params.set("node", String(anchor));
@@ -260,7 +168,7 @@ export function DetectionGraph({
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [dataset, kind, value, filter, anchor, hops]);
+  }, [dataset, kind, value, filter, anchor, hops, nodeLimit]);
   useEffect(() => {
     if (!upload || !["queued", "processing"].includes(upload.status)) return;
     const controller = new AbortController();
@@ -308,11 +216,7 @@ export function DetectionGraph({
       setUploading(false);
     }
   }
-  function selectNode(id: number) {
-    setSelected(id);
-    setAnchor(id);
-  }
-  const shown = data?.nodes || [];
+  const shown = useMemo(() => data?.nodes || [], [data]);
   const ids = new Set(shown.map((n) => n.id));
   const events = useMemo(
     () =>
@@ -323,27 +227,11 @@ export function DetectionGraph({
       ) || [],
     [data, shown],
   );
-  const positions = useMemo(() => layout(shown, events), [shown, events]);
-  const groups = new Map<
-    string,
-    { event: Event; count: number; relations: Set<string> }
-  >();
-  for (const e of events) {
-    const key = `${e.src}:${e.dst}`,
-      old = groups.get(key);
-    groups.set(key, {
-      event: !old || e.evidence > old.event.evidence ? e : old.event,
-      count: (old?.count || 0) + 1,
-      relations: new Set([...(old?.relations || []), e.relation_name]),
-    });
-  }
   const focus = data?.nodes.find((n) => n.id === selected);
-  const neighborIds = new Set([
-    selected,
-    ...events
-      .filter((e) => e.src === selected || e.dst === selected)
-      .flatMap((e) => [e.src, e.dst]),
-  ]);
+  const clustered = Boolean(data?.dataset.prediction_rule?.includes("cluster"));
+  const riskCounts = { high: 0, medium: 0, low: 0, unknown: 0 };
+  for (const node of shown) riskCounts[nodeRisk(node, data?.threshold ?? NaN, !clustered).level]++;
+  const focusRisk = focus ? nodeRisk(focus, data?.threshold ?? NaN, !clustered) : null;
   function exportGraph() {
     if (!data) return;
     const url = URL.createObjectURL(
@@ -372,10 +260,9 @@ export function DetectionGraph({
       <div className={styles.heading}>
         <div>
           <p>V3 NODE CLASSIFICATION</p>
-          <h2>Malicious & benign detection graph</h2>
+          <h2>Explore the entity constellation</h2>
           <span>
-            Upload endpoint logs, run V3 detection, and explore connected IPs,
-            hosts and entities.
+            A fixed 3D map of connected IPs, processes and files. Orbit the graph to explore every relationship.
           </span>
         </div>
         <button onClick={exportGraph} disabled={!data}>
@@ -457,30 +344,12 @@ export function DetectionGraph({
         {uploadError && <p role="alert">{uploadError}</p>}
       </div>
       <div className={styles.stats}>
-        <div className={styles.red}>
-          <ShieldAlert size={20} />
-          <span>
-            Predicted malicious
-            <strong>{data?.counts.predicted_malicious ?? "—"}</strong>
-          </span>
-          <small>Red nodes · score above threshold</small>
-        </div>
-        <div className={styles.green}>
-          <CircleCheck size={20} />
-          <span>
-            Predicted benign
-            <strong>{data?.counts.predicted_benign ?? "—"}</strong>
-          </span>
-          <small>Green nodes · score at or below threshold</small>
-        </div>
-        <div>
-          <Globe size={20} />
-          <span>
-            Recorded IP entities
-            <strong>{data?.nodes.filter((n) => n.ip).length ?? "—"}</strong>
-          </span>
-          <small>Counts describe this displayed sample</small>
-        </div>
+        <div className={styles.red}><ShieldAlert size={20}/><span>Predicted malicious<strong>{data ? riskCounts.high : "—"}</strong></span>
+          <small>Red · {clustered ? "selected by anomaly clustering" : `score > ${data?.threshold.toFixed(6) ?? "threshold"}`}</small></div>
+        <div className={styles.orange}><TriangleAlert size={20}/><span>Medium · near threshold<strong>{data ? riskCounts.medium : "—"}</strong></span>
+          <small>{clustered ? "Warning band unavailable for clustering decisions" : `Orange · 80–100% of threshold · at or below the alert cutoff`}</small></div>
+        <div className={styles.green}><CircleCheck size={20}/><span>Predicted benign · low score<strong>{data ? riskCounts.low : "—"}</strong></span>
+          <small>Green · {clustered ? "not selected by anomaly clustering" : "score < 80% of threshold"}</small></div>
       </div>
       <div className={styles.toolbar}>
         <label>
@@ -576,7 +445,7 @@ export function DetectionGraph({
           <select
             aria-label="Graph connection depth"
             value={hops}
-            onChange={(e) => setHops(Number(e.target.value))}
+            onChange={(e) => { setHops(Number(e.target.value)); setSelected(null); }}
           >
             <option value={1}>1 hop</option>
             <option value={2}>2 hops</option>
@@ -592,18 +461,11 @@ export function DetectionGraph({
         >
           Reset focus
         </button>
-        <button
-          aria-label="Zoom detection graph out"
-          onClick={() => setZoom(Math.max(0.6, zoom - 0.15))}
-        >
-          <ZoomOut size={16} />
-        </button>
-        <button
-          aria-label="Zoom detection graph in"
-          onClick={() => setZoom(Math.min(1.8, zoom + 0.15))}
-        >
-          <ZoomIn size={16} />
-        </button>
+        <label>Graph size
+          <select aria-label="Graph node limit" value={nodeLimit} onChange={e => { setNodeLimit(Number(e.target.value)); setSelected(null); }}>
+            <option value={60}>60 nodes</option><option value={240}>240 nodes</option><option value={400}>400 nodes</option>
+          </select>
+        </label>
       </div>
       <p className={styles.note}>
         {anchor !== null
@@ -612,8 +474,7 @@ export function DetectionGraph({
             ? `Focused on ${kind}: ${value}.`
             : "Showing the highest-scoring starting entity and its connections."}{" "}
         Class filters choose starting entities; connected benign and malicious
-        nodes remain visible. Click any red or green node to load its connected
-        neighborhood.
+        nodes remain visible. Connected entities gather into clusters; distance is a layout aid, not a model score. Click a node to inspect it without moving the layout.
       </p>
       {data?.dataset.scoring && (
         <p className={styles.note}>
@@ -636,155 +497,9 @@ export function DetectionGraph({
             <div
               className={styles.canvas}
               role="region"
-              aria-label="Malicious and benign node graph"
-              tabIndex={0}
+              aria-label="Interactive 3D detection graph"
             >
-              <svg
-                viewBox="0 0 1100 700"
-                width={1100 * zoom}
-                height={700 * zoom}
-                role="img"
-                aria-label="Red predicted malicious nodes and green predicted benign nodes. Network nodes display recorded IPs."
-              >
-                <defs>
-                  <pattern
-                    id="detection-dots"
-                    width="26"
-                    height="26"
-                    patternUnits="userSpaceOnUse"
-                  >
-                    <circle cx="1" cy="1" r="1" fill="#263651" />
-                  </pattern>
-                  <marker
-                    id="detection-arrow"
-                    viewBox="0 0 10 10"
-                    refX="9"
-                    refY="5"
-                    markerWidth="5"
-                    markerHeight="5"
-                    orient="auto"
-                  >
-                    <path d="M0 0L10 5L0 10z" fill="#6d82a4" />
-                  </marker>
-                </defs>
-                <rect width="1100" height="700" fill="url(#detection-dots)" />
-                {[...groups.values()].map(({ event: e, count, relations }) => {
-                  const a = positions.get(e.src)!,
-                    b = positions.get(e.dst)!,
-                    dx = b.x - a.x,
-                    dy = b.y - a.y,
-                    d = Math.hypot(dx, dy) || 1;
-                  return (
-                    <g
-                      key={`${e.src}:${e.dst}`}
-                      opacity={
-                        selected === null ||
-                        e.src === selected ||
-                        e.dst === selected
-                          ? 1
-                          : 0.12
-                      }
-                    >
-                      <path
-                        d={
-                          e.src === e.dst
-                            ? `M${a.x - 14},${a.y - 20}C${a.x - 65},${a.y - 75} ${a.x + 65},${a.y - 75} ${a.x + 14},${a.y - 20}`
-                            : `M${a.x + (dx / d) * 27},${a.y + (dy / d) * 27}L${b.x - (dx / d) * 29},${b.y - (dy / d) * 29}`
-                        }
-                        stroke={
-                          e.src === selected || e.dst === selected
-                            ? "#b5a1ed"
-                            : "#4c6488"
-                        }
-                        strokeWidth="1.6"
-                        fill="none"
-                        markerEnd="url(#detection-arrow)"
-                      />
-                      <title>
-                        {[...relations].join(", ")} · {count} observed events
-                      </title>
-                    </g>
-                  );
-                })}
-                {shown.map((n) => {
-                  const p = positions.get(n.id)!,
-                    Icon = nodeIcon(n),
-                    color = n.alert ? "#fb7185" : "#34d399";
-                  return (
-                    <g
-                      key={n.id}
-                      data-prediction={n.prediction}
-                      data-node-id={n.id}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`${n.alert ? "Predicted malicious" : "Predicted benign"} ${label(n)}`}
-                      className={styles.node}
-                      transform={`translate(${p.x},${p.y})`}
-                      opacity={
-                        selected === null || neighborIds.has(n.id) ? 1 : 0.2
-                      }
-                      onClick={() => selectNode(n.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          selectNode(n.id);
-                        }
-                      }}
-                    >
-                      <circle
-                        r={selected === n.id ? 34 : 29}
-                        fill="none"
-                        stroke={color}
-                        opacity=".16"
-                        strokeWidth="6"
-                      />
-                      <circle
-                        r="25"
-                        fill={n.alert ? "#3d2338" : "#153a36"}
-                        stroke={color}
-                        strokeWidth={selected === n.id ? 3 : 1.8}
-                      />
-                      <Icon x={-10} y={-10} size={20} color={color} />
-                      <rect
-                        x="-91"
-                        y="34"
-                        width="182"
-                        height="35"
-                        rx="7"
-                        fill="#142139"
-                        stroke="#2b3d5b"
-                      />
-                      <text
-                        textAnchor="middle"
-                        y="48"
-                        className={styles.nodeLabel}
-                      >
-                        {label(n).length > 26
-                          ? "…" + label(n).slice(-25)
-                          : label(n)}
-                      </text>
-                      <text
-                        textAnchor="middle"
-                        y="61"
-                        className={styles.nodeMeta}
-                      >
-                        {n.alert ? "MALICIOUS" : "BENIGN"} prediction · #{n.id}
-                      </text>
-                      <title>
-                        {label(n)} · evidence {n.score.toFixed(4)} ·{" "}
-                        {n.ip
-                          ? "recorded remote IP"
-                          : "IP not recorded for this entity"}
-                      </title>
-                    </g>
-                  );
-                })}
-              </svg>
-              {!shown.length && (
-                <div className={styles.empty}>
-                  No matching entities in this graph sample.
-                </div>
-              )}
+              <Graph3D nodes={shown} edges={events} selected={selected} onSelect={setSelected} threshold={data?.threshold ?? NaN} thresholdBased={!clustered} />
             </div>
             {focus && (
               <aside
@@ -792,7 +507,7 @@ export function DetectionGraph({
                 aria-label="Detection node details"
               >
                 <div>
-                  <span className={focus.alert ? styles.red : styles.green}>
+                  <span style={{ color: focusRisk?.color }}>
                     {focus.alert ? (
                       <ShieldAlert size={22} />
                     ) : (
@@ -806,10 +521,11 @@ export function DetectionGraph({
                     <X size={16} />
                   </button>
                 </div>
-                <p className={focus.alert ? styles.red : styles.green}>
-                  {focus.alert ? "PREDICTED MALICIOUS" : "PREDICTED BENIGN"}
+                <p style={{ color: focusRisk?.color }}>
+                  {focusRisk?.label.toUpperCase()}
                 </p>
                 <h3>{label(focus)}</h3>
+                <RecordedEntityDetails key={`${dataset}:${focus.id}`} dataset={dataset} nodeId={focus.id} />
                 <dl>
                   <div>
                     <dt>Entity ID</dt>
@@ -824,19 +540,26 @@ export function DetectionGraph({
                     <dd>{String(focus.attributes.type || "unknown")}</dd>
                   </div>
                   <div>
-                    <dt>V3 evidence score</dt>
-                    <dd>{focus.score.toFixed(4)}</dd>
+                    <dt>Node anomaly score</dt>
+                    <dd>{focus.score.toFixed(6)}</dd>
                   </div>
                   <div>
-                    <dt>Alert threshold</dt>
-                    <dd>{data!.threshold.toFixed(4)}</dd>
+                    <dt>{clustered ? "Validation reference" : "Alert threshold"}</dt>
+                    <dd>{data!.threshold.toFixed(6)}</dd>
                   </div>
+                  {!clustered && <div><dt>Medium band starts at</dt><dd>{(data!.threshold * WARNING_RATIO).toFixed(6)} (80%)</dd></div>}
                 </dl>
+                {focusRisk?.level === "medium" && <p className={styles.mediumNote}>Near-threshold warning. The saved model prediction remains benign because the score has not exceeded the alert threshold.</p>}
                 <p className={styles.decision}>
-                  {focus.score.toFixed(4)} {focus.alert ? ">" : "≤"}{" "}
-                  {data!.threshold.toFixed(4)} →{" "}
-                  {focus.alert ? "malicious prediction" : "benign prediction"}
+                  {clustered ? (
+                    <>{focus.alert ? "Selected" : "Not selected"} by anomaly clustering → {focus.alert ? "malicious prediction" : "benign prediction"}</>
+                  ) : (
+                    <>{focus.score.toFixed(6)} {focus.alert ? ">" : "≤"}{" "}{data!.threshold.toFixed(6)} → {focus.alert ? "malicious prediction" : "benign prediction"}</>
+                  )}
                 </p>
+                <button className={styles.investigate} onClick={() => setAnchor(focus.id)}>
+                  Load this neighborhood <Network size={15} />
+                </button>
                 {dataset === "cadets" && (
                   <button
                     className={styles.investigate}
@@ -847,8 +570,8 @@ export function DetectionGraph({
                 )}
                 {dataset !== "cadets" && (
                   <div className={styles.note}>
-                    Connected events shown here were scored from this upload.
-                    Select another node to follow its neighborhood.
+                    Connected events use the saved predictions for this dataset.
+                    Use Load this neighborhood to explore more connections.
                   </div>
                 )}
                 <label className={styles.truth}>
@@ -867,7 +590,7 @@ export function DetectionGraph({
                       : focus.benchmark_member
                         ? "malicious node listed"
                         : "not listed as malicious"}
-                    . This label did not determine the node color.
+                    . This label did not determine the node risk color.
                   </p>
                 )}
                 <details>
@@ -878,30 +601,13 @@ export function DetectionGraph({
             )}
           </div>
           <div className={styles.legend}>
-            <span>
-              <i className={styles.redDot} />
-              Predicted malicious
-            </span>
-            <span>
-              <i className={styles.greenDot} />
-              Predicted benign
-            </span>
-            <span>
-              <Globe size={14} />
-              IP / network
-            </span>
-            <span>
-              <Terminal size={14} />
-              Process
-            </span>
-            <span>
-              <FileText size={14} />
-              File
-            </span>
-            <span>Click a node to inspect its decision</span>
+            <span><i style={{background:RISK_COLORS.high}}/>Red: predicted malicious</span>
+            {!clustered && <span><i style={{background:RISK_COLORS.medium}}/>Orange: 80–100% of threshold (warning)</span>}
+            <span><i style={{background:RISK_COLORS.low}}/>Green: predicted benign / low score</span>
+            <span>READ / WRITE / other event types label the connections</span>
           </div>
           <p className={styles.note}>
-            {data?.scope} {data?.ip_scope}{" "}
+            {data?.scope} Only recorded IP addresses are displayed. Orange is a visual warning band, not an additional trained class.{" "}
             {data?.truncated
               ? "Additional entities/events were omitted by the display bounds."
               : ""}

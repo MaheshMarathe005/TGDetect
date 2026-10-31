@@ -15,6 +15,7 @@ import time
 import numpy as np
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
+from web_app.backend import final_v3_30 as final30
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / 'datasets/application/cadets_v3'
@@ -45,9 +46,10 @@ def result():
 
 @contextmanager
 def database():
-    if not (DATA / 'investigation.sqlite').exists():
+    path = final30.INDEX if final30.active() else DATA / 'investigation.sqlite'
+    if not path.exists():
         raise HTTPException(503, 'CADETS index unavailable. Run python -m web_app.backend.scripts.prepare_cadets.')
-    db = sqlite3.connect(f'file:{DATA / "investigation.sqlite"}?mode=ro', uri=True)
+    db = sqlite3.connect(f'file:{path}?mode=ro', uri=True)
     db.row_factory = sqlite3.Row
     try:
         yield db
@@ -77,6 +79,21 @@ def event_info(row):
 def summary():
     with database() as db:
         meta = {r['key']: json.loads(r['value']) for r in db.execute('SELECT * FROM metadata')}
+    if final30.active():
+        r = final30.dashboard_result()
+        channels = np.memmap(final30.RUN / 'test_channels.bin', dtype=final30.CHANNEL_DTYPE, mode='r')
+        validation = np.memmap(final30.RUN / 'val_channels.bin', dtype=final30.CHANNEL_DTYPE, mode='r')
+        return {**meta, **r, 'dataset': 'DARPA TC CADETS E3',
+                'model': 'TGNN Final V3 Combined · 30 epochs',
+                'epochs': r['signature']['epochs'], 'batch_size': r['signature']['batch'],
+                'seed': r['signature']['seed'], 'model_config': r['signature']['model'],
+                'validation_ce': float(validation['ce'].mean(dtype=np.float64)),
+                'test_ce': float(channels['ce'].mean(dtype=np.float64)),
+                'score_scope': 'Held-out capture-node metrics, paper threshold on maximum raw relation CE.',
+                'limitations': ['Benchmark labels describe nodes, not individual attack events.',
+                    'Connections in a reconstructed chain are investigative hypotheses, not causal proof.',
+                    'The paper threshold is the maximum validation relation CE; event losses are not probabilities.',
+                    'Typed node-horizon calibration is unsupported for this run.']}
     r = result()
     return dict(dataset='DARPA TC CADETS E3', model='TGNN Sliding Window V3', **meta,
         metrics=r['metrics'], threshold=r['threshold'], epochs=r['signature']['epochs'], batch_size=r['signature']['batch'],
@@ -181,7 +198,7 @@ def detection_graph(node: int | None = Query(None, ge=0), ip: str = Query('', ma
             n['prediction'] = 'predicted_malicious' if n['alert'] else 'predicted_benign'
         items=list(entities.values())
         return dict(nodes=items,events=sorted(edges.values(),key=lambda e:(e['time'],e['idx'])),
-            seeds=[n['id'] for n in seeds],threshold=result()['threshold'],truncated=pruned,
+            seeds=[n['id'] for n in seeds],threshold=(final30.dashboard_result() if final30.active() else result())['threshold'],truncated=pruned,
             counts=dict(predicted_malicious=sum(n['alert'] for n in items),predicted_benign=sum(not n['alert'] for n in items)),
             scope='Bounded recent-event neighborhoods of selected test entities. Colors show full-test V3 node predictions, not event labels or confirmed attacks.',
             ip_scope='Only recorded remote_ip attributes are shown as IP addresses. Process/file nodes without IP metadata are not assigned invented addresses.')
@@ -192,6 +209,15 @@ def detection_graph(node: int | None = Query(None, ge=0), ip: str = Query('', ma
 def explanation(node: int):
     with database() as db:
         info = node_info(db, node)
+        if final30.active():
+            row = db.execute("SELECT * FROM (SELECT * FROM events WHERE split='test' AND src=? UNION SELECT * FROM events WHERE split='test' AND dst=?) ORDER BY evidence DESC,idx LIMIT 1", (node, node)).fetchone()
+            evidence = event_info(row)
+            return dict(node=info, window_start=evidence['time'], window_seconds=0, contributors=[evidence],
+                        single_event_channel=evidence['evidence'], repeated_event_channel=evidence['evidence'],
+                        reconstructed_score=evidence['evidence'], threshold=final30.dashboard_result()['threshold'],
+                        rule='Maximum raw relation cross-entropy across all test events touching this node',
+                        meaning='Exact peak event supporting the capture-node paper-threshold prediction.',
+                        limitations='This explains the scoring calculation, not feature-level causal attribution.')
         windows = defaultdict(list)
         for row in db.execute("SELECT * FROM events WHERE split='test' AND src=? UNION SELECT * FROM events WHERE split='test' AND dst=? ORDER BY idx", (node, node)):
             heap = windows[math.floor(row['time'] / 900)]
@@ -428,6 +454,18 @@ runtime = V3Runtime()
 @router.post('/replay')
 def replay(request: ReplayRequest):
     try:
+        if final30.active():
+            import time
+            started = time.perf_counter()
+            if request.split != 'test' or request.batches != 1:
+                raise HTTPException(422, 'Final V3 preview supports one test batch; use /inference for model details')
+            out = final30.replay()
+            return dict(events=out['events'], device='CPU', batch_size=1024,
+                        setup_seconds=max(0, time.perf_counter() - started - out['inference_ms'] / 1000),
+                        batch_ms=[out['inference_ms']], max_absolute_error_vs_saved_gpu_scores=None,
+                        scores=[dict(idx=x['index'], relation_ce=x['relation_ce'], pair_anomaly=x['pair_anomaly'],
+                                     combined_loss=x['relation_ce'] + .1*x['pair_anomaly']) for x in out['items'][:20]],
+                        scope=out['scope'])
         return runtime.replay(request)
     except HTTPException:
         raise

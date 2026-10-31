@@ -61,3 +61,10 @@ node_modules/
 *.part
 /web_app/frontend/dist/
 .DS_Store
+
+
+# Ignore final results folders
+/final_v6_results/
+/final_v4_results/
+/temp/
+/docs/

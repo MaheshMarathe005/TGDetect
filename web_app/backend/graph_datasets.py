@@ -17,6 +17,7 @@ import uuid
 
 import numpy as np
 from fastapi import APIRouter, HTTPException, Query, Request
+from web_app.backend import final_v3_30 as final30
 from web_app.backend.cadets import (DATA, RESEARCH, CHECKPOINT_SHA, EVENT_DTYPE, EDGE_DTYPE,
                              RELATIONS, digest, research_imports, result)
 
@@ -57,13 +58,13 @@ def update(path, **values):
 
 
 def builtin():
-    return dict(id='cadets', name='DARPA CADETS E3 · recorded test predictions', status='ready', events=1905942,
+    return dict(id='cadets', name=('DARPA CADETS E3 · Final V3 · 30 epochs' if final30.active() else 'DARPA CADETS E3 · recorded test predictions'), status='ready', events=1905942,
                 nodes=268153, source='Original held-out test', progress=1)
 
 
 @contextmanager
 def connection(dataset):
-    path = DATA / 'investigation.sqlite' if dataset == 'cadets' else folder(dataset) / 'graph.sqlite'
+    path = (final30.INDEX if final30.active() else DATA / 'investigation.sqlite') if dataset == 'cadets' else folder(dataset) / 'graph.sqlite'
     if dataset != 'cadets' and status(folder(dataset))['status'] != 'ready':
         raise HTTPException(409, 'Dataset scoring has not completed')
     db = sqlite3.connect(f'file:{path}?mode=ro', uri=True)
@@ -323,10 +324,20 @@ def node_record(row):
     return n
 
 
+@router.get('/{dataset}/nodes/{node}')
+def entity_detail(dataset: str, node: int):
+    from web_app.backend.entity_details import details
+    with connection(dataset) as db:
+        row = db.execute('SELECT * FROM nodes WHERE id=?', (node,)).fetchone()
+        if row is None:
+            raise HTTPException(404, 'Entity not found in this dataset')
+        return details(db, row, 'test' if dataset == 'cadets' else 'upload')
+
+
 @router.get('/{dataset}/graph')
 def graph(dataset: str, node: int | None = Query(None, ge=0), kind: str = Query('ip', pattern='^(ip|host|process|file|entity)$'),
           value: str = Query('', max_length=1000), prediction: str = Query('all', pattern='^(all|malicious|benign)$'),
-          limit: int = Query(24, ge=8, le=60), hops: int = Query(2, ge=1, le=3)):
+          limit: int = Query(24, ge=8, le=400), hops: int = Query(2, ge=1, le=3)):
     with connection(dataset) as db:
         expr = FIELDS[kind]
         where, args = [], []
@@ -356,15 +367,15 @@ def graph(dataset: str, node: int | None = Query(None, ge=0), kind: str = Query(
                         found = db.execute('SELECT * FROM nodes WHERE id=?',(other,)).fetchone()
                         if found is None: continue
                         nodes[other]=node_record(found); following.append(other)
-                    if len(edges)>=120: truncated=True; continue
+                    if len(edges)>=max(120, limit * 6): truncated=True; continue
                     e=dict(row); e.update(id=f'{dataset}:{e["idx"]}',relation_name=RELATIONS[e['relation']])
                     edges[e['idx']]=e
             frontier=following
         items=list(nodes.values())
     meta = dataset_status(dataset)
     return dict(dataset=meta, nodes=items, events=sorted(edges.values(),key=lambda e:(e['time'],e['idx'])), seeds=[r['id'] for r in roots],
-                threshold=result()['threshold'], truncated=truncated,
+                threshold=(final30.dashboard_result() if final30.active() else result())['threshold'] if dataset == 'cadets' else meta.get('threshold'), truncated=truncated,
                 counts=dict(predicted_malicious=sum(n['alert'] for n in items),predicted_benign=sum(not n['alert'] for n in items)),
                 scope='Connected observed neighborhoods of the selected entities. Class selection filters starting entities; connected context keeps both prediction classes. Display bounds may omit other connections.',
-                ip_scope='Only recorded IP addresses are displayed. Colors are model predictions, not confirmed attacks.')
+                ip_scope='Only recorded IP addresses are displayed. Node colors identify entity types; pink rings show model predictions, not confirmed attacks.')
 

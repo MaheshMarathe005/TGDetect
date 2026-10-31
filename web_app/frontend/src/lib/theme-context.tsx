@@ -19,7 +19,12 @@ function getSnapshot(): Theme {
   if (typeof window !== 'undefined') {
     const urlTheme = new URLSearchParams(window.location.search).get('theme');
     if (urlTheme === 'light' || urlTheme === 'dark') return urlTheme;
-    return (localStorage.getItem('tgdetect-theme') as Theme) || 'dark';
+    try {
+      const saved = localStorage.getItem('tgdetect-theme');
+      return saved === 'light' ? 'light' : 'dark';
+    } catch {
+      return 'dark';
+    }
   }
   return 'dark';
 }
@@ -36,13 +41,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const toggleTheme = useCallback(() => {
     const next = (localTheme ?? externalTheme) === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('tgdetect-theme', next);
+    try { localStorage.setItem('tgdetect-theme', next); } catch { /* In-memory toggle still works when storage is disabled. */ }
     setLocalTheme(next);
   }, [localTheme, externalTheme]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
     document.documentElement.classList.toggle('light', theme === 'light');
+    document.documentElement.style.colorScheme = theme;
   }, [theme]);
 
   return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;

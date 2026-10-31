@@ -15,11 +15,10 @@ from fastapi import HTTPException, Request
 from starlette.concurrency import run_in_threadpool
 
 
-def register(app):
-    from web_app.backend import backend as b
+def register(app, b):
 
     store = b.DATA / 'ui_datasets'
-    store.mkdir(exist_ok=True)
+    store.mkdir(parents=True, exist_ok=True)
     base_id = 'dedale-host-memory'
 
     def model(request):
